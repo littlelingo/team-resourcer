@@ -4,17 +4,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.schemas import OrgTreeNode, SupervisorUpdate, TeamMemberDetailResponse
-from app.services import get_org_tree, set_supervisor
+from app.schemas import SupervisorUpdate, TeamMemberDetailResponse
+from app.schemas.tree import TreeResponse
+from app.services import set_supervisor
+from app.services.tree_service import build_org_tree
 
 router = APIRouter()
 
 
-@router.get("/tree", response_model=list[OrgTreeNode])
+@router.get("/tree", response_model=TreeResponse)
 async def get_org_tree_route(
     db: AsyncSession = Depends(get_db),
-) -> list[OrgTreeNode]:
-    return await get_org_tree(db)
+) -> TreeResponse:
+    return await build_org_tree(db)
 
 
 @router.put("/members/{member_uuid}/supervisor", response_model=TeamMemberDetailResponse)

@@ -1,7 +1,7 @@
 ---
 feature: 001-team-resourcer-app
 phase: 3 - Interactive Tree Views
-status: DRAFT
+status: COMPLETE
 created: 2026-03-22
 testing: implement-then-test
 complexity: HIGH
@@ -177,12 +177,12 @@ frontend/src/
 
 ## Implementation Steps
 
-### Step 1 — Install frontend dependencies
+### [x] Step 1 — Install frontend dependencies
 - File: `frontend/package.json`
 - Run inside `frontend/`: `npm install @xyflow/react @dagrejs/dagre @types/dagre`
 - Verify: `node_modules/@xyflow/react` exists, TypeScript compiles without errors on `npx tsc --noEmit`
 
-### Step 2 — Backend: Pydantic schemas for tree responses
+### [x] Step 2 — Backend: Pydantic schemas for tree responses
 - File: `backend/app/schemas/tree.py`
 - Define `TreeNodeData` as a flexible dict (`dict[str, Any]`) to accommodate different node types
 - Define `TreeNode(id: str, type: str, data: TreeNodeData, position: dict)`
@@ -190,7 +190,7 @@ frontend/src/
 - Define `TreeResponse(nodes: list[TreeNode], edges: list[TreeEdge])`
 - Verify: `python -c "from app.schemas.tree import TreeResponse"` succeeds
 
-### Step 3 — Backend: Tree service layer
+### [x] Step 3 — Backend: Tree service layer
 - File: `backend/app/services/tree_service.py`
 - Implement `build_org_tree(db: Session) -> TreeResponse`:
   - Query all `TeamMember` rows
@@ -213,7 +213,7 @@ frontend/src/
   - Return `TreeResponse`
 - Verify: unit test each function with a seeded in-memory SQLite session or via pytest fixtures; confirm node count and edge count match expected values for a known data set
 
-### Step 4 — Backend: Tree router
+### [x] Step 4 — Backend: Tree router
 - File: `backend/app/routers/trees.py`
 - Create `APIRouter(prefix="/org", tags=["trees"])` — note: org tree lives under `/api/org/tree` so prefix is `/org`
 - `GET /tree` → calls `build_org_tree`, returns `TreeResponse`
@@ -228,7 +228,7 @@ frontend/src/
   - `GET /api/areas/1/tree` returns 200
   - Test with `curl` or the FastAPI `/docs` Swagger UI
 
-### Step 5 — Frontend: TanStack Query hooks for tree data
+### [x] Step 5 — Frontend: TanStack Query hooks for tree data
 - File: `frontend/src/api/trees.ts`
 - Implement `useOrgTree()`: `useQuery({ queryKey: ['org-tree'], queryFn: () => fetch('/api/org/tree').then(r => r.json()) })`
 - Implement `useProgramTree(id: number)`: same pattern, `queryKey: ['program-tree', id]`, url `/api/programs/${id}/tree`, enabled only when `id` is defined
@@ -236,7 +236,7 @@ frontend/src/
 - Types: define `TreeNode`, `TreeEdge`, `TreeData` TypeScript interfaces matching the backend schema — place in `frontend/src/types/trees.ts`
 - Verify: TypeScript compiles. In a browser console after Phase 2 shell is running, `fetch('/api/org/tree')` returns the expected shape
 
-### Step 6 — Frontend: dagre layout hook
+### [x] Step 6 — Frontend: dagre layout hook
 - File: `frontend/src/components/trees/useTreeLayout.ts`
 - Accept `(nodes: TreeNode[], edges: TreeEdge[], direction: 'TB' | 'LR' = 'TB')` as parameters
 - Use `dagre.graphlib.Graph`, set `rankdir` to direction, `ranksep: 80`, `nodesep: 60`
@@ -246,7 +246,7 @@ frontend/src/
 - This hook must be called after `nodes` and `edges` are loaded; it is a pure transformation (not a React hook that fires effects) — implement as a plain function exported alongside the hook for testability
 - Verify: given a known 3-node linear chain `[A→B→C]`, the returned positions have strictly increasing Y values (for TB direction)
 
-### Step 7 — Frontend: custom node components
+### [x] Step 7 — Frontend: custom node components
 - Files: `frontend/src/components/trees/nodes/*.tsx`
 
 **MemberNode.tsx**
@@ -276,7 +276,7 @@ frontend/src/
 
 **Verification:** Import each node in a Storybook story or in a temporary test page and confirm they render without TypeScript errors.
 
-### Step 8 — Frontend: shared TreeCanvas component
+### [x] Step 8 — Frontend: shared TreeCanvas component
 - File: `frontend/src/components/trees/TreeCanvas.tsx`
 - Accept props:
   - `nodes: Node[]` (ReactFlow's own Node type)
@@ -307,7 +307,7 @@ frontend/src/
 - The canvas must be inside a container with explicit height (e.g. `h-[calc(100vh-4rem)]`) — ReactFlow requires a non-zero height on its parent; this is a common first-run mistake
 - Verify: renders with `nodes=[]` and `edges=[]` without errors; zoom and pan respond to mouse input; minimap appears in corner
 
-### Step 9 — Frontend: drag-drop reassignment hook
+### [x] Step 9 — Frontend: drag-drop reassignment hook
 - File: `frontend/src/components/trees/useDragReassign.ts`
 - Accepts: `(treeType: 'org' | 'program' | 'area', onSuccess: () => void)`
 - Returns: `{ pendingReassign, confirmReassign, cancelReassign, handleNodeDragStop }`
@@ -330,7 +330,7 @@ frontend/src/
 - `cancelReassign()`: clears `pendingReassign`, snaps node back to original position
 - Verify: mock the PATCH endpoint and confirm that a drag followed by confirm fires the right API call; a drag followed by cancel does not
 
-### Step 10 — Frontend: search/filter hook
+### [x] Step 10 — Frontend: search/filter hook
 - File: `frontend/src/components/trees/useTreeSearch.ts`
 - Accepts: `(nodes: Node[], searchQuery: string)`
 - Returns: `{ filteredNodes }` — same nodes array but with `style` modified:
@@ -340,7 +340,7 @@ frontend/src/
 - The hook does NOT filter edges — edges should stay visible to preserve structure
 - Verify: given 5 nodes where 2 match, `filteredNodes` has length 5 but 3 have `opacity: 0.2`
 
-### Step 11 — Frontend: confirmation dialog and search bar panel components
+### [x] Step 11 — Frontend: confirmation dialog and search bar panel components
 - File: `frontend/src/components/trees/panels/ReassignConfirmDialog.tsx`
 - Use shadcn/ui `<Dialog>` component (already available from Phase 2)
 - Props: `{ open, draggedNode, targetNode, onConfirm, onCancel }`
@@ -357,7 +357,7 @@ frontend/src/
 - Render the same detail fields used in the Phase 2 card view detail expansion
 - Verify: dialog renders with correct names; sheet opens and closes; search input is controlled
 
-### Step 12 — Frontend: OrgTreePage
+### [x] Step 12 — Frontend: OrgTreePage
 - File: `frontend/src/pages/trees/OrgTreePage.tsx`
 - Fetch data with `useOrgTree()`
 - Run `useTreeLayout(rawNodes, rawEdges, 'TB')` to get positioned nodes
@@ -370,7 +370,7 @@ frontend/src/
 - Page title: "Organization Chart"
 - Verify: page loads, shows all members positioned in a hierarchy, minimap visible, search dims non-matching nodes
 
-### Step 13 — Frontend: ProgramTreePage
+### [x] Step 13 — Frontend: ProgramTreePage
 - File: `frontend/src/pages/trees/ProgramTreePage.tsx`
 - Read `id` param from URL with `useParams()`
 - Additionally render a `<Select>` (shadcn/ui) at top of page to switch between programs, populated by `usePrograms()` (existing Phase 2 query hook)
@@ -381,7 +381,7 @@ frontend/src/
 - Reassign verb: "assign to program"
 - Verify: page loads for a valid program id; switching program via select updates the tree
 
-### Step 14 — Frontend: AreaTreePage
+### [x] Step 14 — Frontend: AreaTreePage
 - File: `frontend/src/pages/trees/AreaTreePage.tsx`
 - Same pattern as ProgramTreePage — `<Select>` at top to switch areas, populated by `useAreas()`
 - `nodeTypes = { area: AreaNode, team: TeamNode, member: MemberNode }`
@@ -389,7 +389,7 @@ frontend/src/
 - Reassign verb: "move to team"
 - Verify: area with teams and members renders a 3-level hierarchy; unassigned members connect directly to the area node
 
-### Step 15 — Frontend: routing and navigation wiring
+### [x] Step 15 — Frontend: routing and navigation wiring
 - File: `frontend/src/App.tsx` (or wherever the router is defined in Phase 2)
 - Add routes:
   - `/tree/org` → `<OrgTreePage />`

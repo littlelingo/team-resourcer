@@ -34,6 +34,7 @@ from app.services.team_service import (
     remove_member_from_team,
     update_team,
 )
+from app.services.tree_service import build_area_tree, build_org_tree, build_program_tree
 
 __all__ = [
     # area
@@ -56,6 +57,10 @@ __all__ = [
     # org
     "get_org_tree",
     "set_supervisor",
+    # tree
+    "build_org_tree",
+    "build_program_tree",
+    "build_area_tree",
     # program
     "list_programs",
     "get_program",

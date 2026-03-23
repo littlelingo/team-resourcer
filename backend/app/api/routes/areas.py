@@ -9,6 +9,7 @@ from app.schemas import (
     FunctionalAreaResponse,
     FunctionalAreaUpdate,
 )
+from app.schemas.tree import TreeResponse
 from app.services import (
     create_area,
     delete_area,
@@ -16,6 +17,7 @@ from app.services import (
     list_areas,
     update_area,
 )
+from app.services.tree_service import build_area_tree
 
 router = APIRouter()
 
@@ -28,6 +30,17 @@ async def list_areas_route(
     db: AsyncSession = Depends(get_db),
 ) -> list[FunctionalAreaListResponse]:
     return await list_areas(db)
+
+
+@router.get("/{area_id}/tree", response_model=TreeResponse)
+async def get_area_tree_route(
+    area_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> TreeResponse:
+    tree = await build_area_tree(db, area_id)
+    if tree is None:
+        raise HTTPException(status_code=404, detail="Area not found")
+    return tree
 
 
 @router.get("/{area_id}", response_model=FunctionalAreaResponse)

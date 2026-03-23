@@ -12,6 +12,7 @@ from app.schemas import (
     ProgramUpdate,
     TeamMemberListResponse,
 )
+from app.schemas.tree import TreeResponse
 from app.services import (
     assign_member,
     create_program,
@@ -22,6 +23,7 @@ from app.services import (
     unassign_member,
     update_program,
 )
+from app.services.tree_service import build_program_tree
 
 router = APIRouter()
 
@@ -73,6 +75,17 @@ async def delete_program_route(
     if not found:
         raise HTTPException(status_code=404, detail="Program not found")
     return Response(status_code=204)
+
+
+@router.get("/{program_id}/tree", response_model=TreeResponse)
+async def get_program_tree_route(
+    program_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> TreeResponse:
+    tree = await build_program_tree(db, program_id)
+    if tree is None:
+        raise HTTPException(status_code=404, detail="Program not found")
+    return tree
 
 
 @router.get("/{program_id}/members", response_model=list[TeamMemberListResponse])

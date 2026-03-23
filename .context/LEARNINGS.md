@@ -20,3 +20,26 @@
 - Org tree: load all members flat, build tree in Python (not recursive SQL)
 - Image naming: UUID-based to prevent path traversal
 - Sub-routers: teams nested under areas, history nested under members
+
+## Phase 2 — Card View + Table View (2026-03-23)
+
+### What went well
+- Parallel agent execution: foundation (steps 1-5) + UI shell (steps 6-7) ran concurrently
+- shadcn CLI worked in interactive terminal for component generation
+- TanStack Query v5 object syntax + cache invalidation pattern clean
+- Custom Tailwind sidebar simpler and more reliable than shadcn Sidebar component
+
+### Issues caught in review
+- PATCH→PUT mismatch: all 4 update mutations used wrong HTTP method (405 errors)
+- Program assignments silently discarded: form collected data it couldn't submit
+- Edit from table passed incomplete TeamMemberList, would overwrite salary/phone with blanks
+- ImageUpload had no client-side file type/size validation + object URL memory leak
+- getInitials duplicated 3x, actions dropdown duplicated 4x → extracted to shared
+- Two MemberFormDialog instances mounted simultaneously → consolidated to one
+- Stale team_id when area changes in form → added useEffect watcher
+
+### Architecture decisions
+- Teams endpoint is nested (/api/areas/{id}/teams/) — useAllTeams fans out queries per area
+- Backend returns salary/bonus/pto as string decimals — frontend parses with parseFloat
+- Program assignments managed via separate endpoints, not in member form
+- Detail sheet uses @radix-ui/react-dialog with Tailwind slide animation (not Sheet)

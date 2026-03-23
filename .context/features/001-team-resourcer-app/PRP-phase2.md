@@ -1,7 +1,7 @@
 ---
 feature: 001-team-resourcer-app
 phase: 2 - Card View + Table View
-status: DRAFT
+status: COMPLETE
 testing: implement-then-test
 complexity: HIGH
 depends_on: PRP-phase1
@@ -21,7 +21,7 @@ Phase 1 must be complete and the backend must be running (`docker compose up`). 
 
 ## Steps
 
-### Step 1 — Scaffold frontend (skip if already done in Phase 1)
+### [x] Step 1 — Scaffold frontend (skip if already done in Phase 1)
 
 **Directory**: `frontend/`
 
@@ -78,7 +78,7 @@ npx tailwindcss init -p
 
 ---
 
-### Step 2 — Install all npm dependencies
+### [x] Step 2 — Install all npm dependencies
 
 **Directory**: `frontend/`
 
@@ -142,7 +142,7 @@ export function cn(...inputs: ClassValue[]) {
 
 ---
 
-### Step 3 — Configure environment and API base URL
+### [x] Step 3 — Configure environment and API base URL
 
 **File to create**: `frontend/.env.development`
 
@@ -164,7 +164,7 @@ This module exports a typed `apiFetch` wrapper. It reads `import.meta.env.VITE_A
 
 ---
 
-### Step 4 — Define TypeScript types mirroring Phase 1 Pydantic schemas
+### [x] Step 4 — Define TypeScript types mirroring Phase 1 Pydantic schemas
 
 **File to create**: `frontend/src/types/index.ts`
 
@@ -249,7 +249,7 @@ export type TeamFormInput = Omit<Team, 'id' | 'functional_area' | 'lead' | 'memb
 
 ---
 
-### Step 5 — Build the API query hooks with TanStack Query
+### [x] Step 5 — Build the API query hooks with TanStack Query
 
 **File to create**: `frontend/src/lib/query-client.ts`
 
@@ -286,7 +286,7 @@ Export the following hooks using `@tanstack/react-query` `useQuery` and `useMuta
 
 ---
 
-### Step 6 — Build the app shell: routing, layout, sidebar
+### [x] Step 6 — Build the app shell: routing, layout, sidebar
 
 **File to modify**: `frontend/src/main.tsx`
 
@@ -327,7 +327,7 @@ Reusable header component. Props: `title: string`, `description?: string`, `acti
 
 ---
 
-### Step 7 — Build shared reusable components
+### [x] Step 7 — Build shared reusable components
 
 #### 7a. Confirmation dialog
 
@@ -389,7 +389,7 @@ Uses `useReactTable` with `getCoreRowModel`, `getSortedRowModel`, `getFilteredRo
 
 ---
 
-### Step 8 — Build the Members page (card view + table view)
+### [x] Step 8 — Build the Members page (card view + table view)
 
 #### 8a. Member card component
 
@@ -502,7 +502,7 @@ Export a `memberColumns` array of `ColumnDef<TeamMember>` for use in the table v
 
 ---
 
-### Step 9 — Build the Programs page
+### [x] Step 9 — Build the Programs page
 
 **File to create**: `frontend/src/pages/ProgramsPage.tsx`
 
@@ -531,7 +531,7 @@ Columns: Name (sortable, clicking opens the members sheet), Description, Member 
 
 ---
 
-### Step 10 — Build the Functional Areas page
+### [x] Step 10 — Build the Functional Areas page
 
 **File to create**: `frontend/src/pages/FunctionalAreasPage.tsx`
 
@@ -557,7 +557,7 @@ Columns: Name (sortable), Description, Team Count (badge, computed from backend 
 
 ---
 
-### Step 11 — Build the Teams page
+### [x] Step 11 — Build the Teams page
 
 **File to create**: `frontend/src/pages/TeamsPage.tsx`
 

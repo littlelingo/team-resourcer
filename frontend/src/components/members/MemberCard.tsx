@@ -1,0 +1,121 @@
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import * as Avatar from '@radix-ui/react-avatar'
+import { MoreVertical, MapPin } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { getImageUrl } from '@/lib/api-client'
+import { getInitials } from '@/lib/member-utils'
+import type { TeamMemberList } from '@/types'
+
+interface MemberCardProps {
+  member: TeamMemberList & {
+    functional_area?: { id: number; name: string; description: string | null }
+    program_assignments?: { program?: { id: number; name: string }; role: string | null }[]
+  }
+  onEdit: (member: MemberCardProps['member']) => void
+  onDelete: (member: MemberCardProps['member']) => void
+  onClick: (member: MemberCardProps['member']) => void
+}
+
+export default function MemberCard({ member, onEdit, onDelete, onClick }: MemberCardProps) {
+  const imageUrl = getImageUrl(member.image_path)
+  const initials = getInitials(member.name)
+
+  return (
+    <div
+      className={cn(
+        'relative rounded-lg border border-slate-200 bg-white p-4 shadow-sm',
+        'cursor-pointer transition-shadow hover:shadow-md',
+      )}
+      onClick={() => onClick(member)}
+    >
+      {/* Kebab menu — stop propagation so card click doesn't fire */}
+      <div
+        className="absolute right-3 top-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              aria-label="Member actions"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </button>
+          </DropdownMenu.Trigger>
+
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content
+              align="end"
+              sideOffset={4}
+              className={cn(
+                'z-50 min-w-[120px] rounded-md border border-slate-200 bg-white p-1 shadow-md',
+                'data-[state=open]:animate-in data-[state=closed]:animate-out',
+                'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+                'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+              )}
+            >
+              <DropdownMenu.Item
+                onSelect={() => onEdit(member)}
+                className="flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm text-slate-700 outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100"
+              >
+                Edit
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => onDelete(member)}
+                className="flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm text-red-600 outline-none transition-colors hover:bg-red-50 focus:bg-red-50"
+              >
+                Delete
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
+      </div>
+
+      {/* Avatar + name + title */}
+      <div className="flex flex-col items-center text-center">
+        <Avatar.Root className="mb-3 h-16 w-16 overflow-hidden rounded-full bg-slate-200 flex-shrink-0">
+          <Avatar.Image
+            src={imageUrl}
+            alt={member.name}
+            className="h-full w-full object-cover"
+          />
+          <Avatar.Fallback className="flex h-full w-full items-center justify-center text-base font-semibold text-slate-600">
+            {initials}
+          </Avatar.Fallback>
+        </Avatar.Root>
+
+        <h3 className="pr-6 text-sm font-semibold text-slate-900 leading-tight line-clamp-1">
+          {member.name}
+        </h3>
+        {member.title && (
+          <p className="mt-0.5 text-xs text-slate-500 line-clamp-1">{member.title}</p>
+        )}
+      </div>
+
+      {/* Badges */}
+      <div className="mt-3 flex flex-wrap justify-center gap-1">
+        {member.functional_area && (
+          <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+            {member.functional_area.name}
+          </span>
+        )}
+        {member.program_assignments?.map((pa, i) => (
+          <span
+            key={i}
+            className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600"
+          >
+            {pa.program?.name ?? `Program ${i + 1}`}
+          </span>
+        ))}
+      </div>
+
+      {/* Location */}
+      {member.location && (
+        <div className="mt-3 flex items-center justify-center gap-1 text-xs text-slate-400">
+          <MapPin className="h-3 w-3 flex-shrink-0" />
+          <span className="truncate">{member.location}</span>
+        </div>
+      )}
+    </div>
+  )
+}

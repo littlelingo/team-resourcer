@@ -3,6 +3,7 @@
 ## Project
 - [project_phase1_scaffold.md](project_phase1_scaffold.md) — Phase 1: all 9 steps complete (FastAPI + PostgreSQL backend)
 - [project_phase2_progress.md](project_phase2_progress.md) — Phase 2 Steps 1-11 complete as of 2026-03-23; Step 12+ remaining
+- [project_phase3_progress.md](project_phase3_progress.md) — Phase 3 Steps 1-8 complete as of 2026-03-23 (backend + frontend foundation); Steps 9+ remaining
 
 ## Feedback
 - [feedback_protected_env_files.md](feedback_protected_env_files.md) — .env and .env.example are protected by a hook; use bash cat/heredoc to write them

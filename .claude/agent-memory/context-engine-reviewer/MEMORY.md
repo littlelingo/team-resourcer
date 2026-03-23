@@ -11,6 +11,10 @@
 - [project_phase2_frontend.md](project_phase2_frontend.md) — Phase 2 frontend tech stack, architecture decisions, and key fragile areas
 - [project_security_review_phase2.md](project_security_review_phase2.md) — Phase 2 security review: ImageUpload constraints, compensation data exposure, URL param injection, error leakage
 
+## Phase 3 Trees
+- [project_phase3_tree_findings.md](project_phase3_tree_findings.md) — Phase 3 tree views review: PATCH/PUT mismatch, image field name bug, PII in org tree payload, drag-reassign gaps
+- [project_phase3_findings.md](project_phase3_findings.md) — Phase 3 reviewer findings: 5 criticals (PATCH/405, wrong endpoint, image field, program dup assignment, CORS), 6 warnings
+
 ## Known Issues / Fragile Areas (Phase 2)
 - [feedback_http_method_mismatch.md](feedback_http_method_mismatch.md) — Backend uses PUT, frontend uses PATCH for update mutations
 - [feedback_program_assignments_not_submitted.md](feedback_program_assignments_not_submitted.md) — Program assignments in MemberFormDialog collected but never sent to API

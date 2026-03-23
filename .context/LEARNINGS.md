@@ -43,3 +43,27 @@
 - Backend returns salary/bonus/pto as string decimals — frontend parses with parseFloat
 - Program assignments managed via separate endpoints, not in member form
 - Detail sheet uses @radix-ui/react-dialog with Tailwind slide animation (not Sheet)
+
+## Phase 3 — Interactive Tree Views (2026-03-23)
+
+### What went well
+- @xyflow/react v12 + dagre layout worked smoothly for all three tree types
+- Flat node/edge format from backend (positions at 0,0, layout client-side) was a clean separation
+- Parallel tracks: backend endpoints + frontend foundation ran concurrently
+- Custom node components with Tailwind styling matched Phase 2 card aesthetics
+
+### Issues caught in review
+- PATCH→PUT mismatch AGAIN (3rd phase in a row) — this is the #1 recurring anti-pattern
+- Org drag-reassign bypassed dedicated supervisor endpoint (skipped circular ref validation)
+- Program reassign created duplicates (missing DELETE of old assignment before POST new)
+- image vs image_path field name mismatch between backend tree_service and frontend MemberNode
+- Org tree node data included PII (email, employee_id) not needed by the renderer
+- Dagre silently creates phantom nodes for orphaned edges — needed guard on setEdge
+- Dragged nodes not restored to position when no drop target found
+
+### Architecture decisions
+- Tree endpoints return flat node/edge lists, not nested JSON — simpler client-side processing
+- Dagre layout runs client-side (useTreeLayout hook) — keeps API decoupled from layout
+- Drag-drop uses proximity detection (60px threshold) since ReactFlow lacks native parent-assignment
+- Program reassign requires DELETE old + POST new (not a single PATCH)
+- Node data should contain only rendering fields — relational IDs go in edges

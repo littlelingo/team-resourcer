@@ -42,3 +42,18 @@
 ## Sub-router without parent ownership validation
 **Don't**: Allow `/areas/999/teams/42` to return team 42 even if it belongs to area 1.
 **Do**: Validate `team.functional_area_id == area_id` on all sub-router operations.
+
+## Tree node data exposing unnecessary fields
+**Don't**: Include relational IDs (supervisor_id, team_id) or PII (email) in tree node data payloads.
+**Do**: Include only fields the node component renders. Encode relationships in edges.
+**Why**: Widens PII blast radius; relational data already lives in edges.
+
+## Bypassing dedicated endpoints for convenience
+**Don't**: Use generic `PUT /members/{uuid}` when a dedicated endpoint exists (e.g., `PUT /org/members/{uuid}/supervisor`).
+**Do**: Use the dedicated endpoint — it has domain-specific validation (circular ref checks, etc.).
+**Why**: Generic endpoints skip domain validation, allowing invalid state.
+
+## Multi-step mutations without cleanup
+**Don't**: POST a new assignment without DELETEing the old one (e.g., program reassignment).
+**Do**: DELETE the old relationship first, then POST the new one. Handle partial failure.
+**Why**: Creates duplicate assignments; repeated drags accumulate unboundedly.

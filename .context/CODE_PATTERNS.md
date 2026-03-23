@@ -1,3 +1,33 @@
 # Code Patterns
 
-_No patterns detected yet. Will be populated as code is added._
+## Backend Service Layer
+- Each service receives `AsyncSession` as first arg, returns model instances or None
+- Services do NOT import from `api/routes/` (one-way dependency: routes → services → models)
+- Use `selectinload` for eager loading relationships in async context
+- Use `exclude_unset=True` (not `exclude_none`) in `model_dump()` for update operations — allows explicit null clearing
+- Financial fields (salary, bonus, pto_used) auto-capture history on change via `_FINANCIAL_FIELDS` constant
+
+## Backend API Routes
+- Routes delegate entirely to service layer — no DB queries in handlers
+- Use `Depends(get_db)` for session injection
+- 404 via `HTTPException(status_code=404)` when entity not found
+- 204 for deletes, 201 for creates
+- `ValueError` from services → `HTTPException(400)` or `HTTPException(404)` depending on context
+- Sub-routers (teams under areas, history under members) validate parent entity ownership
+
+## Pydantic Schemas
+- Use `ConfigDict(from_attributes=True)` on response schemas
+- Separate Create/Update/ListResponse/DetailResponse per entity
+- `Update` schemas use all Optional fields, no immutable fields (e.g., no employee_id)
+- Validators: `@field_validator` for email regex, employee_id strip/non-empty
+
+## SQLAlchemy Models
+- SQLAlchemy 2.0 mapped class syntax (`Mapped`, `mapped_column`)
+- String FK references to avoid circular imports
+- `use_alter=True` on circular FKs (Team.lead_id → TeamMember)
+- Timestamps: `server_default=func.now()` + `onupdate=func.now()`
+
+## Image Upload
+- Validate via Pillow magic bytes, not just Content-Type header
+- UUID-based filenames: `{member_uuid}.{ext}` — no path traversal risk
+- 5 MB size limit enforced during chunked read

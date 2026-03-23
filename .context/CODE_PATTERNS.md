@@ -27,6 +27,22 @@
 - `use_alter=True` on circular FKs (Team.lead_id → TeamMember)
 - Timestamps: `server_default=func.now()` + `onupdate=func.now()`
 
+## Frontend Hooks (TanStack Query v5)
+- Object syntax: `useQuery({ queryKey, queryFn })`, `useMutation({ mutationFn })`
+- Mutations invalidate relevant query keys on success
+- Backend uses PUT for updates, not PATCH — all update mutations must use `method: "PUT"`
+- Hooks that require a parent ID (e.g., useTeams needs areaId) return empty when ID is absent
+- Use `enabled: Boolean(id)` to prevent queries with empty/null IDs
+
+## Frontend Components
+- Extract shared utilities (getInitials → `lib/member-utils.ts`, RowActionsMenu → `shared/`)
+- Single dialog instance pattern: one form dialog toggled between add/edit mode via `member` prop
+- Edit from table must fetch full detail (TeamMemberList is incomplete) before opening form
+- ImageUpload: validate MIME type + file size client-side, revoke object URLs on cleanup
+- Use `getImageUrl()` for ALL image_path references — never use raw path as src
+- URL search params: runtime guard values (e.g., `rawView === 'table' ? 'table' : 'card'`)
+- Form watchers: clear dependent fields when parent changes (team_id when area changes)
+
 ## Image Upload
 - Validate via Pillow magic bytes, not just Content-Type header
 - UUID-based filenames: `{member_uuid}.{ext}` — no path traversal risk

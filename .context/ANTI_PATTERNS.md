@@ -19,6 +19,26 @@
 **Don't**: Add explicit `session.close()` in `finally` when using `async with` context manager.
 **Do**: Let the `async with` handle cleanup automatically.
 
+## PATCH vs PUT mismatch between frontend and backend
+**Don't**: Use `method: "PATCH"` in frontend when backend routes are `@router.put()`.
+**Do**: Match HTTP methods exactly — check backend route decorators.
+**Why**: FastAPI returns 405 Method Not Allowed, silently breaking all edit operations.
+
+## Form collecting data it can't submit
+**Don't**: Show form fields for data managed by separate API endpoints (e.g., program assignments in the member form).
+**Do**: Only include fields the form's submit handler actually sends. Use separate UI for separately-managed relationships.
+**Why**: Users fill in data that gets silently discarded on submit — a data-loss UX bug.
+
+## Passing list-projection type where detail type is needed
+**Don't**: Cast `TeamMemberList` to `TeamMember` for edit forms (`as unknown as TeamMember`).
+**Do**: Fetch the full detail record before opening the edit form.
+**Why**: List projections lack fields like salary/phone — the form shows blanks and can overwrite real data with empty values.
+
+## Mounting multiple dialog instances for add/edit
+**Don't**: Render separate Dialog instances for add and edit modes of the same form.
+**Do**: Use one instance, toggling mode via the `member` prop (undefined = add, defined = edit).
+**Why**: Multiple Dialog roots cause focus-trap conflicts and double-mount internal queries.
+
 ## Sub-router without parent ownership validation
 **Don't**: Allow `/areas/999/teams/42` to return team 42 even if it belongs to area 1.
 **Do**: Validate `team.functional_area_id == area_id` on all sub-router operations.

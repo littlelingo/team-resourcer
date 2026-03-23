@@ -1,7 +1,7 @@
 ---
 feature: 001-team-resourcer-app
 phase: 1 - Project Scaffold + Data Model + API
-status: DRAFT
+status: COMPLETE
 testing: implement-then-test
 complexity: HIGH
 ---
@@ -18,7 +18,7 @@ No frontend application code is created in this phase — only the React/Vite co
 
 ## Steps
 
-### Step 1: Repository Root Scaffold
+### Step 1: Repository Root Scaffold [x]
 
 Create top-level configuration files that govern the entire project.
 
@@ -76,7 +76,7 @@ Targets:
 
 ---
 
-### Step 2: Backend Scaffold
+### Step 2: Backend Scaffold [x]
 
 **2.1 — Directory structure**
 
@@ -235,7 +235,7 @@ Instantiate as `settings = Settings()` at module level.
 
 ---
 
-### Step 3: Database Models
+### Step 3: Database Models [x]
 
 All models live in `backend/app/models/`. All use SQLAlchemy 2.0 mapped class syntax (`DeclarativeBase`, `Mapped`, `mapped_column`).
 
@@ -356,7 +356,7 @@ from app.models.program_assignment import ProgramAssignment
 
 ---
 
-### Step 4: Alembic Configuration & Initial Migration
+### Step 4: Alembic Configuration & Initial Migration [x]
 
 **4.1 — `backend/alembic.ini`**
 
@@ -481,7 +481,7 @@ All schemas live in `backend/app/schemas/`. Use Pydantic v2 throughout (`model_c
 
 ---
 
-### Step 6: Service Layer
+### Step 6: Service Layer [x]
 
 All services live in `backend/app/services/`. Each service receives an `AsyncSession` as its first argument. No service imports from `api/routes/` (one-way dependency).
 
@@ -557,7 +557,7 @@ All services live in `backend/app/services/`. Each service receives an `AsyncSes
 
 ---
 
-### Step 7: API Routes
+### Step 7: API Routes [x]
 
 All routers live in `backend/app/api/routes/`. Use `APIRouter`. Each route delegates entirely to the service layer — no DB queries in route handlers.
 
@@ -848,14 +848,14 @@ Each step has a pass/fail acceptance test. Implementation is complete when ALL p
 - [ ] POST a FunctionalArea, then POST a TeamMember with salary set, then `GET /api/members/{uuid}` returns member with `history` containing one entry
 
 ### Step 8 (Frontend)
-- [ ] `docker compose logs frontend` shows Vite dev server started on port 5173
-- [ ] No TypeScript errors: `docker compose exec frontend npx tsc --noEmit`
+- [x] `docker compose logs frontend` shows Vite dev server started on port 5173
+- [x] No TypeScript errors: `docker compose exec frontend npx tsc --noEmit`
 
 ### Step 9 (Seed)
-- [ ] `make seed` exits 0 without errors
-- [ ] Re-running `make seed` a second time exits 0 (idempotent)
-- [ ] After seed: `curl http://localhost:8000/api/members/ | python3 -m json.tool` shows 3 members
-- [ ] After seed: `curl http://localhost:8000/api/org/tree | python3 -m json.tool` shows non-empty tree
+- [x] `make seed` exits 0 without errors
+- [x] Re-running `make seed` a second time exits 0 (idempotent)
+- [x] After seed: `curl http://localhost:8000/api/members/ | python3 -m json.tool` shows 3 members
+- [x] After seed: `curl http://localhost:8000/api/org/tree | python3 -m json.tool` shows non-empty tree
 
 ---
 

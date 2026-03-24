@@ -1,14 +1,14 @@
 ---
 feature: 002-test-coverage
 phase: frontend
-status: DRAFT
+status: COMPLETE
 testing: test-first
 complexity: HIGH
 ---
 
 # PRP: Frontend Test Coverage
 
-## Status: DRAFT
+## Status: COMPLETE
 ## Created: 2026-03-23
 ## Complexity: HIGH
 ## Testing Strategy: test-first — write test files as primary deliverable; no application code changes
@@ -573,4 +573,14 @@ interface MapColumnsStepProps {
 
 ## 7. Metrics
 
-<!-- Auto-populated by /validate after completion -->
+- **Plan date**: 2026-03-23
+- **Validate date**: 2026-03-24
+- **Elapsed**: 1 day
+- **Steps**: 7 (all complete)
+- **Strategy**: test-first (test files are the deliverable)
+- **Test files**: 15 (18 created, 15 test suites)
+- **Tests**: 111 passed, 0 failed
+- **Coverage**: 100% lines, 100% functions on src/lib/ + src/hooks/
+- **Errors during implementation**: 2 (MapColumnsStep duplicate text, coverage threshold gap — both fixed same session)
+- **Knowledge entries added**: 4 (MSW v2 setup, TanStack Query testing, duplicate text matching, coverage scope)
+- **Execution mode**: Agent team (4 parallel implementers + 1 coordinator)

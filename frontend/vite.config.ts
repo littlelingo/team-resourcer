@@ -10,4 +10,21 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    env: {
+      VITE_API_BASE_URL: 'http://localhost:8000',
+    },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
+      include: ['src/lib/**', 'src/hooks/**'],
+      thresholds: {
+        lines: 70,
+        functions: 70,
+      },
+    },
+  },
 })

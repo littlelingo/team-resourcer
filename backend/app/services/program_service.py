@@ -100,8 +100,16 @@ async def assign_member(
         )
         db.add(assignment)
     await db.commit()
-    await db.refresh(assignment)
-    return assignment
+    # Re-query with eager loading to avoid lazy-load in async response serialization
+    result = await db.execute(
+        select(ProgramAssignment)
+        .where(
+            ProgramAssignment.program_id == program_id,
+            ProgramAssignment.member_uuid == data.member_uuid,
+        )
+        .options(selectinload(ProgramAssignment.program))
+    )
+    return result.scalar_one()
 
 
 async def unassign_member(db: AsyncSession, program_id: int, member_uuid: uuid.UUID) -> bool:

@@ -1,7 +1,7 @@
 ---
 feature: 002-test-coverage
 phase: backend
-status: DRAFT
+status: COMPLETE
 testing: test-first (we ARE writing tests)
 complexity: HIGH
 ---

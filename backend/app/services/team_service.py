@@ -32,8 +32,7 @@ async def create_team(db: AsyncSession, data: TeamCreate) -> Team:
     team = Team(**data.model_dump())
     db.add(team)
     await db.commit()
-    await db.refresh(team)
-    return team
+    return await get_team(db, team.id)
 
 
 async def update_team(db: AsyncSession, team_id: int, data: TeamUpdate) -> Team | None:
@@ -44,8 +43,7 @@ async def update_team(db: AsyncSession, team_id: int, data: TeamUpdate) -> Team 
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(team, field, value)
     await db.commit()
-    await db.refresh(team)
-    return team
+    return await get_team(db, team_id)
 
 
 async def delete_team(db: AsyncSession, team_id: int) -> bool:

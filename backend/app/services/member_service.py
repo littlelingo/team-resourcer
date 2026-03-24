@@ -77,8 +77,7 @@ async def create_member(db: AsyncSession, data: TeamMemberCreate) -> TeamMember:
             await create_history_entry(db, member.uuid, field, value, today)
 
     await db.commit()
-    await db.refresh(member)
-    return member
+    return await get_member(db, member.uuid)
 
 
 async def update_member(
@@ -105,8 +104,7 @@ async def update_member(
         setattr(member, field, value)
 
     await db.commit()
-    await db.refresh(member)
-    return member
+    return await get_member(db, member_uuid)
 
 
 async def delete_member(db: AsyncSession, member_uuid: uuid.UUID) -> bool:

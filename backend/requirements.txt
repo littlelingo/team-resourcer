@@ -9,6 +9,11 @@ pydantic-settings==2.6.1
 python-multipart==0.0.20
 aiofiles==24.1.0
 pillow==11.2.1
+pandas>=2.2
+openpyxl>=3.1
+google-api-python-client>=2.120
+google-auth>=2.29
+google-auth-httplib2>=0.2
 ruff==0.8.6
 mypy==1.13.0
 pytest==8.3.4

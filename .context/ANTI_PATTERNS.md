@@ -57,3 +57,13 @@
 **Don't**: POST a new assignment without DELETEing the old one (e.g., program reassignment).
 **Do**: DELETE the old relationship first, then POST the new one. Handle partial failure.
 **Why**: Creates duplicate assignments; repeated drags accumulate unboundedly.
+
+## Unbounded file read on upload endpoints
+**Don't**: `await file.read()` with no size limit.
+**Do**: Read at most N+1 bytes and reject if exceeded (HTTP 413).
+**Why**: A large upload can OOM a single-worker server.
+
+## get_or_create scoped only by name (missing composite key)
+**Don't**: Look up entities by name alone when they belong to a parent (e.g., Team by name without area_id).
+**Do**: Scope the lookup by the full composite key (name + parent FK).
+**Why**: Silently re-parents existing entities to a different owner, corrupting org structure.

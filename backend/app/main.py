@@ -7,17 +7,21 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.routes.areas import router as areas_router
 from app.api.routes.history import router as history_router
+from app.api.routes.import_router import router as import_router
 from app.api.routes.members import router as members_router
 from app.api.routes.org import router as org_router
 from app.api.routes.programs import router as programs_router
 from app.core.config import settings
+from app.services.import_session import start_cleanup_task
 
 os.makedirs(settings.upload_dir, exist_ok=True)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    cleanup_task = start_cleanup_task()
     yield
+    cleanup_task.cancel()
 
 
 app = FastAPI(title="Team Resourcer API", version="1.0.0", lifespan=lifespan)
@@ -49,3 +53,4 @@ app.include_router(
 app.include_router(programs_router, prefix="/api/programs", tags=["programs"])
 app.include_router(areas_router, prefix="/api/areas", tags=["areas", "teams"])
 app.include_router(org_router, prefix="/api/org", tags=["org"])
+app.include_router(import_router, prefix="/api/import", tags=["import"])

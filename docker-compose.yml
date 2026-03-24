@@ -19,9 +19,17 @@ services:
   backend:
     build: ./backend
     env_file: .env
+    # Google Sheets import (optional).
+    # Set GOOGLE_SERVICE_ACCOUNT_FILE to the path of your service account JSON file
+    # OR set GOOGLE_SERVICE_ACCOUNT_JSON to the base64-encoded JSON content.
+    # If neither is set, Google Sheets import will return a 422 error with instructions.
+    environment:
+      GOOGLE_SERVICE_ACCOUNT_FILE: /run/secrets/gcp-service-account
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${GOOGLE_SERVICE_ACCOUNT_JSON:-}
     volumes:
       - ./backend:/app
       - uploads:/app/uploads
+      - ${GOOGLE_SERVICE_ACCOUNT_FILE:-/dev/null}:/run/secrets/gcp-service-account:ro
     ports:
       - "8000:8000"
     depends_on:

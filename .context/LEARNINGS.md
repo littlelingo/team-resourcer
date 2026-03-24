@@ -67,3 +67,27 @@
 - Drag-drop uses proximity detection (60px threshold) since ReactFlow lacks native parent-assignment
 - Program reassign requires DELETE old + POST new (not a single PATCH)
 - Node data should contain only rendering fields — relational IDs go in edges
+
+## Phase 4 — Data Import (2026-03-23)
+
+### What went well
+- Backend + frontend tracks ran fully in parallel with clean separation
+- Session cache pattern (in-memory dict with UUID key + TTL) worked well for single-user
+- Four-step wizard state machine (source → map → preview → result) was clean to implement
+- Auto-suggest column mapping via case-insensitive label matching saved UX effort
+
+### Issues caught in review
+- No file size limit on upload — could OOM the server with large files (added 10MB limit)
+- Team get_or_create silently re-parented existing teams to different areas (scoped by area_id)
+- No circular supervisor detection in two-pass import (added cycle walk)
+- Row index off-by-one: already 1-based from mapper but frontend added +1 again
+- Credential file path leaked in 422 error response (now logs internally, generic message to client)
+- Session not cleaned up on DB commit failure (added try/finally)
+- Bare except:pass on Decimal conversion — removed (mapper already validates)
+- No query cache invalidation after import commit (added invalidateQueries)
+
+### Architecture decisions
+- Import uses stateless session cache (in-memory dict, 30-min TTL) — acceptable for single-user
+- Two-pass supervisor resolution: first pass upserts all members, second pass sets supervisor_id
+- get_or_create for FK-by-name fields (areas, teams, programs) — creates missing entities atomically
+- Column mapping is advisory — auto-suggest helps but user always has final say

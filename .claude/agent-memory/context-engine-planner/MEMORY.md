@@ -11,7 +11,9 @@
 ## Planning Patterns
 - [`planning_alembic_async.md`](planning_alembic_async.md) — Alembic needs psycopg2 URL even when app uses asyncpg; always add psycopg2-binary to requirements
 - [`planning_circular_fk.md`](planning_circular_fk.md) — Team.lead_id ↔ TeamMember circular FK risk; use string-based relationship() refs and use_alter=True on the FK
+- [`planning_vitest_setup.md`](planning_vitest_setup.md) — Vitest + MSW v2 + Testing Library gotchas: test.env for VITE_ vars, msw/node import, tsconfig types override, retry:false for QueryClient
+- [`planning_sqlite_test_db.md`](planning_sqlite_test_db.md) — aiosqlite in-memory SQLite pattern for tests; AsyncClient not TestClient; no @pytest.mark.asyncio with asyncio_mode=auto; commit_import isolation via unique IDs
 
 ## Planner — User & Project Context
-- [`project_state.md`](project_state.md) — No application code exists yet (2026-03-22); design-first workflow; PRPs written before scaffolding
+- [`project_state.md`](project_state.md) — Frontend + backend fully scaffolded as of 2026-03-23; zero test coverage; feature 002 test PRPs in progress
 - [`user_profile.md`](user_profile.md) — Senior technical fluency; implement-then-test is project default (CLAUDE.md); do not propose TDD

@@ -12,8 +12,6 @@ from PIL import Image, UnidentifiedImageError
 
 from app.core.config import settings
 
-_ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
-
 _FORMAT_TO_EXT: dict[str, str] = {
     "JPEG": "jpg",
     "PNG": "png",
@@ -26,13 +24,6 @@ _CHUNK_SIZE = 64 * 1024  # 64 KB read chunks
 
 async def save_profile_image(member_uuid: uuid.UUID, file: UploadFile) -> str:
     """Validate and persist a profile image. Returns the relative URL path."""
-    content_type = file.content_type or ""
-    if content_type not in _ALLOWED_CONTENT_TYPES:
-        raise ValueError(
-            f"Unsupported content type '{content_type}'. "
-            "Allowed types: image/jpeg, image/png, image/webp."
-        )
-
     # Read file in chunks to validate size and collect data
     chunks: list[bytes] = []
     total = 0

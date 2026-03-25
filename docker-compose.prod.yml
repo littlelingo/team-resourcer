@@ -1,7 +1,10 @@
 # Production overrides — usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up
 services:
   backend:
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+    # Single worker: import_session uses in-memory dict (not shared across workers).
+    # Async uvicorn handles concurrency within one process.
+    # TODO: replace with Redis-backed session store to restore multi-worker support.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1
     volumes:
       - uploads:/app/uploads
 

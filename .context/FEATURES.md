@@ -16,3 +16,4 @@
 | 009 | Dev Workflow | COMPLETE | implement-then-test | .context/features/009-dev-workflow/PRP.md |
 | 010 | Adapt — Code Quality (Round 2) | COMPLETE | implement-then-test | .context/features/010-adapt-quality-2/PRP.md |
 | 011 | Adapt — DevOps (Round 2) | COMPLETE | implement-then-test | .context/features/011-adapt-devops-2/PRP.md |
+| 012 | Adapt — Security (Round 2) | COMPLETE | implement-then-test | .context/features/012-adapt-security-2/PRP.md |

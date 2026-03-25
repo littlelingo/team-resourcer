@@ -1,5 +1,10 @@
 # Learnings
 
+## 012-adapt-security-2 (2026-03-25)
+
+### Pillow verify() invalidates the image object
+- After `img.verify()`, the Image object cannot be reused — Pillow's documented behavior. Must call `Image.open()` a second time to read `.format`. This double-open is intentional and should not be collapsed into a single open.
+
 ## 002-test-coverage-backend (2026-03-24)
 
 ### SQLite + aiosqlite test isolation

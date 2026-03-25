@@ -8,3 +8,4 @@
 | 001 | Phase 4 — Data Import | COMPLETE | implement-then-test | .context/features/001-team-resourcer-app/PRP-phase4.md |
 | 002 | Test Coverage — Backend | COMPLETE | test-first | .context/features/002-test-coverage/PRP-backend.md |
 | 002 | Test Coverage — Frontend | DRAFT | test-first | .context/features/002-test-coverage/PRP-frontend.md |
+| 007 | Adapt — DevOps | COMPLETE | implement-then-test | .context/features/007-adapt-devops/PRP.md |

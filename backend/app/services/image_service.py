@@ -10,10 +10,12 @@ from PIL import Image, UnidentifiedImageError
 
 from app.core.config import settings
 
-_ALLOWED_CONTENT_TYPES: dict[str, str] = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp",
+_ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
+
+_FORMAT_TO_EXT: dict[str, str] = {
+    "JPEG": "jpg",
+    "PNG": "png",
+    "WEBP": "webp",
 }
 
 _MAX_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
@@ -28,10 +30,6 @@ async def save_profile_image(member_uuid: uuid.UUID, file: UploadFile) -> str:
             f"Unsupported content type '{content_type}'. "
             "Allowed types: image/jpeg, image/png, image/webp."
         )
-
-    ext = _ALLOWED_CONTENT_TYPES[content_type]
-    filename = f"{member_uuid}.{ext}"
-    dest_path = os.path.join(settings.upload_dir, filename)
 
     # Read file in chunks to validate size and collect data
     chunks: list[bytes] = []
@@ -51,8 +49,17 @@ async def save_profile_image(member_uuid: uuid.UUID, file: UploadFile) -> str:
     try:
         img = Image.open(io.BytesIO(data))
         img.verify()
-    except (UnidentifiedImageError, Exception):
+    except (UnidentifiedImageError, SyntaxError):
         raise ValueError("File is not a valid image.")
+
+    # Derive extension from actual image format, not Content-Type header
+    detected_format = Image.open(io.BytesIO(data)).format or ""
+    ext = _FORMAT_TO_EXT.get(detected_format)
+    if ext is None:
+        raise ValueError("File is not a valid image.")
+
+    filename = f"{member_uuid}.{ext}"
+    dest_path = os.path.join(settings.upload_dir, filename)
 
     os.makedirs(settings.upload_dir, exist_ok=True)
     async with aiofiles.open(dest_path, "wb") as f:

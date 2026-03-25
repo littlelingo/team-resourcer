@@ -26,9 +26,18 @@ async def upload_file(
 ) -> UploadResponse:
     """Accept a multipart CSV or XLSX file and return headers and a preview."""
     MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
-    file_bytes = await file.read(MAX_UPLOAD_BYTES + 1)
-    if len(file_bytes) > MAX_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="File exceeds 10 MB limit.")
+    CHUNK_SIZE = 64 * 1024  # 64 KB
+    chunks: list[bytes] = []
+    total = 0
+    while True:
+        chunk = await file.read(CHUNK_SIZE)
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail="File exceeds 10 MB limit.")
+        chunks.append(chunk)
+    file_bytes = b"".join(chunks)
     filename = file.filename or ""
     try:
         result = parse_upload(file_bytes, filename)

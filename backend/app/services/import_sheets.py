@@ -57,8 +57,10 @@ def _load_credentials() -> Any:
             info = json.loads(decoded)
             return service_account.Credentials.from_service_account_info(info, scopes=_SCOPES)
         except Exception as exc:
+            logger.warning("Failed to load credentials from GOOGLE_SERVICE_ACCOUNT_JSON: %s", exc)
             raise ImportSheetsError(
-                f"Failed to load credentials from GOOGLE_SERVICE_ACCOUNT_JSON: {exc}"
+                "Google credentials are misconfigured. "
+                "Check that GOOGLE_SERVICE_ACCOUNT_JSON is valid base64-encoded JSON."
             ) from exc
 
     raise ImportSheetsError(

@@ -10,56 +10,14 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import DataTable from '@/components/shared/DataTable'
 import PageError from '@/components/shared/PageError'
 import MemberCard from '@/components/members/MemberCard'
-import MemberDetailSheet from '@/components/members/MemberDetailSheet'
 import MemberFormDialog from '@/components/members/MemberFormDialog'
+import { SkeletonCard, MemberDetailSheetWrapper } from '@/pages/MembersPage.helpers'
 import { buildMemberColumns } from '@/components/members/memberColumns'
 import { useMembers, useMember, useDeleteMember } from '@/hooks/useMembers'
 import { usePrograms } from '@/hooks/usePrograms'
 import { useFunctionalAreas } from '@/hooks/useFunctionalAreas'
 import { useTeams } from '@/hooks/useTeams'
 import type { TeamMember, TeamMemberList } from '@/types'
-
-// ─── Skeleton card ────────────────────────────────────────────────────────────
-
-function SkeletonCard() {
-  return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm animate-pulse">
-      <div className="flex flex-col items-center">
-        <div className="mb-3 h-16 w-16 rounded-full bg-slate-200" />
-        <div className="h-3.5 w-24 rounded bg-slate-200" />
-        <div className="mt-2 h-3 w-16 rounded bg-slate-100" />
-      </div>
-      <div className="mt-3 flex justify-center gap-1">
-        <div className="h-4 w-14 rounded-full bg-slate-100" />
-        <div className="h-4 w-12 rounded-full bg-slate-100" />
-      </div>
-    </div>
-  )
-}
-
-// ─── Detail sheet wrapper — fetches full member on open ───────────────────────
-
-function MemberDetailSheetWrapper({
-  uuid,
-  open,
-  onOpenChange,
-  onEdit,
-}: {
-  uuid: string | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onEdit: (member: TeamMember) => void
-}) {
-  const { data: member = null } = useMember(uuid ?? '')
-  return (
-    <MemberDetailSheet
-      member={member}
-      open={open}
-      onOpenChange={onOpenChange}
-      onEdit={onEdit}
-    />
-  )
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 

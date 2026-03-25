@@ -1,10 +1,30 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import type { MappedPreviewResult, CommitResult } from '@/api/importApi'
+import type { MappedPreviewResult, CommitResult, EntityType } from '@/api/importApi'
 import SourceStep from './SourceStep'
-import MapColumnsStep from './MapColumnsStep'
+import MapColumnsStep, {
+  MEMBER_TARGET_FIELDS,
+  PROGRAM_TARGET_FIELDS,
+  AREA_TARGET_FIELDS,
+  TEAM_TARGET_FIELDS,
+  type TargetField,
+} from './MapColumnsStep'
 import PreviewStep from './PreviewStep'
 import ResultStep from './ResultStep'
+
+// ─── Entity configs ──────────────────────────────────────────────────────────
+
+interface EntityConfig {
+  targetFields: TargetField[]
+  requiredFields: string[]
+}
+
+const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
+  member: { targetFields: MEMBER_TARGET_FIELDS, requiredFields: ['employee_id', 'name'] },
+  program: { targetFields: PROGRAM_TARGET_FIELDS, requiredFields: ['name'] },
+  area: { targetFields: AREA_TARGET_FIELDS, requiredFields: ['name'] },
+  team: { targetFields: TEAM_TARGET_FIELDS, requiredFields: ['name'] },
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -105,7 +125,13 @@ function StepIndicator({ current }: { current: WizardStep }) {
 
 // ─── Wizard ───────────────────────────────────────────────────────────────────
 
-export default function ImportWizard() {
+interface ImportWizardProps {
+  entityType?: EntityType
+  onComplete?: () => void
+}
+
+export default function ImportWizard({ entityType = 'member', onComplete }: ImportWizardProps) {
+  const entityConfig = ENTITY_CONFIGS[entityType]
   const [state, setState] = useState<WizardState>(INITIAL_STATE)
 
   function handleStartOver() {
@@ -147,6 +173,7 @@ export default function ImportWizard() {
 
   function handleCommitResult(commitResult: CommitResult) {
     setState((prev) => ({ ...prev, step: 'result', commitResult }))
+    onComplete?.()
   }
 
   return (
@@ -174,6 +201,9 @@ export default function ImportWizard() {
           headers={state.headers}
           initialColumnMap={state.columnMap}
           onPreview={handleMapPreview}
+          targetFields={entityConfig.targetFields}
+          requiredFields={entityConfig.requiredFields}
+          entityType={entityType}
         />
       )}
 
@@ -184,6 +214,7 @@ export default function ImportWizard() {
           mappedPreview={state.mappedPreview}
           onBack={handleBackToMap}
           onCommit={handleCommitResult}
+          entityType={entityType}
         />
       )}
 

@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { previewMapping } from '@/api/importApi'
-import type { MappedPreviewResult } from '@/api/importApi'
+import type { MappedPreviewResult, EntityType } from '@/api/importApi'
 
 // ─── Target field definitions ─────────────────────────────────────────────────
 
-const TARGET_FIELDS: { label: string; value: string }[] = [
+export interface TargetField {
+  label: string
+  value: string
+}
+
+export const MEMBER_TARGET_FIELDS: TargetField[] = [
   { label: 'Employee ID', value: 'employee_id' },
   { label: 'Full Name', value: 'name' },
   { label: 'Job Title', value: 'title' },
@@ -23,20 +28,32 @@ const TARGET_FIELDS: { label: string; value: string }[] = [
   { label: 'Supervisor Employee ID', value: 'supervisor_employee_id' },
 ]
 
+export const PROGRAM_TARGET_FIELDS: TargetField[] = [
+  { label: 'Name', value: 'name' },
+  { label: 'Description', value: 'description' },
+]
+
+export const AREA_TARGET_FIELDS: TargetField[] = [
+  { label: 'Name', value: 'name' },
+  { label: 'Description', value: 'description' },
+]
+
+export const TEAM_TARGET_FIELDS: TargetField[] = [
+  { label: 'Name', value: 'name' },
+  { label: 'Functional Area', value: 'functional_area_name' },
+  { label: 'Description', value: 'description' },
+]
+
 // Auto-suggest: try exact match first, then includes
-function suggestField(header: string): string | null {
+function suggestField(header: string, fields: TargetField[]): string | null {
   const normalized = header.trim().toLowerCase()
-  // Exact match against label
-  const exact = TARGET_FIELDS.find((f) => f.label.toLowerCase() === normalized)
+  const exact = fields.find((f) => f.label.toLowerCase() === normalized)
   if (exact) return exact.value
-  // Exact match against value
-  const exactValue = TARGET_FIELDS.find((f) => f.value.toLowerCase() === normalized)
+  const exactValue = fields.find((f) => f.value.toLowerCase() === normalized)
   if (exactValue) return exactValue.value
-  // Includes match against label
-  const includes = TARGET_FIELDS.find((f) => f.label.toLowerCase().includes(normalized) || normalized.includes(f.label.toLowerCase()))
+  const includes = fields.find((f) => f.label.toLowerCase().includes(normalized) || normalized.includes(f.label.toLowerCase()))
   if (includes) return includes.value
-  // Includes match against value
-  const includesValue = TARGET_FIELDS.find((f) => f.value.toLowerCase().includes(normalized) || normalized.includes(f.value.toLowerCase()))
+  const includesValue = fields.find((f) => f.value.toLowerCase().includes(normalized) || normalized.includes(f.value.toLowerCase()))
   if (includesValue) return includesValue.value
   return null
 }
@@ -48,6 +65,9 @@ interface MapColumnsStepProps {
   headers: string[]
   initialColumnMap: Record<string, string | null>
   onPreview: (columnMap: Record<string, string | null>, result: MappedPreviewResult) => void
+  targetFields?: TargetField[]
+  requiredFields?: string[]
+  entityType?: EntityType
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -57,13 +77,15 @@ export default function MapColumnsStep({
   headers,
   initialColumnMap,
   onPreview,
+  targetFields = MEMBER_TARGET_FIELDS,
+  requiredFields = ['employee_id', 'name'],
+  entityType = 'member',
 }: MapColumnsStepProps) {
   const [columnMap, setColumnMap] = useState<Record<string, string | null>>(() => {
-    // If we have an existing map from wizard state, use it; otherwise auto-suggest
     if (Object.keys(initialColumnMap).length > 0) return initialColumnMap
     const auto: Record<string, string | null> = {}
     for (const header of headers) {
-      auto[header] = suggestField(header)
+      auto[header] = suggestField(header, targetFields)
     }
     return auto
   })
@@ -73,23 +95,22 @@ export default function MapColumnsStep({
     if (Object.keys(initialColumnMap).length === 0) {
       const auto: Record<string, string | null> = {}
       for (const header of headers) {
-        auto[header] = suggestField(header)
+        auto[header] = suggestField(header, targetFields)
       }
       setColumnMap(auto)
     }
-  }, [headers, initialColumnMap])
+  }, [headers, initialColumnMap, targetFields])
 
   const previewMutation = useMutation({
-    mutationFn: () => previewMapping({ session_id: sessionId, column_map: columnMap }),
+    mutationFn: () => previewMapping({ session_id: sessionId, column_map: columnMap, entity_type: entityType }),
     onSuccess: (data) => {
       onPreview(columnMap, data)
     },
   })
 
-  // Required: employee_id and name must be mapped
-  const hasRequiredFields =
-    Object.values(columnMap).includes('employee_id') &&
-    Object.values(columnMap).includes('name')
+  const hasRequiredFields = requiredFields.every((f) =>
+    Object.values(columnMap).includes(f),
+  )
 
   function handleChange(header: string, value: string) {
     setColumnMap((prev) => ({
@@ -103,7 +124,7 @@ export default function MapColumnsStep({
       <div className="mb-6">
         <h2 className="text-base font-semibold text-slate-900 mb-1">Map Columns</h2>
         <p className="text-sm text-slate-500">
-          Match each column from your source file to a member field. Columns set to "Skip" will be ignored.
+          Match each column from your source file to a target field. Columns set to "Skip" will be ignored.
         </p>
       </div>
 
@@ -134,7 +155,7 @@ export default function MapColumnsStep({
                     className="w-full rounded border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
                   >
                     <option value="">Skip this column</option>
-                    {TARGET_FIELDS.map((field) => (
+                    {targetFields.map((field) => (
                       <option key={field.value} value={field.value}>
                         {field.label}
                       </option>
@@ -149,7 +170,9 @@ export default function MapColumnsStep({
 
       {!hasRequiredFields && (
         <p className="mb-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-          Map at least <strong>Employee ID</strong> and <strong>Name</strong> to continue.
+          Map at least {requiredFields.map((f, i) => (
+            <span key={f}>{i > 0 && ' and '}<strong>{targetFields.find((t) => t.value === f)?.label ?? f}</strong></span>
+          ))} to continue.
         </p>
       )}
 

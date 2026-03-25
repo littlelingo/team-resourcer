@@ -9,9 +9,12 @@ export interface UploadResponse {
   total_row_count: number
 }
 
+export type EntityType = 'member' | 'program' | 'area' | 'team'
+
 export interface MappingConfig {
   session_id: string
   column_map: Record<string, string | null>
+  entity_type?: EntityType
 }
 
 export interface MappedRow {

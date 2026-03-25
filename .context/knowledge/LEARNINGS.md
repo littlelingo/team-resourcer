@@ -38,6 +38,11 @@
 - Component renders headers both as `<span>` labels and as `<option>` text in selects. `getByText('Employee ID')` finds multiple elements.
 - Fix: use `getAllByText()` and filter by tag, or use more specific selectors.
 
+### Docker image tag pinning: pin both runtime AND distro
+- `node:20.20.1-alpine` pins the Node patch but floats the Alpine version. If Docker Hub remaps `-alpine` to a new distro release, the OS packages shift silently.
+- Pin both: `node:20.20.1-alpine3.23`. This matches the backend convention (`python:3.12.8-slim-bookworm`).
+- `node:20.20.1-alpine3.21` does NOT exist — Node 20.20.1 was only built against Alpine 3.23. Always verify the tag exists before committing.
+
 ### Coverage config scope matters
 - Setting `coverage.include: ['src/lib/**', 'src/hooks/**']` means ALL files in those dirs count toward thresholds, including hooks not in the PRP scope.
 - Either test everything in the included dirs, or narrow the include pattern. We chose to test everything — resulted in 100% coverage.

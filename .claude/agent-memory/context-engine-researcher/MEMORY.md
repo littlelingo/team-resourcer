@@ -8,3 +8,6 @@
 
 ## Audit
 - [`audit_findings_march2025.md`](audit_findings_march2025.md) — 2026-03-25 re-audit findings: image upload never wired, --reload in Dockerfile, unpinned node image, multi-worker session bug
+
+## Research: Entity Import Feature
+- [`research_entity_import.md`](research_entity_import.md) — 2026-03-25 findings on adding CSV/Sheets import for programs, areas, teams

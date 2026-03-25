@@ -2,8 +2,9 @@ from __future__ import annotations
 
 """Commit mapped import rows to the database, handling upserts and history."""
 
+import uuid as uuid_mod
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from sqlalchemy import select
@@ -94,7 +95,7 @@ async def _append_history_if_changed(
         return
     try:
         new_decimal = Decimal(str(new_value))
-    except Exception:
+    except (ValueError, InvalidOperation):
         return
 
     existing = getattr(member, field, None)
@@ -148,7 +149,7 @@ async def commit_import(
 
     # First pass: upsert all members (without supervisor resolution)
     # Track employee_id -> uuid for second pass
-    employee_id_to_uuid: dict[str, Any] = {}
+    employee_id_to_uuid: dict[str, uuid_mod.UUID] = {}
 
     for row in deduped_valid:
         data = row.data

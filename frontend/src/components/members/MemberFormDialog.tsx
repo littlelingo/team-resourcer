@@ -11,6 +11,7 @@ import Field from '@/components/shared/Field'
 import ImageUpload from '@/components/shared/ImageUpload'
 import SelectField from '@/components/shared/SelectField'
 import { useMembers, useCreateMember, useUpdateMember } from '@/hooks/useMembers'
+import { apiFetch } from '@/lib/api-client'
 import { useFunctionalAreas } from '@/hooks/useFunctionalAreas'
 import { useTeams } from '@/hooks/useTeams'
 import type { TeamMember } from '@/types'
@@ -121,8 +122,9 @@ export default function MemberFormDialog({
 
   async function onSubmit(values: MemberFormValues) {
     try {
+      let memberUuid: string
       if (isEdit && member) {
-        await updateMember.mutateAsync({
+        const updated = await updateMember.mutateAsync({
           uuid: member.uuid,
           data: {
             employee_id: values.employee_id,
@@ -142,9 +144,10 @@ export default function MemberFormDialog({
             pto_used: values.pto_used || undefined,
           },
         })
+        memberUuid = updated.uuid
         toast.success('Member updated')
       } else {
-        await createMember.mutateAsync({
+        const created = await createMember.mutateAsync({
           employee_id: values.employee_id,
           name: values.name,
           title: values.title || undefined,
@@ -161,8 +164,20 @@ export default function MemberFormDialog({
           bonus: values.bonus || undefined,
           pto_used: values.pto_used || undefined,
         })
+        memberUuid = created.uuid
         toast.success('Member created')
       }
+
+      // Upload image if one was selected
+      if (imageFileRef.current) {
+        const formData = new FormData()
+        formData.append('file', imageFileRef.current)
+        await apiFetch(`/api/members/${memberUuid}/image`, {
+          method: 'POST',
+          body: formData,
+        })
+      }
+
       onSuccess?.()
       onOpenChange(false)
       reset()

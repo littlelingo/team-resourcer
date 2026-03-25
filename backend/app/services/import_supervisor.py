@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from typing import Any
 
 from sqlalchemy import select
@@ -26,7 +27,7 @@ def _has_cycle(start: Any, target: Any, mapping: dict[Any, Any]) -> bool:
 async def resolve_supervisors(
     db: AsyncSession,
     deduped_valid: list[MappedRow],
-    employee_id_to_uuid: dict[str, Any],
+    employee_id_to_uuid: dict[str, uuid.UUID],
     error_rows: list[MappedRow],
 ) -> None:
     """Resolve supervisor_employee_id FKs with cycle detection.

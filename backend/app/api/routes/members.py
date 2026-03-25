@@ -17,6 +17,7 @@ from app.services import (
     list_members,
     save_profile_image,
     update_member,
+    update_member_image,
 )
 
 router = APIRouter()
@@ -87,6 +88,5 @@ async def upload_image_route(
         image_path = await save_profile_image(member_uuid, file)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    member.image_path = image_path
-    await db.commit()
+    await update_member_image(db, member_uuid, image_path)
     return {"image_path": image_path}

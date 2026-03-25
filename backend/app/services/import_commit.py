@@ -301,8 +301,8 @@ async def commit_import(
     except Exception:
         await db.rollback()
         raise
-    finally:
-        delete_session(session_id)
+
+    delete_session(session_id)
 
     return CommitResult(
         created_count=created_count,

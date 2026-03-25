@@ -107,6 +107,16 @@ async def update_member(
     return await get_member(db, member_uuid)
 
 
+async def update_member_image(db: AsyncSession, member_uuid: uuid.UUID, image_path: str) -> None:
+    """Set a member's image_path and commit."""
+    result = await db.execute(select(TeamMember).where(TeamMember.uuid == member_uuid))
+    member = result.scalar_one_or_none()
+    if member is None:
+        raise ValueError(f"Member {member_uuid} not found")
+    member.image_path = image_path
+    await db.commit()
+
+
 async def delete_member(db: AsyncSession, member_uuid: uuid.UUID) -> bool:
     """Delete a member. Returns True if found and deleted, False otherwise."""
     result = await db.execute(select(TeamMember).where(TeamMember.uuid == member_uuid))

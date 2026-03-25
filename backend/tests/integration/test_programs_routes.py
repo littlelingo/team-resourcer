@@ -49,18 +49,12 @@ async def test_assign_member(client, program, member):
 
 
 async def test_assign_member_program_not_found(client, member):
-    # Route doesn't validate program existence upfront. Depending on FK
-    # enforcement, either an IntegrityError or a ResponseValidationError
-    # (program=None in response) is raised through ASGI transport.
-    import pytest
-
-    with pytest.raises(Exception):
-        resp = await client.post(
-            "/api/programs/99999/assignments",
-            json={"member_uuid": str(member.uuid), "program_id": 99999},
-        )
-        # If we get a response instead of exception, it must not be 201
-        assert resp.status_code != 201
+    resp = await client.post(
+        "/api/programs/99999/assignments",
+        json={"member_uuid": str(member.uuid), "program_id": 99999},
+    )
+    assert resp.status_code == 404
+    assert "Program 99999 not found" in resp.json()["detail"]
 
 
 async def test_unassign_member(client, program, member):

@@ -79,6 +79,10 @@ async def assign_member(
     db: AsyncSession, program_id: int, data: ProgramAssignmentCreate
 ) -> ProgramAssignment:
     """Assign a member to a program, or update their role if already assigned (upsert)."""
+    program = await get_program(db, program_id)
+    if not program:
+        raise ValueError(f"Program {program_id} not found")
+
     member = await db.get(TeamMember, data.member_uuid)
     if not member:
         raise ValueError(f"Member {data.member_uuid} not found")

@@ -13,6 +13,7 @@ from app.services.member_service import (
     get_member,
     list_members,
     update_member,
+    update_member_image,
 )
 from app.services.org_service import get_org_tree, set_supervisor
 from app.services.program_service import (
@@ -54,6 +55,7 @@ __all__ = [
     "create_member",
     "update_member",
     "delete_member",
+    "update_member_image",
     # org
     "get_org_tree",
     "set_supervisor",

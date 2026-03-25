@@ -43,6 +43,14 @@
 - URL search params: runtime guard values (e.g., `rawView === 'table' ? 'table' : 'card'`)
 - Form watchers: clear dependent fields when parent changes (team_id when area changes)
 
+## Multi-Entity Import
+- `MappingConfig.entity_type` defaults to `"member"` for backward compatibility
+- `ENTITY_CONFIGS` dict in `import_mapper.py` maps entity type → target fields, required fields, numeric fields, validators
+- `commit_import` dispatches to entity-specific commit functions (`_commit_areas`, `_commit_programs`, `_commit_teams`, `_commit_members`)
+- Simple entities (areas, programs) upsert by unique name; teams upsert by `(name, functional_area_id)`
+- Frontend `ImportWizard` accepts `entityType` prop; `MapColumnsStep` accepts `targetFields` and `requiredFields` props
+- Per-section import opens the wizard in a Radix Dialog modal from each page's header
+
 ## Image Upload
 - Validate via Pillow magic bytes, not just Content-Type header
 - UUID-based filenames: `{member_uuid}.{ext}` — no path traversal risk

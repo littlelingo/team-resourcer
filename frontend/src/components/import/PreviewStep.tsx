@@ -4,7 +4,11 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { AlertCircle, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { commitImport } from '@/api/importApi'
-import type { MappedPreviewResult, MappedRow, CommitResult, MappingConfig } from '@/api/importApi'
+import type { MappedPreviewResult, MappedRow, CommitResult, MappingConfig, EntityType } from '@/api/importApi'
+import { memberKeys } from '@/hooks/useMembers'
+import { programKeys } from '@/hooks/usePrograms'
+import { areaKeys } from '@/hooks/useFunctionalAreas'
+import { teamKeys } from '@/hooks/useTeams'
 
 const PAGE_SIZE = 20
 
@@ -14,6 +18,7 @@ interface PreviewStepProps {
   mappedPreview: MappedPreviewResult
   onBack: () => void
   onCommit: (result: CommitResult) => void
+  entityType?: EntityType
 }
 
 export default function PreviewStep({
@@ -22,6 +27,7 @@ export default function PreviewStep({
   mappedPreview,
   onBack,
   onCommit,
+  entityType = 'member',
 }: PreviewStepProps) {
   const [page, setPage] = useState(0)
   const queryClient = useQueryClient()
@@ -38,14 +44,23 @@ export default function PreviewStep({
 
   const commitMutation = useMutation({
     mutationFn: () => {
-      const config: MappingConfig = { session_id: sessionId, column_map: columnMap }
+      const config: MappingConfig = { session_id: sessionId, column_map: columnMap, entity_type: entityType }
       return commitImport(config)
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['members'] })
-      queryClient.invalidateQueries({ queryKey: ['programs'] })
-      queryClient.invalidateQueries({ queryKey: ['functional-areas'] })
-      queryClient.invalidateQueries({ queryKey: ['teams'] })
+      if (entityType === 'member') {
+        queryClient.invalidateQueries({ queryKey: memberKeys.all })
+        queryClient.invalidateQueries({ queryKey: programKeys.all })
+        queryClient.invalidateQueries({ queryKey: areaKeys.all })
+        queryClient.invalidateQueries({ queryKey: teamKeys.all })
+      } else if (entityType === 'program') {
+        queryClient.invalidateQueries({ queryKey: programKeys.all })
+      } else if (entityType === 'area') {
+        queryClient.invalidateQueries({ queryKey: areaKeys.all })
+      } else if (entityType === 'team') {
+        queryClient.invalidateQueries({ queryKey: teamKeys.all })
+        queryClient.invalidateQueries({ queryKey: areaKeys.all })
+      }
       onCommit(data)
     },
   })

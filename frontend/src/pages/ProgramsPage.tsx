@@ -4,6 +4,7 @@ import * as Avatar from '@radix-ui/react-avatar'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { getImageUrl } from '@/lib/api-client'
+import ImportWizard from '@/components/import/ImportWizard'
 import PageHeader from '@/components/layout/PageHeader'
 import { DataTable } from '@/components/shared/DataTable'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
@@ -102,6 +103,7 @@ function ProgramMembersSheet({
 
 export default function ProgramsPage() {
   const [addOpen, setAddOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [editProgram, setEditProgram] = useState<Program | null>(null)
   const [deleteProgram, setDeleteProgram] = useState<Program | null>(null)
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
@@ -146,13 +148,22 @@ export default function ProgramsPage() {
       <PageHeader
         title="Programs"
         actions={
-          <button
-            type="button"
-            onClick={() => setAddOpen(true)}
-            className="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-          >
-            Add Program
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setImportOpen(true)}
+              className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            >
+              Import
+            </button>
+            <button
+              type="button"
+              onClick={() => setAddOpen(true)}
+              className="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            >
+              Add Program
+            </button>
+          </div>
         }
       />
 
@@ -191,6 +202,17 @@ export default function ProgramsPage() {
         program={selectedProgram}
         onClose={() => setSelectedProgram(null)}
       />
+
+      {/* Import dialog */}
+      <Dialog.Root open={importOpen} onOpenChange={setImportOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-0 shadow-xl max-h-[90vh] overflow-y-auto">
+            <Dialog.Title className="sr-only">Import Programs</Dialog.Title>
+            <ImportWizard entityType="program" onComplete={() => setImportOpen(false)} />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 # PRP: Per-Section Entity Import (Programs, Areas, Teams)
 
-**Status**: APPROVED
+**Status**: COMPLETE
 **Strategy**: implement-then-test
 **Complexity**: MEDIUM
 **Branch**: `feat/entity-import`

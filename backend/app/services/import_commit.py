@@ -111,44 +111,105 @@ async def _append_history_if_changed(
         await db.flush()
 
 
-async def commit_import(
-    session_id: str,
-    mapping_config: MappingConfig,
-    db: AsyncSession,
-) -> CommitResult:
-    """Apply mapping, validate rows, and write valid rows to the database.
-
-    Rows with errors are skipped. Rows with only warnings are imported.
-    After commit, the session is deleted.
-
-    Args:
-        session_id: The import session token.
-        mapping_config: Column mapping configuration.
-        db: Async database session.
-
-    Returns:
-        CommitResult with created/updated/skipped counts and error rows.
-    """
-    mapped_result = apply_mapping(session_id, mapping_config)
-
-    valid_rows = [r for r in mapped_result.rows if not r.errors]
-    error_rows = [r for r in mapped_result.rows if r.errors]
-
-    # Deduplicate by employee_id (first occurrence wins)
-    seen_employee_ids: set[str] = set()
-    deduped_valid: list[MappedRow] = []
+def _dedup_rows(valid_rows: list[MappedRow], dedup_field: str) -> list[MappedRow]:
+    """Deduplicate rows by a field value; first occurrence wins."""
+    seen: set[str] = set()
+    deduped: list[MappedRow] = []
     for row in valid_rows:
-        emp_id = str(row.data.get("employee_id", "")).strip()
-        if emp_id in seen_employee_ids:
+        val = str(row.data.get(dedup_field, "")).strip()
+        if val in seen:
             continue
-        seen_employee_ids.add(emp_id)
-        deduped_valid.append(row)
+        seen.add(val)
+        deduped.append(row)
+    return deduped
 
+
+async def _commit_areas(db: AsyncSession, rows: list[MappedRow]) -> tuple[int, int]:
+    """Upsert functional areas by name. Returns (created, updated)."""
+    created = updated = 0
+    for row in rows:
+        name = str(row.data.get("name", "")).strip()
+        if not name:
+            continue
+        result = await db.execute(select(FunctionalArea).where(FunctionalArea.name == name))
+        area = result.scalar_one_or_none()
+        if area is None:
+            area = FunctionalArea(name=name)
+            db.add(area)
+            created += 1
+        else:
+            updated += 1
+        desc = row.data.get("description")
+        if desc is not None and desc != "":
+            area.description = str(desc)
+        await db.flush()
+    return created, updated
+
+
+async def _commit_programs(db: AsyncSession, rows: list[MappedRow]) -> tuple[int, int]:
+    """Upsert programs by name. Returns (created, updated)."""
+    created = updated = 0
+    for row in rows:
+        name = str(row.data.get("name", "")).strip()
+        if not name:
+            continue
+        result = await db.execute(select(Program).where(Program.name == name))
+        program = result.scalar_one_or_none()
+        if program is None:
+            program = Program(name=name)
+            db.add(program)
+            created += 1
+        else:
+            updated += 1
+        desc = row.data.get("description")
+        if desc is not None and desc != "":
+            program.description = str(desc)
+        await db.flush()
+    return created, updated
+
+
+async def _commit_teams(db: AsyncSession, rows: list[MappedRow]) -> tuple[int, int]:
+    """Upsert teams by (name, area). Returns (created, updated)."""
+    created = updated = 0
+    for row in rows:
+        name = str(row.data.get("name", "")).strip()
+        if not name:
+            continue
+        fa_name = row.data.get("functional_area_name")
+        functional_area_id: int | None = None
+        if fa_name:
+            area = await _get_or_create_functional_area(db, str(fa_name))
+            functional_area_id = area.id
+
+        if functional_area_id is None:
+            area = await _get_or_create_functional_area(db, "Unassigned")
+            functional_area_id = area.id
+
+        result = await db.execute(
+            select(Team).where(Team.name == name, Team.functional_area_id == functional_area_id)
+        )
+        team = result.scalar_one_or_none()
+        if team is None:
+            team = Team(name=name, functional_area_id=functional_area_id)
+            db.add(team)
+            created += 1
+        else:
+            updated += 1
+        desc = row.data.get("description")
+        if desc is not None and desc != "":
+            team.description = str(desc)
+        await db.flush()
+    return created, updated
+
+
+async def _commit_members(
+    db: AsyncSession,
+    deduped_valid: list[MappedRow],
+    error_rows: list[MappedRow],
+) -> tuple[int, int]:
+    """Upsert members with FK resolution and history. Returns (created, updated)."""
     created_count = 0
     updated_count = 0
-
-    # First pass: upsert all members (without supervisor resolution)
-    # Track employee_id -> uuid for second pass
     employee_id_to_uuid: dict[str, uuid_mod.UUID] = {}
 
     for row in deduped_valid:
@@ -181,7 +242,6 @@ async def commit_import(
         is_new = member is None
 
         if is_new:
-            # For new members, functional_area_id is required
             if functional_area_id is None:
                 area = await _get_or_create_functional_area(db, "Unassigned")
                 functional_area_id = area.id
@@ -199,27 +259,17 @@ async def commit_import(
 
         employee_id_to_uuid[emp_id] = member.uuid
 
-        # Update scalar fields (only non-blank values)
-        scalar_fields = [
-            "name",
-            "title",
-            "location",
-            "email",
-            "phone",
-            "slack_handle",
-        ]
+        scalar_fields = ["name", "title", "location", "email", "phone", "slack_handle"]
         for f in scalar_fields:
             val = data.get(f)
             if val is not None and val != "":
                 setattr(member, f, str(val))
 
-        # Update FK fields
         if functional_area_id is not None:
             member.functional_area_id = functional_area_id
         if team_id is not None:
             member.team_id = team_id
 
-        # Financial fields with history
         for fin_field in _FINANCIAL_FIELDS:
             val = data.get(fin_field)
             if val is not None and val != "":
@@ -228,7 +278,6 @@ async def commit_import(
 
         await db.flush()
 
-        # Program assignment
         if program is not None:
             role = data.get("program_role")
             await _upsert_program_assignment(
@@ -237,6 +286,40 @@ async def commit_import(
 
     # Second pass: resolve supervisor_employee_id FKs
     await resolve_supervisors(db, deduped_valid, employee_id_to_uuid, error_rows)
+
+    return created_count, updated_count
+
+
+async def commit_import(
+    session_id: str,
+    mapping_config: MappingConfig,
+    db: AsyncSession,
+) -> CommitResult:
+    """Apply mapping, validate rows, and write valid rows to the database.
+
+    Dispatches to entity-specific commit logic based on mapping_config.entity_type.
+    After commit, the session is deleted.
+    """
+    mapped_result = apply_mapping(session_id, mapping_config)
+
+    valid_rows = [r for r in mapped_result.rows if not r.errors]
+    error_rows = [r for r in mapped_result.rows if r.errors]
+
+    entity_type = mapping_config.entity_type
+    from app.services.import_mapper import ENTITY_CONFIGS
+
+    dedup_field = ENTITY_CONFIGS[entity_type].dedup_field
+    deduped_valid = _dedup_rows(valid_rows, dedup_field)
+    dedup_skipped = len(valid_rows) - len(deduped_valid)
+
+    if entity_type == "area":
+        created, updated = await _commit_areas(db, deduped_valid)
+    elif entity_type == "program":
+        created, updated = await _commit_programs(db, deduped_valid)
+    elif entity_type == "team":
+        created, updated = await _commit_teams(db, deduped_valid)
+    else:
+        created, updated = await _commit_members(db, deduped_valid, error_rows)
 
     try:
         await db.commit()
@@ -247,8 +330,8 @@ async def commit_import(
     delete_session(session_id)
 
     return CommitResult(
-        created_count=created_count,
-        updated_count=updated_count,
-        skipped_count=len(error_rows),
+        created_count=created,
+        updated_count=updated,
+        skipped_count=len(error_rows) + dedup_skipped,
         error_rows=error_rows,
     )

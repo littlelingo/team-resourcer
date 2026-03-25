@@ -2,9 +2,11 @@ from __future__ import annotations
 
 """Pydantic schemas for the data import pipeline."""
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel
+
+EntityType = Literal["member", "program", "area", "team"]
 
 
 class ParseResult(BaseModel):
@@ -28,6 +30,7 @@ class SheetRequest(BaseModel):
 class MappingConfig(BaseModel):
     session_id: str
     column_map: dict[str, str | None]
+    entity_type: EntityType = "member"
 
 
 class MappedRow(BaseModel):

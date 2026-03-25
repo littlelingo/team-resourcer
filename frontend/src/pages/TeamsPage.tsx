@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react'
 import { useQueries } from '@tanstack/react-query'
+import * as Dialog from '@radix-ui/react-dialog'
 import { toast } from 'sonner'
 import { apiFetch } from '@/lib/api-client'
+import ImportWizard from '@/components/import/ImportWizard'
 import { teamKeys } from '@/hooks/useTeams'
 import PageHeader from '@/components/layout/PageHeader'
 import { DataTable } from '@/components/shared/DataTable'
@@ -35,6 +37,7 @@ function useAllTeams(areaIds: number[]) {
 
 export default function TeamsPage() {
   const [addOpen, setAddOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [editTeam, setEditTeam] = useState<Team | null>(null)
   const [deleteTeam, setDeleteTeam] = useState<Team | null>(null)
 
@@ -101,13 +104,22 @@ export default function TeamsPage() {
       <PageHeader
         title="Teams"
         actions={
-          <button
-            type="button"
-            onClick={() => setAddOpen(true)}
-            className="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-          >
-            Add Team
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setImportOpen(true)}
+              className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            >
+              Import
+            </button>
+            <button
+              type="button"
+              onClick={() => setAddOpen(true)}
+              className="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            >
+              Add Team
+            </button>
+          </div>
         }
       />
 
@@ -140,6 +152,17 @@ export default function TeamsPage() {
         onConfirm={handleDeleteConfirm}
         loading={deleteMutation.isPending}
       />
+
+      {/* Import dialog */}
+      <Dialog.Root open={importOpen} onOpenChange={setImportOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-0 shadow-xl max-h-[90vh] overflow-y-auto">
+            <Dialog.Title className="sr-only">Import Teams</Dialog.Title>
+            <ImportWizard entityType="team" onComplete={() => setImportOpen(false)} />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   )
 }

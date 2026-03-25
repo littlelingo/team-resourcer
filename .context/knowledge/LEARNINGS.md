@@ -1,5 +1,13 @@
 # Learnings
 
+## 013-entity-import (2026-03-25)
+
+### TanStack Query invalidation must use exported key constants
+- `queryClient.invalidateQueries({ queryKey: ['functional-areas'] })` does NOT match queries registered under `areaKeys.all = ["areas"]`. Always import and use the exported `*Keys.all` constants from hooks, never bare string literals. This was a stale-data bug caught in review.
+
+### Dedup-skipped rows should be surfaced in CommitResult
+- `_dedup_rows` silently removes duplicates from valid rows before commit. If the removed count isn't added to `skipped_count`, users see a total that doesn't add up (e.g., 10 rows uploaded but only 7 created + 0 skipped). Always compute `dedup_skipped = len(valid_rows) - len(deduped_valid)` and include it.
+
 ## 012-adapt-security-2 (2026-03-25)
 
 ### Pillow verify() invalidates the image object

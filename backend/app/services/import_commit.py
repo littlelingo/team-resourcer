@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Commit mapped import rows to the database, handling upserts and history."""
+
 from datetime import date
 from decimal import Decimal
 from typing import Any
@@ -22,6 +24,7 @@ _FINANCIAL_FIELDS = ("salary", "bonus", "pto_used")
 
 
 async def _get_or_create_functional_area(db: AsyncSession, name: str) -> FunctionalArea:
+    """Fetch a functional area by name or create it if it does not exist."""
     result = await db.execute(select(FunctionalArea).where(FunctionalArea.name == name))
     area = result.scalar_one_or_none()
     if area is None:
@@ -32,6 +35,7 @@ async def _get_or_create_functional_area(db: AsyncSession, name: str) -> Functio
 
 
 async def _get_or_create_team(db: AsyncSession, name: str, functional_area_id: int | None) -> Team:
+    """Fetch a team by name and area or create it if it does not exist."""
     if functional_area_id is None:
         # Need at least a placeholder area — create/fetch one called "Unassigned"
         area = await _get_or_create_functional_area(db, "Unassigned")
@@ -49,6 +53,7 @@ async def _get_or_create_team(db: AsyncSession, name: str, functional_area_id: i
 
 
 async def _get_or_create_program(db: AsyncSession, name: str) -> Program:
+    """Fetch a program by name or create it if it does not exist."""
     result = await db.execute(select(Program).where(Program.name == name))
     program = result.scalar_one_or_none()
     if program is None:
@@ -61,6 +66,7 @@ async def _get_or_create_program(db: AsyncSession, name: str) -> Program:
 async def _upsert_program_assignment(
     db: AsyncSession, member_uuid: Any, program_id: int, role: str | None
 ) -> None:
+    """Insert or update a program assignment for a member."""
     result = await db.execute(
         select(ProgramAssignment).where(
             ProgramAssignment.member_uuid == member_uuid,

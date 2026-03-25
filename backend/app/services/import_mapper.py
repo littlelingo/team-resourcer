@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Apply a column mapping to raw session rows and validate each row."""
+
 import re
 from decimal import Decimal, InvalidOperation
 from typing import Any

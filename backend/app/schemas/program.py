@@ -1,3 +1,5 @@
+"""Pydantic schemas for program create, update, and response."""
+
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict

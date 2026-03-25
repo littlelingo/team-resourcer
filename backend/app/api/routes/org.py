@@ -1,3 +1,5 @@
+"""Route handlers for org-wide tree and supervisor management."""
+
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -16,6 +18,7 @@ router = APIRouter()
 async def get_org_tree_route(
     db: AsyncSession = Depends(get_db),
 ) -> TreeResponse:
+    """Fetch the full org-wide supervisor hierarchy as a node/edge tree."""
     return await build_org_tree(db)
 
 
@@ -25,6 +28,7 @@ async def set_supervisor_route(
     data: SupervisorUpdate,
     db: AsyncSession = Depends(get_db),
 ) -> TeamMemberDetailResponse:
+    """Set or clear the supervisor for a member by UUID."""
     try:
         member = await set_supervisor(db, member_uuid, data.supervisor_id)
     except ValueError as exc:

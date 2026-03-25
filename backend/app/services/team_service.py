@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""CRUD operations and membership management for teams."""
+
 import uuid
 
 from sqlalchemy import select

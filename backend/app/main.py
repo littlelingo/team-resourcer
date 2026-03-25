@@ -1,3 +1,5 @@
+"""FastAPI application factory with router registration and CORS configuration."""
+
 import os
 from contextlib import asynccontextmanager
 
@@ -19,6 +21,7 @@ os.makedirs(settings.upload_dir, exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Start background cleanup task on startup and cancel it on shutdown."""
     cleanup_task = start_cleanup_task()
     yield
     cleanup_task.cancel()
@@ -37,6 +40,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health():
+    """Return a simple health-check payload."""
     return {"status": "ok"}
 
 

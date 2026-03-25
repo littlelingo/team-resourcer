@@ -1,3 +1,5 @@
+"""Route handlers for functional area CRUD and area tree."""
+
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,6 +31,7 @@ router.include_router(teams_router, prefix="/{area_id}/teams", tags=["teams"])
 async def list_areas_route(
     db: AsyncSession = Depends(get_db),
 ) -> list[FunctionalAreaListResponse]:
+    """List all functional areas."""
     return await list_areas(db)
 
 
@@ -37,6 +40,7 @@ async def get_area_tree_route(
     area_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> TreeResponse:
+    """Fetch the node/edge tree for a single functional area."""
     tree = await build_area_tree(db, area_id)
     if tree is None:
         raise HTTPException(status_code=404, detail="Area not found")
@@ -48,6 +52,7 @@ async def get_area_route(
     area_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> FunctionalAreaResponse:
+    """Fetch a single functional area by ID."""
     area = await get_area(db, area_id)
     if area is None:
         raise HTTPException(status_code=404, detail="Area not found")
@@ -59,6 +64,7 @@ async def create_area_route(
     data: FunctionalAreaCreate,
     db: AsyncSession = Depends(get_db),
 ) -> FunctionalAreaResponse:
+    """Create a new functional area."""
     return await create_area(db, data)
 
 
@@ -68,6 +74,7 @@ async def update_area_route(
     data: FunctionalAreaUpdate,
     db: AsyncSession = Depends(get_db),
 ) -> FunctionalAreaResponse:
+    """Update an existing functional area by ID."""
     area = await update_area(db, area_id, data)
     if area is None:
         raise HTTPException(status_code=404, detail="Area not found")
@@ -79,6 +86,7 @@ async def delete_area_route(
     area_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> Response:
+    """Delete a functional area by ID."""
     found = await delete_area(db, area_id)
     if not found:
         raise HTTPException(status_code=404, detail="Area not found")

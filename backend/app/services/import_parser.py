@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Parsing utilities for CSV and XLSX import files."""
+
 import csv
 import io
 from typing import Any
@@ -39,6 +41,7 @@ def parse_upload(file_bytes: bytes, filename: str) -> ParseResult:
 
 
 def _parse_csv(file_bytes: bytes) -> ParseResult:
+    """Parse raw CSV bytes and return a ParseResult."""
     try:
         text = file_bytes.decode("utf-8-sig")
     except UnicodeDecodeError:
@@ -67,6 +70,7 @@ def _parse_csv(file_bytes: bytes) -> ParseResult:
 
 
 def _parse_xlsx(file_bytes: bytes) -> ParseResult:
+    """Parse raw XLSX bytes using pandas and return a ParseResult."""
     try:
         import pandas as pd
     except ImportError as exc:

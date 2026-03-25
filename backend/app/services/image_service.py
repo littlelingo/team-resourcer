@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Profile image validation and persistence."""
+
 import io
 import os
 import uuid

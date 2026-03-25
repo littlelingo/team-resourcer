@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""CRUD operations for functional areas."""
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

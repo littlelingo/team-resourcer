@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Pydantic schemas for the data import pipeline."""
+
 from typing import Any
 
 from pydantic import BaseModel

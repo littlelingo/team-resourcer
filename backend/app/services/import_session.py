@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""In-memory session store for upload/import state with TTL-based expiry."""
+
 import asyncio
 import uuid
 from dataclasses import dataclass, field

@@ -1,3 +1,5 @@
+"""Pydantic schemas for team member create, update, and response."""
+
 import re
 from datetime import datetime
 from decimal import Decimal

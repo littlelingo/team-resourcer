@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Fetch and parse data from Google Sheets for import."""
+
 import base64
 import json
 import logging

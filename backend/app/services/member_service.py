@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""CRUD operations for team members with financial history tracking."""
+
 import uuid
 from datetime import date
 

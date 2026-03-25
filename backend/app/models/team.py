@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""SQLAlchemy model for the teams table."""
+
 import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING

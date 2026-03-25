@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""SQLAlchemy model for the team_members table."""
+
 import uuid
 from datetime import datetime
 from decimal import Decimal

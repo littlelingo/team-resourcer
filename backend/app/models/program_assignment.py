@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""SQLAlchemy model for the program_assignments table."""
+
 import uuid
 from typing import TYPE_CHECKING
 

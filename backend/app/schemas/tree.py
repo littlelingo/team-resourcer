@@ -1,3 +1,5 @@
+"""Pydantic schemas for tree node/edge responses."""
+
 from typing import Any
 
 from pydantic import BaseModel

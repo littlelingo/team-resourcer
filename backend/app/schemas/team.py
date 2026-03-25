@@ -1,3 +1,5 @@
+"""Pydantic schemas for team create, update, and response."""
+
 from datetime import datetime
 from uuid import UUID
 

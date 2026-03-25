@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Org-tree building and supervisor management."""
+
 import uuid
 
 from sqlalchemy import select

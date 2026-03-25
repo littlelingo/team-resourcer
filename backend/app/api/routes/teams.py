@@ -1,3 +1,5 @@
+"""Route handlers for team CRUD and team membership management."""
+
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Response
@@ -27,6 +29,7 @@ async def list_teams_route(
     area_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> list[TeamResponse]:
+    """List all teams within a functional area."""
     return await list_teams(db, area_id=area_id)
 
 
@@ -36,6 +39,7 @@ async def get_team_route(
     team_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> TeamResponse:
+    """Fetch a single team by ID within a functional area."""
     team = await get_team(db, team_id)
     if team is None or team.functional_area_id != area_id:
         raise HTTPException(status_code=404, detail="Team not found")
@@ -48,6 +52,7 @@ async def create_team_route(
     data: TeamCreate,
     db: AsyncSession = Depends(get_db),
 ) -> TeamResponse:
+    """Create a new team within a functional area."""
     # Override functional_area_id from path parameter
     data = data.model_copy(update={"functional_area_id": area_id})
     return await create_team(db, data)
@@ -60,6 +65,7 @@ async def update_team_route(
     data: TeamUpdate,
     db: AsyncSession = Depends(get_db),
 ) -> TeamResponse:
+    """Update an existing team by ID within a functional area."""
     team = await get_team(db, team_id)
     if team is None or team.functional_area_id != area_id:
         raise HTTPException(status_code=404, detail="Team not found")
@@ -75,6 +81,7 @@ async def delete_team_route(
     team_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> Response:
+    """Delete a team by ID within a functional area."""
     team = await get_team(db, team_id)
     if team is None or team.functional_area_id != area_id:
         raise HTTPException(status_code=404, detail="Team not found")
@@ -89,6 +96,7 @@ async def add_member_route(
     member_uuid: UUID = Body(..., embed=True),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
+    """Add a member to a team."""
     found = await add_member_to_team(db, team_id, member_uuid)
     if not found:
         raise HTTPException(status_code=404, detail="Member not found")
@@ -102,6 +110,7 @@ async def remove_member_route(
     member_uuid: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> Response:
+    """Remove a member from a team."""
     found = await remove_member_from_team(db, team_id, member_uuid)
     if not found:
         raise HTTPException(status_code=404, detail="Member not found in team")

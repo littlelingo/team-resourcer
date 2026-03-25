@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Build flat node/edge tree structures for org, program, and area views."""
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload

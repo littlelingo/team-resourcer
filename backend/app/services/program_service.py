@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""CRUD operations for programs and program-member assignments."""
+
 import uuid
 
 from sqlalchemy import select

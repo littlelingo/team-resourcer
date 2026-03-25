@@ -1,3 +1,5 @@
+"""Route handlers for program CRUD, tree, members, and assignments."""
+
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -32,6 +34,7 @@ router = APIRouter()
 async def list_programs_route(
     db: AsyncSession = Depends(get_db),
 ) -> list[ProgramResponse]:
+    """List all programs."""
     return await list_programs(db)
 
 
@@ -40,6 +43,7 @@ async def get_program_route(
     program_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> ProgramResponse:
+    """Fetch a single program by ID."""
     program = await get_program(db, program_id)
     if program is None:
         raise HTTPException(status_code=404, detail="Program not found")
@@ -51,6 +55,7 @@ async def create_program_route(
     data: ProgramCreate,
     db: AsyncSession = Depends(get_db),
 ) -> ProgramResponse:
+    """Create a new program."""
     return await create_program(db, data)
 
 
@@ -60,6 +65,7 @@ async def update_program_route(
     data: ProgramUpdate,
     db: AsyncSession = Depends(get_db),
 ) -> ProgramResponse:
+    """Update an existing program by ID."""
     program = await update_program(db, program_id, data)
     if program is None:
         raise HTTPException(status_code=404, detail="Program not found")
@@ -71,6 +77,7 @@ async def delete_program_route(
     program_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> Response:
+    """Delete a program by ID."""
     found = await delete_program(db, program_id)
     if not found:
         raise HTTPException(status_code=404, detail="Program not found")
@@ -82,6 +89,7 @@ async def get_program_tree_route(
     program_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> TreeResponse:
+    """Fetch the node/edge tree for a single program."""
     tree = await build_program_tree(db, program_id)
     if tree is None:
         raise HTTPException(status_code=404, detail="Program not found")
@@ -93,6 +101,7 @@ async def get_program_members_route(
     program_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> list[TeamMemberListResponse]:
+    """List all members assigned to a program."""
     return await get_program_members(db, program_id)
 
 
@@ -102,6 +111,7 @@ async def assign_member_route(
     data: ProgramAssignmentCreate,
     db: AsyncSession = Depends(get_db),
 ) -> ProgramAssignmentResponse:
+    """Assign a member to a program."""
     try:
         return await assign_member(db, program_id, data)
     except ValueError as exc:
@@ -114,6 +124,7 @@ async def unassign_member_route(
     member_uuid: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> Response:
+    """Remove a member's assignment from a program."""
     found = await unassign_member(db, program_id, member_uuid)
     if not found:
         raise HTTPException(status_code=404, detail="Assignment not found")

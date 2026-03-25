@@ -1,3 +1,5 @@
+"""Pydantic schemas for org tree nodes and supervisor updates."""
+
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict

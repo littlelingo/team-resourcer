@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Service functions for creating and querying member financial history."""
+
 import uuid
 from datetime import date
 from decimal import Decimal

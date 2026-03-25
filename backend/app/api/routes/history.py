@@ -1,3 +1,5 @@
+"""Route handlers for member financial history."""
+
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -16,5 +18,6 @@ async def get_history_route(
     field: HistoryFieldEnum | None = None,
     db: AsyncSession = Depends(get_db),
 ) -> list[MemberHistoryResponse]:
+    """List history entries for a member with optional field filter."""
     field_str = field.value if field is not None else None
     return await get_member_history(db, member_uuid, field=field_str)

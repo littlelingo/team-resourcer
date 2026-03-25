@@ -1,3 +1,5 @@
+"""Pydantic schemas for program assignment create and response."""
+
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict

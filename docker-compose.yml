@@ -41,6 +41,9 @@ services:
     build: ./frontend
     environment:
       - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  # anonymous vol; run `make rebuild-frontend` after npm install
     ports:
       - "5173:5173"
     command: npm run dev -- --host

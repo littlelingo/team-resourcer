@@ -13,4 +13,4 @@
 | 006 | Adapt — Structure | COMPLETE | implement-then-test | .context/features/006-adapt-structure/PRP.md |
 | 007 | Adapt — DevOps | COMPLETE | implement-then-test | .context/features/007-adapt-devops/PRP.md |
 | 008 | Adapt — Documentation | COMPLETE | implement-then-test | .context/features/008-adapt-docs/PRP.md |
-| 009 | Dev Workflow | APPROVED | implement-then-test | .context/features/009-dev-workflow/PRP.md |
+| 009 | Dev Workflow | COMPLETE | implement-then-test | .context/features/009-dev-workflow/PRP.md |

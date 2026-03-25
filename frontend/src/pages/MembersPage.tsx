@@ -224,7 +224,7 @@ export default function MembersPage() {
         </div>
       ) : (
         <DataTable
-          columns={columns}
+          columns={columns as Parameters<typeof DataTable>[0]['columns']}
           data={filteredMembers as Parameters<typeof DataTable>[0]['data']}
           loading={isLoading}
           emptyMessage="No members found."

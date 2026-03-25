@@ -9,10 +9,10 @@ import TreeSearchBar from '@/components/trees/panels/TreeSearchBar'
 import ReassignConfirmDialog from '@/components/trees/panels/ReassignConfirmDialog'
 import MemberDetailPanel from '@/components/trees/panels/MemberDetailPanel'
 import MemberNode from '@/components/trees/nodes/MemberNode'
-import type { ComponentType } from 'react'
+import type { NodeTypes } from '@xyflow/react'
 
-const nodeTypes: Record<string, ComponentType> = {
-  member: MemberNode as ComponentType,
+const nodeTypes: NodeTypes = {
+  member: MemberNode,
 }
 
 export default function OrgTreePage() {

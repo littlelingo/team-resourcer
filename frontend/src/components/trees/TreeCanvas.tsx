@@ -1,4 +1,3 @@
-import type { ComponentType } from 'react'
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -7,12 +6,12 @@ import {
   Background,
   BackgroundVariant,
 } from '@xyflow/react'
-import type { Node, Edge, NodeMouseHandler, OnNodeDrag } from '@xyflow/react'
+import type { Node, Edge, NodeMouseHandler, OnNodeDrag, NodeTypes } from '@xyflow/react'
 
 interface TreeCanvasProps {
   nodes: Node[]
   edges: Edge[]
-  nodeTypes: Record<string, ComponentType>
+  nodeTypes: NodeTypes
   onNodeClick?: NodeMouseHandler
   onNodeDragStop?: OnNodeDrag
   className?: string

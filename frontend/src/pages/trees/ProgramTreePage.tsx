@@ -14,11 +14,11 @@ import ReassignConfirmDialog from '@/components/trees/panels/ReassignConfirmDial
 import MemberDetailPanel from '@/components/trees/panels/MemberDetailPanel'
 import MemberNode from '@/components/trees/nodes/MemberNode'
 import ProgramNode from '@/components/trees/nodes/ProgramNode'
-import type { ComponentType } from 'react'
+import type { NodeTypes } from '@xyflow/react'
 
-const nodeTypes: Record<string, ComponentType> = {
-  program: ProgramNode as ComponentType,
-  member: MemberNode as ComponentType,
+const nodeTypes: NodeTypes = {
+  program: ProgramNode,
+  member: MemberNode,
 }
 
 export default function ProgramTreePage() {

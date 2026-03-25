@@ -9,3 +9,4 @@ services:
     command: npx serve dist -l 5173
     environment:
       - NODE_ENV=production
+    volumes: !reset []

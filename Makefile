@@ -1,4 +1,4 @@
-.PHONY: up down logs migrate migration seed test lint format typecheck shell-db
+.PHONY: up down logs migrate migration seed test lint format typecheck shell-db reload reload-backend reload-frontend rebuild rebuild-backend rebuild-frontend
 
 up:
 	docker compose up -d
@@ -32,3 +32,22 @@ typecheck:
 
 shell-db:
 	docker compose exec db psql -U resourcer -d team_resourcer
+
+# restart containers (picks up env/config changes; code changes use HMR)
+reload:
+	docker compose restart backend frontend
+
+reload-backend:
+	docker compose restart backend
+
+reload-frontend:
+	docker compose restart frontend
+
+rebuild:
+	docker compose up -d --build
+
+rebuild-backend:
+	docker compose up -d --build backend
+
+rebuild-frontend:
+	docker compose up -d --build frontend

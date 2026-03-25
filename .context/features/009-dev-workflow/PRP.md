@@ -1,6 +1,6 @@
 ---
 feature: 009-dev-workflow
-status: APPROVED
+status: COMPLETE
 testing_strategy: implement-then-test
 complexity: LOW
 ---

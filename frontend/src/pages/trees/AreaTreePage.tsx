@@ -15,12 +15,12 @@ import MemberDetailPanel from '@/components/trees/panels/MemberDetailPanel'
 import MemberNode from '@/components/trees/nodes/MemberNode'
 import AreaNode from '@/components/trees/nodes/AreaNode'
 import TeamNode from '@/components/trees/nodes/TeamNode'
-import type { ComponentType } from 'react'
+import type { NodeTypes } from '@xyflow/react'
 
-const nodeTypes: Record<string, ComponentType> = {
-  area: AreaNode as ComponentType,
-  team: TeamNode as ComponentType,
-  member: MemberNode as ComponentType,
+const nodeTypes: NodeTypes = {
+  area: AreaNode,
+  team: TeamNode,
+  member: MemberNode,
 }
 
 export default function AreaTreePage() {

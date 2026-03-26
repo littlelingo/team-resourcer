@@ -41,7 +41,9 @@ async def get_org_tree(db: AsyncSession) -> list[OrgTreeNode]:
 
     # Root nodes are those with no supervisor
     roots = [m for m in members if m.supervisor_id is None]
-    return [_build_tree(m, member_map) for m in sorted(roots, key=lambda m: m.name)]
+    return [
+        _build_tree(m, member_map) for m in sorted(roots, key=lambda m: (m.last_name, m.first_name))
+    ]
 
 
 async def set_supervisor(

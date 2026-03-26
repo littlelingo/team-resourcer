@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Avatar from '@radix-ui/react-avatar'
 import { X } from 'lucide-react'
+import { getInitials } from '@/lib/member-utils'
 import { toast } from 'sonner'
 import { getImageUrl } from '@/lib/api-client'
 import ImportWizard from '@/components/import/ImportWizard'
@@ -79,7 +80,7 @@ function ProgramMembersSheet({
                         className="h-full w-full object-cover"
                       />
                       <Avatar.Fallback className="flex h-full w-full items-center justify-center text-xs font-medium text-slate-600">
-                        {`${member.first_name[0]}${member.last_name[0]}`.toUpperCase()}
+                        {getInitials(member.first_name, member.last_name)}
                       </Avatar.Fallback>
                     </Avatar.Root>
                     <div>

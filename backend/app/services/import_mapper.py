@@ -3,6 +3,7 @@ from __future__ import annotations
 """Apply a column mapping to raw session rows and validate each row."""
 
 import re
+from datetime import date
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
@@ -26,9 +27,7 @@ def _validate_hire_date(data: dict[str, Any], errors: list[str]) -> None:
     val = data.get("hire_date")
     if val and val != "":
         try:
-            from datetime import date as _date
-
-            _date.fromisoformat(str(val))
+            date.fromisoformat(str(val))
         except ValueError:
             errors.append(f"'hire_date' must be ISO date format (YYYY-MM-DD), got '{val}'.")
 

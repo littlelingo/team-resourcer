@@ -309,9 +309,7 @@ async def _commit_members(
         hire_date_val = data.get("hire_date")
         if hire_date_val and hire_date_val != "":
             try:
-                from datetime import date as _date
-
-                member.hire_date = _date.fromisoformat(str(hire_date_val))
+                member.hire_date = date.fromisoformat(str(hire_date_val))
             except ValueError:
                 pass  # Already caught at preview validation stage
 

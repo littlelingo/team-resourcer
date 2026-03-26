@@ -17,13 +17,17 @@ from app.schemas.program_assignment import ProgramAssignmentCreate
 
 async def list_programs(db: AsyncSession) -> list[Program]:
     """Return all programs ordered by name."""
-    result = await db.execute(select(Program).order_by(Program.name))
+    result = await db.execute(
+        select(Program).options(selectinload(Program.agency)).order_by(Program.name)
+    )
     return list(result.scalars().all())
 
 
 async def get_program(db: AsyncSession, program_id: int) -> Program | None:
     """Fetch a single program by ID."""
-    result = await db.execute(select(Program).where(Program.id == program_id))
+    result = await db.execute(
+        select(Program).options(selectinload(Program.agency)).where(Program.id == program_id)
+    )
     return result.scalar_one_or_none()
 
 
@@ -33,7 +37,10 @@ async def create_program(db: AsyncSession, data: ProgramCreate) -> Program:
     db.add(program)
     await db.commit()
     await db.refresh(program)
-    return program
+    result = await db.execute(
+        select(Program).options(selectinload(Program.agency)).where(Program.id == program.id)
+    )
+    return result.scalar_one()
 
 
 async def update_program(db: AsyncSession, program_id: int, data: ProgramUpdate) -> Program | None:
@@ -45,7 +52,10 @@ async def update_program(db: AsyncSession, program_id: int, data: ProgramUpdate)
         setattr(program, field, value)
     await db.commit()
     await db.refresh(program)
-    return program
+    result = await db.execute(
+        select(Program).options(selectinload(Program.agency)).where(Program.id == program.id)
+    )
+    return result.scalar_one()
 
 
 async def delete_program(db: AsyncSession, program_id: int) -> bool:

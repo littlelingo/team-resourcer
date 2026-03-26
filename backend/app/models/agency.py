@@ -1,22 +1,21 @@
 from __future__ import annotations
 
-"""SQLAlchemy model for the programs table."""
+"""SQLAlchemy model for the agencies table."""
 
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
 
 if TYPE_CHECKING:
-    from app.models.agency import Agency
-    from app.models.program_assignment import ProgramAssignment
+    from app.models.program import Program
 
 
-class Program(Base):
-    __tablename__ = "programs"
+class Agency(Base):
+    __tablename__ = "agencies"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
@@ -31,10 +30,5 @@ class Program(Base):
         nullable=False,
     )
 
-    agency_id: Mapped[int | None] = mapped_column(ForeignKey("agencies.id"), nullable=True)
-
     # Relationships
-    assignments: Mapped[list[ProgramAssignment]] = relationship(
-        "ProgramAssignment", back_populates="program"
-    )
-    agency: Mapped["Agency | None"] = relationship("Agency", back_populates="programs")
+    programs: Mapped[list[Program]] = relationship("Program", back_populates="agency")

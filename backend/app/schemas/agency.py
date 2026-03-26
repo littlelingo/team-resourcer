@@ -1,38 +1,33 @@
-"""Pydantic schemas for program create, update, and response."""
+"""Pydantic schemas for agency create, update, and response."""
 
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.schemas.agency import AgencyListResponse
 
-
-class ProgramCreate(BaseModel):
+class AgencyCreate(BaseModel):
     name: str
     description: str | None = None
-    agency_id: int | None = None
 
 
-class ProgramUpdate(BaseModel):
+class AgencyUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
-    agency_id: int | None = None
 
 
-class ProgramResponse(BaseModel):
+class AgencyResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     name: str
     description: str | None
-    agency_id: int | None
-    agency: AgencyListResponse | None = None
     created_at: datetime
     updated_at: datetime
 
 
-class ProgramListResponse(BaseModel):
+class AgencyListResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     name: str
+    description: str | None

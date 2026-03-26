@@ -6,6 +6,14 @@ export interface FunctionalArea {
   description: string | null
 }
 
+// ─── Agencies ────────────────────────────────────────────────────────────────
+
+export interface Agency {
+  id: number
+  name: string
+  description: string | null
+}
+
 // ─── Teams ───────────────────────────────────────────────────────────────────
 
 /** Lightweight team reference embedded in member responses */
@@ -38,6 +46,8 @@ export interface Program {
   id: number
   name: string
   description: string | null
+  agency_id: number | null
+  agency?: Agency
   created_at: string
   updated_at: string
 }
@@ -113,6 +123,12 @@ export interface MemberFormInput {
 }
 
 export interface ProgramFormInput {
+  name: string
+  description?: string
+  agency_id?: number
+}
+
+export interface AgencyFormInput {
   name: string
   description?: string
 }

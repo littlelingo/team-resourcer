@@ -1,31 +1,23 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import RowActionsMenu from '@/components/shared/RowActionsMenu'
-import type { Program } from '@/types'
+import type { Agency } from '@/types'
 
-interface ProgramColumnsOptions {
-  onEdit: (program: Program) => void
-  onDelete: (program: Program) => void
-  onSelect: (program: Program) => void
+interface AgencyColumnsOptions {
+  onEdit: (agency: Agency) => void
+  onDelete: (agency: Agency) => void
 }
 
-export function getProgramColumns({
+export function getAgencyColumns({
   onEdit,
   onDelete,
-  onSelect,
-}: ProgramColumnsOptions): ColumnDef<Program>[] {
+}: AgencyColumnsOptions): ColumnDef<Agency>[] {
   return [
     {
       accessorKey: 'name',
       header: 'Name',
       enableSorting: true,
       cell: ({ row }) => (
-        <button
-          type="button"
-          onClick={() => onSelect(row.original)}
-          className="font-medium text-slate-900 hover:text-blue-600 hover:underline text-left"
-        >
-          {row.original.name}
-        </button>
+        <span className="font-medium text-slate-900">{row.original.name}</span>
       ),
     },
     {
@@ -35,16 +27,6 @@ export function getProgramColumns({
       cell: ({ row }) => (
         <span className="text-slate-500 line-clamp-2">
           {row.original.description ?? '—'}
-        </span>
-      ),
-    },
-    {
-      id: 'agency',
-      header: 'Agency',
-      enableSorting: false,
-      cell: ({ row }) => (
-        <span className="text-slate-500">
-          {row.original.agency?.name ?? '—'}
         </span>
       ),
     },

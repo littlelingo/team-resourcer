@@ -10,6 +10,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.agency import Agency
 from app.models.functional_area import FunctionalArea
 from app.models.member_history import MemberHistory
 from app.models.program import Program
@@ -124,6 +125,28 @@ def _dedup_rows(valid_rows: list[MappedRow], dedup_field: str) -> list[MappedRow
     return deduped
 
 
+async def _commit_agencies(db: AsyncSession, rows: list[MappedRow]) -> tuple[int, int]:
+    """Upsert agencies by name. Returns (created, updated)."""
+    created = updated = 0
+    for row in rows:
+        name = str(row.data.get("name", "")).strip()
+        if not name:
+            continue
+        result = await db.execute(select(Agency).where(Agency.name == name))
+        agency = result.scalar_one_or_none()
+        if agency is None:
+            agency = Agency(name=name)
+            db.add(agency)
+            created += 1
+        else:
+            updated += 1
+        desc = row.data.get("description")
+        if desc is not None and desc != "":
+            agency.description = str(desc)
+        await db.flush()
+    return created, updated
+
+
 async def _commit_areas(db: AsyncSession, rows: list[MappedRow]) -> tuple[int, int]:
     """Upsert functional areas by name. Returns (created, updated)."""
     created = updated = 0
@@ -164,6 +187,15 @@ async def _commit_programs(db: AsyncSession, rows: list[MappedRow]) -> tuple[int
         desc = row.data.get("description")
         if desc is not None and desc != "":
             program.description = str(desc)
+        # Resolve agency by name (lookup-only — do not create)
+        agency_name = row.data.get("agency_name")
+        if agency_name:
+            agency_result = await db.execute(
+                select(Agency).where(Agency.name == str(agency_name).strip())
+            )
+            found_agency = agency_result.scalar_one_or_none()
+            if found_agency is not None:
+                program.agency_id = found_agency.id
         await db.flush()
     return created, updated
 
@@ -318,6 +350,8 @@ async def commit_import(
         created, updated = await _commit_programs(db, deduped_valid)
     elif entity_type == "team":
         created, updated = await _commit_teams(db, deduped_valid)
+    elif entity_type == "agency":
+        created, updated = await _commit_agencies(db, deduped_valid)
     else:
         created, updated = await _commit_members(db, deduped_valid, error_rows)
 

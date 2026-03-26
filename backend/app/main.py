@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.api.routes.agencies import router as agencies_router
 from app.api.routes.areas import router as areas_router
 from app.api.routes.history import router as history_router
 from app.api.routes.import_router import router as import_router
@@ -55,6 +56,7 @@ app.include_router(
     tags=["history"],
 )
 app.include_router(programs_router, prefix="/api/programs", tags=["programs"])
+app.include_router(agencies_router, prefix="/api/agencies", tags=["agencies"])
 app.include_router(areas_router, prefix="/api/areas", tags=["areas", "teams"])
 app.include_router(org_router, prefix="/api/org", tags=["org"])
 app.include_router(import_router, prefix="/api/import", tags=["import"])

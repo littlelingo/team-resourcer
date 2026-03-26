@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel
 
-EntityType = Literal["member", "program", "area", "team"]
+EntityType = Literal["member", "program", "area", "team", "agency"]
 
 
 class ParseResult(BaseModel):

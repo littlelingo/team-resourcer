@@ -9,6 +9,7 @@ import { memberKeys } from '@/hooks/useMembers'
 import { programKeys } from '@/hooks/usePrograms'
 import { areaKeys } from '@/hooks/useFunctionalAreas'
 import { teamKeys } from '@/hooks/useTeams'
+import { agencyKeys } from '@/hooks/useAgencies'
 
 const PAGE_SIZE = 20
 
@@ -60,6 +61,8 @@ export default function PreviewStep({
       } else if (entityType === 'team') {
         queryClient.invalidateQueries({ queryKey: teamKeys.all })
         queryClient.invalidateQueries({ queryKey: areaKeys.all })
+      } else if (entityType === 'agency') {
+        queryClient.invalidateQueries({ queryKey: agencyKeys.all })
       }
       onCommit(data)
     },

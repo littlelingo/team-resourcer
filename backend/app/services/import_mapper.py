@@ -53,7 +53,7 @@ ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
         validators=[_validate_email],
     ),
     "program": EntityConfig(
-        target_fields={"name", "description"},
+        target_fields={"name", "description", "agency_name"},
         required_fields={"name"},
     ),
     "area": EntityConfig(
@@ -62,6 +62,10 @@ ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
     ),
     "team": EntityConfig(
         target_fields={"name", "functional_area_name", "description"},
+        required_fields={"name"},
+    ),
+    "agency": EntityConfig(
+        target_fields={"name", "description"},
         required_fields={"name"},
     ),
 }

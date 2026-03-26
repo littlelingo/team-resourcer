@@ -13,6 +13,7 @@ import asyncio
 from sqlalchemy import select
 
 from app.core.database import AsyncSessionLocal
+from app.models.agency import Agency
 from app.models.functional_area import FunctionalArea
 from app.models.program import Program
 from app.models.program_assignment import ProgramAssignment
@@ -31,6 +32,18 @@ async def seed() -> None:
         if result.scalar_one_or_none() is not None:
             print("Seed data already present — skipping.")
             return
+
+        # ------------------------------------------------------------------ #
+        # 0. Agencies
+        # ------------------------------------------------------------------ #
+        va = Agency(name="VA", description="Department of Veterans Affairs")
+        cms = Agency(name="CMS", description="Centers for Medicare & Medicaid Services")
+        sec = Agency(name="SEC", description="Securities and Exchange Commission")
+        db.add_all([va, cms, sec])
+        await db.flush()
+        print(f"Created Agency: {va.name} (id={va.id})")
+        print(f"Created Agency: {cms.name} (id={cms.id})")
+        print(f"Created Agency: {sec.name} (id={sec.id})")
 
         # ------------------------------------------------------------------ #
         # 1. Functional Areas
@@ -127,8 +140,12 @@ async def seed() -> None:
         # ------------------------------------------------------------------ #
         # 4. Programs
         # ------------------------------------------------------------------ #
-        alpha = Program(name="Alpha Program", description="First flagship initiative")
-        beta = Program(name="Beta Program", description="Second growth initiative")
+        alpha = Program(
+            name="Alpha Program", description="First flagship initiative", agency_id=va.id
+        )
+        beta = Program(
+            name="Beta Program", description="Second growth initiative", agency_id=cms.id
+        )
         db.add_all([alpha, beta])
         await db.flush()
         print(f"Created Program: {alpha.name} (id={alpha.id})")

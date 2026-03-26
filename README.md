@@ -245,17 +245,34 @@ Step 4: Commit
 
 | Command | Description |
 |---|---|
+| **Lifecycle** | |
 | `make up` | Start all services in the background |
 | `make down` | Stop all services |
 | `make logs` | Tail logs from all services |
+| **Per-Service Start** | |
+| `make up-backend` | Start only the backend service |
+| `make up-frontend` | Start only the frontend service |
+| `make up-db` | Start only the database service |
+| **Rebuild** | |
+| `make rebuild` | Rebuild and start all services |
+| `make rebuild-backend` | Rebuild and start backend only |
+| `make rebuild-frontend` | Rebuild and start frontend only |
+| `make rebuild-db` | Rebuild and start database only |
+| **Reload** | |
+| `make reload` | Restart backend and frontend containers |
+| `make reload-backend` | Restart backend container only |
+| `make reload-frontend` | Restart frontend container only |
+| **Database** | |
 | `make migrate` | Run pending Alembic migrations |
 | `make migration name="description"` | Generate a new Alembic migration |
 | `make seed` | Seed the database with sample data |
+| `make shell-db` | Open a psql shell to the database |
+| `make reset-db` | Drop and recreate the database, then run migrations |
+| **Code Quality** | |
 | `make test` | Run backend test suite (pytest) |
 | `make lint` | Run ruff linter on backend code |
 | `make format` | Run ruff formatter on backend code |
 | `make typecheck` | Run mypy type checker on backend code |
-| `make shell-db` | Open a psql shell to the database |
 
 ### Hot Reload
 

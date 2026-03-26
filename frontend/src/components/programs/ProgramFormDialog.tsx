@@ -63,7 +63,7 @@ export default function ProgramFormDialog({
     const payload = {
       name: values.name,
       description: values.description || undefined,
-      agency_id: values.agency_id || null,
+      agency_id: values.agency_id || undefined,
     }
 
     if (isEdit && program) {

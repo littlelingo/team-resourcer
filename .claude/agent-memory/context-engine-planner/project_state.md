@@ -4,7 +4,7 @@ description: Current scaffolding and phase completion status of team-resourcer
 type: project
 ---
 
-As of 2026-03-23, the team-resourcer repo has a fully scaffolded frontend and backend. Source files exist under `frontend/src/` and `backend/app/`. The codebase is feature-complete for the initial four phases but has zero test coverage (no test files, no test tooling installed on the frontend, no tests directory on the backend despite pytest being installed).
+As of 2026-03-26, the team-resourcer repo has a fully scaffolded frontend and backend. Feature 017 (Agency entity + Program FK) was completed and merged. Feature 018 (Member name split + hire_date) PRP was written 2026-03-26. Source files exist under `frontend/src/` and `backend/app/`. The codebase is feature-complete for the initial four phases but has zero test coverage (no test files, no test tooling installed on the frontend, no tests directory on the backend despite pytest being installed).
 
 **Why:** The project was designed-first (PRPs written before scaffolding), and test coverage was deferred. A test coverage initiative (feature 002) is now underway with separate frontend and backend PRPs.
 

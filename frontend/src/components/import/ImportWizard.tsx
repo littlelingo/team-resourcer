@@ -6,6 +6,7 @@ import MapColumnsStep, {
   MEMBER_TARGET_FIELDS,
   PROGRAM_TARGET_FIELDS,
   AREA_TARGET_FIELDS,
+  AGENCY_TARGET_FIELDS,
   TEAM_TARGET_FIELDS,
   type TargetField,
 } from './MapColumnsStep'
@@ -24,6 +25,7 @@ const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
   program: { targetFields: PROGRAM_TARGET_FIELDS, requiredFields: ['name'] },
   area: { targetFields: AREA_TARGET_FIELDS, requiredFields: ['name'] },
   team: { targetFields: TEAM_TARGET_FIELDS, requiredFields: ['name'] },
+  agency: { targetFields: AGENCY_TARGET_FIELDS, requiredFields: ['name'] },
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────

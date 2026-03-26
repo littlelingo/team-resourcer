@@ -9,7 +9,7 @@ export interface UploadResponse {
   total_row_count: number
 }
 
-export type EntityType = 'member' | 'program' | 'area' | 'team'
+export type EntityType = 'member' | 'program' | 'area' | 'team' | 'agency'
 
 export interface MappingConfig {
   session_id: string

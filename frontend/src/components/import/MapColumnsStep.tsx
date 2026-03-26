@@ -38,6 +38,11 @@ export const AREA_TARGET_FIELDS: TargetField[] = [
   { label: 'Description', value: 'description' },
 ]
 
+export const AGENCY_TARGET_FIELDS: TargetField[] = [
+  { label: 'Name', value: 'name' },
+  { label: 'Description', value: 'description' },
+]
+
 export const TEAM_TARGET_FIELDS: TargetField[] = [
   { label: 'Name', value: 'name' },
   { label: 'Functional Area', value: 'functional_area_name' },

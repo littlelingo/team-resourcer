@@ -34,3 +34,8 @@
 | Format     | `make format` |
 | Type-check | `make typecheck` |
 | DB shell   | `make shell-db` |
+| Reset DB   | `make reset-db` |
+| Start backend | `make up-backend` |
+| Start frontend | `make up-frontend` |
+| Start DB   | `make up-db` |
+| Rebuild DB | `make rebuild-db` |

@@ -1,4 +1,4 @@
-.PHONY: up down logs migrate migration seed test lint format typecheck shell-db reload reload-backend reload-frontend rebuild rebuild-backend rebuild-frontend
+.PHONY: up down logs migrate migration seed test lint format typecheck shell-db reload reload-backend reload-frontend rebuild rebuild-backend rebuild-frontend rebuild-db reset-db up-backend up-frontend up-db
 
 up:
 	docker compose up -d
@@ -42,6 +42,29 @@ reload-backend:
 
 reload-frontend:
 	docker compose restart frontend
+
+# start individual services
+up-backend:
+	docker compose up -d backend
+
+up-frontend:
+	docker compose up -d frontend
+
+up-db:
+	docker compose up -d db
+
+# rebuild individual services
+rebuild-db:
+	docker compose up -d --build db
+
+# drop and recreate the database, then run migrations
+reset-db:
+	docker compose exec db psql -U resourcer -c "DROP DATABASE IF EXISTS team_resourcer;"
+	docker compose exec db psql -U resourcer -c "CREATE DATABASE team_resourcer;"
+	docker compose restart backend
+	@sleep 2
+	docker compose exec backend alembic upgrade head
+	@echo "Database reset complete."
 
 rebuild:
 	docker compose up -d --build

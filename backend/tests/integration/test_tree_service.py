@@ -17,8 +17,12 @@ async def test_build_org_tree_single_member(db_session, area, member):
 
 
 async def test_build_org_tree_supervisor_edge(db_session, area):
-    alice = TeamMember(employee_id="TREE001", name="Alice", functional_area_id=area.id)
-    bob = TeamMember(employee_id="TREE002", name="Bob", functional_area_id=area.id)
+    alice = TeamMember(
+        employee_id="TREE001", first_name="Alice", last_name="Test", functional_area_id=area.id
+    )
+    bob = TeamMember(
+        employee_id="TREE002", first_name="Bob", last_name="Test", functional_area_id=area.id
+    )
     db_session.add_all([alice, bob])
     await db_session.flush()
     bob.supervisor_id = alice.uuid

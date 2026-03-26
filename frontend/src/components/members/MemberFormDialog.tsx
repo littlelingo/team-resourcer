@@ -20,7 +20,9 @@ import type { TeamMember } from '@/types'
 
 const memberFormSchema = z.object({
   employee_id: z.string().min(1, 'Employee ID is required'),
-  name: z.string().min(1, 'Name is required'),
+  first_name: z.string().min(1, 'First name is required'),
+  last_name: z.string().min(1, 'Last name is required'),
+  hire_date: z.string().optional(),
   title: z.string(),
   email: z.string().email('Invalid email').or(z.literal('')),
   phone: z.string(),
@@ -83,7 +85,9 @@ export default function MemberFormDialog({
     resolver: zodResolver(memberFormSchema),
     defaultValues: {
       employee_id: member?.employee_id ?? '',
-      name: member?.name ?? '',
+      first_name: member?.first_name ?? '',
+      last_name: member?.last_name ?? '',
+      hire_date: member?.hire_date ?? '',
       title: member?.title ?? '',
       email: member?.email ?? '',
       phone: member?.phone ?? '',
@@ -128,7 +132,9 @@ export default function MemberFormDialog({
           uuid: member.uuid,
           data: {
             employee_id: values.employee_id,
-            name: values.name,
+            first_name: values.first_name,
+            last_name: values.last_name,
+            hire_date: values.hire_date || undefined,
             title: values.title || undefined,
             email: values.email || undefined,
             phone: values.phone || undefined,
@@ -149,7 +155,9 @@ export default function MemberFormDialog({
       } else {
         const created = await createMember.mutateAsync({
           employee_id: values.employee_id,
-          name: values.name,
+          first_name: values.first_name,
+          last_name: values.last_name,
+          hire_date: values.hire_date || undefined,
           title: values.title || undefined,
           email: values.email || '',
           phone: values.phone || undefined,
@@ -190,7 +198,7 @@ export default function MemberFormDialog({
   // Supervisor options: all members except self
   const supervisorOptions = allMembers
     .filter((m) => !member || m.uuid !== member.uuid)
-    .map((m) => ({ value: m.uuid, label: m.name }))
+    .map((m) => ({ value: m.uuid, label: `${m.first_name} ${m.last_name}` }))
 
   const areaOptions = areas.map((a) => ({ value: String(a.id), label: a.name }))
   const teamOptions = teams.map((t) => ({ value: String(t.id), label: t.name }))
@@ -259,14 +267,30 @@ export default function MemberFormDialog({
                     placeholder="EMP-001"
                   />
                 </Field>
-                <Field label="Name" required error={errors.name?.message}>
+                <Field label="First Name" required error={errors.first_name?.message}>
                   <input
-                    {...register('name')}
+                    {...register('first_name')}
                     className={inputCls}
-                    placeholder="Full name"
+                    placeholder="First name"
                   />
                 </Field>
               </div>
+
+              <Field label="Last Name" required error={errors.last_name?.message}>
+                <input
+                  {...register('last_name')}
+                  className={inputCls}
+                  placeholder="Last name"
+                />
+              </Field>
+
+              <Field label="Hire Date" error={errors.hire_date?.message}>
+                <input
+                  {...register('hire_date')}
+                  type="date"
+                  className={inputCls}
+                />
+              </Field>
 
               <Field label="Title" error={errors.title?.message}>
                 <input {...register('title')} className={inputCls} placeholder="Job title" />

@@ -8,7 +8,8 @@ export const handlers = [
     HttpResponse.json([
       {
         uuid: 'uuid-1',
-        name: 'Alice Example',
+        first_name: 'Alice',
+        last_name: 'Example',
         employee_id: 'E001',
         title: 'Engineer',
         image_path: null,
@@ -21,7 +22,8 @@ export const handlers = [
   http.get(`${BASE}/api/members/:uuid`, () =>
     HttpResponse.json({
       uuid: 'uuid-1',
-      name: 'Alice Example',
+      first_name: 'Alice',
+      last_name: 'Example',
       employee_id: 'E001',
       title: 'Engineer',
       image_path: null,
@@ -30,13 +32,13 @@ export const handlers = [
 
   http.post(`${BASE}/api/members/`, () =>
     HttpResponse.json(
-      { uuid: 'uuid-new', name: 'Bob New', employee_id: 'E002' },
+      { uuid: 'uuid-new', first_name: 'Bob', last_name: 'New', employee_id: 'E002' },
       { status: 201 },
     ),
   ),
 
   http.put(`${BASE}/api/members/:uuid`, () =>
-    HttpResponse.json({ uuid: 'uuid-1', name: 'Alice Updated' }),
+    HttpResponse.json({ uuid: 'uuid-1', first_name: 'Alice', last_name: 'Updated' }),
   ),
 
   http.delete(`${BASE}/api/members/:uuid`, () =>

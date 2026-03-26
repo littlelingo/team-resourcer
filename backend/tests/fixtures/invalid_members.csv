@@ -1,5 +1,5 @@
-employee_id,name,email,salary
-EMP010,,alice@example.com,50000
-EMP011,Bob Jones,not-an-email,75000
-EMP012,Carol White,carol@example.com,not-a-number
-,Dave Brown,dave@example.com,60000
+employee_id,first_name,last_name,email,salary
+EMP010,,Smith,alice@example.com,50000
+EMP011,Bob,Jones,not-an-email,75000
+EMP012,Carol,White,carol@example.com,not-a-number
+,Dave,Brown,dave@example.com,60000

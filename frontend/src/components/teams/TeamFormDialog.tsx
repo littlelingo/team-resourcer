@@ -263,7 +263,7 @@ export default function TeamFormDialog({
                               value={member.uuid}
                               className="flex cursor-pointer items-center gap-2 rounded-sm px-3 py-1.5 text-sm text-slate-700 outline-none hover:bg-slate-100 focus:bg-slate-100"
                             >
-                              <Select.ItemText>{member.name}</Select.ItemText>
+                              <Select.ItemText>{`${member.first_name} ${member.last_name}`}</Select.ItemText>
                               <Select.ItemIndicator className="ml-auto">
                                 <Check className="h-3.5 w-3.5" />
                               </Select.ItemIndicator>

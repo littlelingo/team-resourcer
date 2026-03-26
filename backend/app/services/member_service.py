@@ -30,7 +30,7 @@ async def list_members(
             selectinload(TeamMember.functional_area),
             selectinload(TeamMember.team),
         )
-        .order_by(TeamMember.name)
+        .order_by(TeamMember.last_name, TeamMember.first_name)
     )
     if area_id is not None:
         stmt = stmt.where(TeamMember.functional_area_id == area_id)

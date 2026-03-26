@@ -63,15 +63,15 @@ export default function MemberDetailPanel({ memberId, onClose }: MemberDetailPan
                   <Avatar.Root className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-slate-200">
                     <Avatar.Image
                       src={getImageUrl(member.image_path)}
-                      alt={member.name}
+                      alt={`${member.first_name} ${member.last_name}`}
                       className="h-full w-full object-cover"
                     />
                     <Avatar.Fallback className="flex h-full w-full items-center justify-center text-lg font-semibold text-slate-600">
-                      {getInitials(member.name)}
+                      {getInitials(member.first_name, member.last_name)}
                     </Avatar.Fallback>
                   </Avatar.Root>
                   <div className="min-w-0">
-                    <h2 className="text-lg font-semibold text-slate-900 leading-tight">{member.name}</h2>
+                    <h2 className="text-lg font-semibold text-slate-900 leading-tight">{`${member.first_name} ${member.last_name}`}</h2>
                     {member.title && (
                       <p className="mt-0.5 text-sm text-slate-500">{member.title}</p>
                     )}

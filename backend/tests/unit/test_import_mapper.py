@@ -24,47 +24,58 @@ def make_config(sid, col_map):
 
 
 def test_apply_mapping_happy_path_all_valid():
-    rows = [{"Col_ID": "EMP001", "Col_Name": "Alice"}]
-    sid = create_session(rows, ["Col_ID", "Col_Name"])
-    config = make_config(sid, {"Col_ID": "employee_id", "Col_Name": "name"})
+    rows = [{"Col_ID": "EMP001", "Col_FN": "Alice", "Col_LN": "Smith"}]
+    sid = create_session(rows, ["Col_ID", "Col_FN", "Col_LN"])
+    config = make_config(
+        sid, {"Col_ID": "employee_id", "Col_FN": "first_name", "Col_LN": "last_name"}
+    )
     result = apply_mapping(sid, config)
     assert result.error_count == 0
     assert result.warning_count == 0
     assert result.rows[0].data["employee_id"] == "EMP001"
-    assert result.rows[0].data["name"] == "Alice"
+    assert result.rows[0].data["first_name"] == "Alice"
+    assert result.rows[0].data["last_name"] == "Smith"
 
 
 def test_apply_mapping_missing_employee_id_is_error():
-    rows = [{"Col_ID": "", "Col_Name": "Alice"}]
-    sid = create_session(rows, ["Col_ID", "Col_Name"])
-    config = make_config(sid, {"Col_ID": "employee_id", "Col_Name": "name"})
+    rows = [{"Col_ID": "", "Col_FN": "Alice", "Col_LN": "Smith"}]
+    sid = create_session(rows, ["Col_ID", "Col_FN", "Col_LN"])
+    config = make_config(
+        sid, {"Col_ID": "employee_id", "Col_FN": "first_name", "Col_LN": "last_name"}
+    )
     result = apply_mapping(sid, config)
     assert result.error_count == 1
     assert any("employee_id" in e for e in result.rows[0].errors)
 
 
 def test_apply_mapping_missing_name_is_error():
-    rows = [{"Col_ID": "EMP001", "Col_Name": ""}]
-    sid = create_session(rows, ["Col_ID", "Col_Name"])
-    config = make_config(sid, {"Col_ID": "employee_id", "Col_Name": "name"})
+    rows = [{"Col_ID": "EMP001", "Col_FN": "", "Col_LN": "Smith"}]
+    sid = create_session(rows, ["Col_ID", "Col_FN", "Col_LN"])
+    config = make_config(
+        sid, {"Col_ID": "employee_id", "Col_FN": "first_name", "Col_LN": "last_name"}
+    )
     result = apply_mapping(sid, config)
     assert result.error_count == 1
-    assert any("name" in e for e in result.rows[0].errors)
+    assert any("first_name" in e for e in result.rows[0].errors)
 
 
 def test_apply_mapping_invalid_email_is_error():
-    rows = [{"id": "EMP001", "n": "Alice", "e": "not-an-email"}]
-    sid = create_session(rows, ["id", "n", "e"])
-    config = make_config(sid, {"id": "employee_id", "n": "name", "e": "email"})
+    rows = [{"id": "EMP001", "fn": "Alice", "ln": "Test", "e": "not-an-email"}]
+    sid = create_session(rows, ["id", "fn", "ln", "e"])
+    config = make_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name", "e": "email"}
+    )
     result = apply_mapping(sid, config)
     assert result.error_count == 1
     assert any("Invalid email" in e for e in result.rows[0].errors)
 
 
 def test_apply_mapping_non_numeric_salary_is_error():
-    rows = [{"id": "EMP001", "n": "Alice", "s": "not-a-number"}]
-    sid = create_session(rows, ["id", "n", "s"])
-    config = make_config(sid, {"id": "employee_id", "n": "name", "s": "salary"})
+    rows = [{"id": "EMP001", "fn": "Alice", "ln": "Test", "s": "not-a-number"}]
+    sid = create_session(rows, ["id", "fn", "ln", "s"])
+    config = make_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name", "s": "salary"}
+    )
     result = apply_mapping(sid, config)
     assert result.error_count == 1
     assert any("salary" in e and "numeric" in e for e in result.rows[0].errors)
@@ -72,11 +83,11 @@ def test_apply_mapping_non_numeric_salary_is_error():
 
 def test_apply_mapping_duplicate_employee_id_is_warning():
     rows = [
-        {"id": "EMP001", "n": "Alice"},
-        {"id": "EMP001", "n": "Duplicate"},
+        {"id": "EMP001", "fn": "Alice", "ln": "Test"},
+        {"id": "EMP001", "fn": "Duplicate", "ln": "Test"},
     ]
-    sid = create_session(rows, ["id", "n"])
-    config = make_config(sid, {"id": "employee_id", "n": "name"})
+    sid = create_session(rows, ["id", "fn", "ln"])
+    config = make_config(sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name"})
     result = apply_mapping(sid, config)
     assert result.warning_count == 1
     assert result.error_count == 0
@@ -84,9 +95,11 @@ def test_apply_mapping_duplicate_employee_id_is_warning():
 
 
 def test_apply_mapping_skipped_column_none_not_in_data():
-    rows = [{"id": "EMP001", "n": "Alice", "skip": "ignored"}]
-    sid = create_session(rows, ["id", "n", "skip"])
-    config = make_config(sid, {"id": "employee_id", "n": "name", "skip": None})
+    rows = [{"id": "EMP001", "fn": "Alice", "ln": "Test", "skip": "ignored"}]
+    sid = create_session(rows, ["id", "fn", "ln", "skip"])
+    config = make_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name", "skip": None}
+    )
     result = apply_mapping(sid, config)
     assert "skip" not in result.rows[0].data
 

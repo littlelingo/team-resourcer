@@ -8,3 +8,4 @@
 - [project_012_security2_review.md](project_012_security2_review.md) — 012-adapt-security-2 (--workers 1, remove Content-Type check): key findings from review on 2026-03-25
 - [project_013_entity_import_review.md](project_013_entity_import_review.md) — 013-entity-import (per-section CSV/Sheets import for programs/areas/teams): key findings from review on 2026-03-25
 - [project_017_agency_review.md](project_017_agency_review.md) — 017-program-agency (Agency entity, program FK, import support): key findings from review on 2026-03-25
+- [project_018_member_name_split_review.md](project_018_member_name_split_review.md) — 018-member-name-split (first_name/last_name split + hire_date): key findings from review on 2026-03-26

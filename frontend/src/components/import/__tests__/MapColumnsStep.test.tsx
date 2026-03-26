@@ -18,7 +18,7 @@ function renderWithQuery(ui: React.ReactElement) {
 
 const defaultProps = {
   sessionId: 'session-123',
-  headers: ['Employee ID', 'Full Name'],
+  headers: ['Employee ID', 'First Name', 'Last Name'],
   initialColumnMap: {} as Record<string, string | null>,
   onPreview: vi.fn(),
 }
@@ -30,11 +30,12 @@ describe('MapColumnsStep', () => {
 
   it('renders all source column headers', () => {
     renderWithQuery(<MapColumnsStep {...defaultProps} />)
-    // Source headers render inside a <span class="font-mono ...">
     const spans = screen.getAllByText('Employee ID')
     expect(spans.some((el) => el.tagName === 'SPAN')).toBe(true)
-    const nameSpans = screen.getAllByText('Full Name')
-    expect(nameSpans.some((el) => el.tagName === 'SPAN')).toBe(true)
+    const firstNameSpans = screen.getAllByText('First Name')
+    expect(firstNameSpans.some((el) => el.tagName === 'SPAN')).toBe(true)
+    const lastNameSpans = screen.getAllByText('Last Name')
+    expect(lastNameSpans.some((el) => el.tagName === 'SPAN')).toBe(true)
   })
 
   it('renders "Map Columns" heading', () => {
@@ -44,25 +45,23 @@ describe('MapColumnsStep', () => {
 
   it('auto-suggests employee_id for "Employee ID" header', () => {
     renderWithQuery(<MapColumnsStep {...defaultProps} />)
-    // The selects are ordered by headers array; first header is 'Employee ID'
     const selects = screen.getAllByRole('combobox')
     expect((selects[0] as HTMLSelectElement).value).toBe('employee_id')
   })
 
-  it('auto-suggests name for "Full Name" header', () => {
+  it('auto-suggests first_name for "First Name" header', () => {
     renderWithQuery(<MapColumnsStep {...defaultProps} />)
     const selects = screen.getAllByRole('combobox')
-    expect((selects[1] as HTMLSelectElement).value).toBe('name')
+    expect((selects[1] as HTMLSelectElement).value).toBe('first_name')
   })
 
   it('renders Skip option in each select', () => {
     renderWithQuery(<MapColumnsStep {...defaultProps} />)
     const skipOptions = screen.getAllByText('Skip this column')
-    // Each select has a Skip option; we have 2 headers
-    expect(skipOptions.length).toBeGreaterThanOrEqual(2)
+    expect(skipOptions.length).toBeGreaterThanOrEqual(3)
   })
 
-  it('shows required fields warning when employee_id/name not mapped', () => {
+  it('shows required fields warning when required fields not mapped', () => {
     renderWithQuery(
       <MapColumnsStep
         {...defaultProps}
@@ -70,7 +69,6 @@ describe('MapColumnsStep', () => {
         initialColumnMap={{}}
       />
     )
-    // The warning text mentions both required fields
     expect(screen.getByText(/Map at least/)).toBeInTheDocument()
   })
 
@@ -87,7 +85,6 @@ describe('MapColumnsStep', () => {
 
   it('Preview button is enabled when required fields are mapped', () => {
     renderWithQuery(<MapColumnsStep {...defaultProps} />)
-    // 'Employee ID' -> employee_id and 'Full Name' -> name are auto-mapped
     expect(screen.getByRole('button', { name: /preview/i })).not.toBeDisabled()
   })
 
@@ -128,10 +125,9 @@ describe('MapColumnsStep', () => {
     const previewBtn = screen.getByRole('button', { name: /preview/i })
     await user.click(previewBtn)
 
-    // Wait for the mutation to resolve
     await vi.waitFor(() => {
       expect(onPreview).toHaveBeenCalledWith(
-        { 'Employee ID': 'employee_id', 'Full Name': 'name' },
+        { 'Employee ID': 'employee_id', 'First Name': 'first_name', 'Last Name': 'last_name' },
         mockResult
       )
     })

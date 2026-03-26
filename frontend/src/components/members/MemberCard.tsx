@@ -18,7 +18,7 @@ interface MemberCardProps {
 
 export default function MemberCard({ member, onEdit, onDelete, onClick }: MemberCardProps) {
   const imageUrl = getImageUrl(member.image_path)
-  const initials = getInitials(member.name)
+  const initials = getInitials(member.first_name, member.last_name)
 
   return (
     <div
@@ -76,7 +76,7 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
         <Avatar.Root className="mb-3 h-16 w-16 overflow-hidden rounded-full bg-slate-200 flex-shrink-0">
           <Avatar.Image
             src={imageUrl}
-            alt={member.name}
+            alt={`${member.first_name} ${member.last_name}`}
             className="h-full w-full object-cover"
           />
           <Avatar.Fallback className="flex h-full w-full items-center justify-center text-base font-semibold text-slate-600">
@@ -85,7 +85,7 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
         </Avatar.Root>
 
         <h3 className="pr-6 text-sm font-semibold text-slate-900 leading-tight line-clamp-1">
-          {member.name}
+          {`${member.first_name} ${member.last_name}`}
         </h3>
         {member.title && (
           <p className="mt-0.5 text-xs text-slate-500 line-clamp-1">{member.title}</p>

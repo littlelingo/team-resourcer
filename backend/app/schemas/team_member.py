@@ -1,7 +1,7 @@
 """Pydantic schemas for team member create, update, and response."""
 
 import re
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -17,7 +17,9 @@ _EMAIL_RE = re.compile(r"^[^@]+@[^@]+\.[^@]+$")
 
 class TeamMemberCreate(BaseModel):
     employee_id: str
-    name: str
+    first_name: str
+    last_name: str
+    hire_date: date | None = None
     title: str | None = None
     location: str | None = None
     email: str | None = None
@@ -47,7 +49,9 @@ class TeamMemberCreate(BaseModel):
 
 
 class TeamMemberUpdate(BaseModel):
-    name: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    hire_date: date | None = None
     title: str | None = None
     location: str | None = None
     email: str | None = None
@@ -73,7 +77,8 @@ class TeamMemberListResponse(BaseModel):
 
     uuid: UUID
     employee_id: str
-    name: str
+    first_name: str
+    last_name: str
     title: str | None
     location: str | None
     image_path: str | None
@@ -88,7 +93,9 @@ class TeamMemberDetailResponse(BaseModel):
 
     uuid: UUID
     employee_id: str
-    name: str
+    first_name: str
+    last_name: str
+    hire_date: date | None
     title: str | None
     location: str | None
     image_path: str | None

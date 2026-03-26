@@ -30,7 +30,7 @@ describe('useMembers', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
     expect(result.current.data).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ name: 'Alice Example' }),
+        expect.objectContaining({ first_name: 'Alice', last_name: 'Example' }),
       ]),
     )
   })
@@ -68,7 +68,7 @@ describe('useMember', () => {
 describe('useCreateMember', () => {
   it('POSTs successfully', async () => {
     const { result } = renderHook(() => useCreateMember(), { wrapper: createWrapper() })
-    result.current.mutate({ name: 'Bob', employee_id: 'E002', email: 'bob@example.com' })
+    result.current.mutate({ first_name: 'Bob', last_name: 'New', employee_id: 'E002', email: 'bob@example.com' })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
   })
 })
@@ -76,7 +76,7 @@ describe('useCreateMember', () => {
 describe('useUpdateMember', () => {
   it('PUTs successfully', async () => {
     const { result } = renderHook(() => useUpdateMember(), { wrapper: createWrapper() })
-    result.current.mutate({ uuid: 'uuid-1', data: { name: 'Alice Updated' } })
+    result.current.mutate({ uuid: 'uuid-1', data: { first_name: 'Alice', last_name: 'Updated' } })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
   })
 })

@@ -1,4 +1,4 @@
-employee_id,name,email
-EMP020,Original Person,original@example.com
-EMP020,Duplicate Person,duplicate@example.com
-EMP021,Unique Person,unique@example.com
+employee_id,first_name,last_name,email
+EMP020,Original,Person,original@example.com
+EMP020,Duplicate,Person,duplicate@example.com
+EMP021,Unique,Person,unique@example.com

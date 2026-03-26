@@ -10,24 +10,36 @@ async def test_list_members_empty(client, area):
 async def test_create_member_returns_201(client, area):
     resp = await client.post(
         "/api/members/",
-        json={"employee_id": "T001", "name": "Test User", "functional_area_id": area.id},
+        json={
+            "employee_id": "T001",
+            "first_name": "Test",
+            "last_name": "User",
+            "functional_area_id": area.id,
+        },
     )
     assert resp.status_code == 201
     body = resp.json()
     assert body["employee_id"] == "T001"
-    assert body["name"] == "Test User"
+    assert body["first_name"] == "Test"
+    assert body["last_name"] == "User"
     assert "uuid" in body
 
 
 async def test_get_member_by_uuid(client, area):
     resp = await client.post(
         "/api/members/",
-        json={"employee_id": "T002", "name": "Test User", "functional_area_id": area.id},
+        json={
+            "employee_id": "T002",
+            "first_name": "Test",
+            "last_name": "User",
+            "functional_area_id": area.id,
+        },
     )
     uuid = resp.json()["uuid"]
     resp = await client.get(f"/api/members/{uuid}")
     assert resp.status_code == 200
-    assert resp.json()["name"] == "Test User"
+    assert resp.json()["first_name"] == "Test"
+    assert resp.json()["last_name"] == "User"
 
 
 async def test_get_member_not_found(client):
@@ -38,7 +50,12 @@ async def test_get_member_not_found(client):
 async def test_update_member(client, area):
     resp = await client.post(
         "/api/members/",
-        json={"employee_id": "T003", "name": "Test User", "functional_area_id": area.id},
+        json={
+            "employee_id": "T003",
+            "first_name": "Test",
+            "last_name": "User",
+            "functional_area_id": area.id,
+        },
     )
     uuid = resp.json()["uuid"]
     resp = await client.put(f"/api/members/{uuid}", json={"title": "Senior Engineer"})
@@ -57,7 +74,12 @@ async def test_update_member_not_found(client):
 async def test_delete_member(client, area):
     resp = await client.post(
         "/api/members/",
-        json={"employee_id": "T004", "name": "Test User", "functional_area_id": area.id},
+        json={
+            "employee_id": "T004",
+            "first_name": "Test",
+            "last_name": "User",
+            "functional_area_id": area.id,
+        },
     )
     uuid = resp.json()["uuid"]
     resp = await client.delete(f"/api/members/{uuid}")
@@ -76,7 +98,8 @@ async def test_create_member_records_history_for_financial_fields(client, area):
         "/api/members/",
         json={
             "employee_id": "T005",
-            "name": "Rich User",
+            "first_name": "Rich",
+            "last_name": "User",
             "functional_area_id": area.id,
             "salary": 100000,
             "bonus": 5000,
@@ -95,7 +118,8 @@ async def test_update_member_records_history_on_salary_change(client, area):
         "/api/members/",
         json={
             "employee_id": "T006",
-            "name": "Salary User",
+            "first_name": "Salary",
+            "last_name": "User",
             "functional_area_id": area.id,
             "salary": 100000,
         },
@@ -113,11 +137,21 @@ async def test_list_members_filtered_by_area(client, db_session, area):
     await db_session.flush()
     await client.post(
         "/api/members/",
-        json={"employee_id": "T007", "name": "Eng User", "functional_area_id": area.id},
+        json={
+            "employee_id": "T007",
+            "first_name": "Eng",
+            "last_name": "User",
+            "functional_area_id": area.id,
+        },
     )
     await client.post(
         "/api/members/",
-        json={"employee_id": "T008", "name": "Design User", "functional_area_id": design.id},
+        json={
+            "employee_id": "T008",
+            "first_name": "Design",
+            "last_name": "User",
+            "functional_area_id": design.id,
+        },
     )
     resp = await client.get(f"/api/members/?area_id={area.id}")
     assert len(resp.json()) == 1

@@ -16,7 +16,7 @@ export function getTeamColumns({
   onDelete,
 }: TeamColumnsOptions): ColumnDef<Team>[] {
   const areaMap = new Map(areas.map((a) => [a.id, a.name]))
-  const memberMap = new Map(members.map((m) => [m.uuid, m.name]))
+  const memberMap = new Map(members.map((m) => [m.uuid, `${m.first_name} ${m.last_name}`]))
 
   return [
     {

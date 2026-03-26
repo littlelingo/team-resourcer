@@ -107,7 +107,8 @@ async def team(db_session, area):
 async def member(db_session, area):
     m = TeamMember(
         employee_id="EMP001",
-        name="Alice Smith",
+        first_name="Alice",
+        last_name="Smith",
         functional_area_id=area.id,
     )
     db_session.add(m)

@@ -85,7 +85,7 @@ export default function MembersPage() {
     const q = search.toLowerCase()
     return members.filter(
       (m) =>
-        m.name.toLowerCase().includes(q) ||
+        `${m.first_name} ${m.last_name}`.toLowerCase().includes(q) ||
         (m.email && m.email.toLowerCase().includes(q)) ||
         (m.title && m.title.toLowerCase().includes(q)),
     )
@@ -269,7 +269,7 @@ export default function MembersPage() {
         title="Delete Member"
         description={
           deleteMember
-            ? `Are you sure you want to delete ${deleteMember.name}? This action cannot be undone.`
+            ? `Are you sure you want to delete ${deleteMember.first_name} ${deleteMember.last_name}? This action cannot be undone.`
             : 'Are you sure?'
         }
         onConfirm={handleDelete}

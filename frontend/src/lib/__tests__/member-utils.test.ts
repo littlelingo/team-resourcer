@@ -1,31 +1,45 @@
-import { getInitials } from '@/lib/member-utils'
+import { getInitials, getInitialsFromName } from '@/lib/member-utils'
 
 describe('getInitials', () => {
-  it('single word returns first two chars uppercased', () => {
-    expect(getInitials('alice')).toBe('AL')
+  it('returns first char of each name', () => {
+    expect(getInitials('Alice', 'Example')).toBe('AE')
   })
 
-  it('single char returns that char uppercased', () => {
-    expect(getInitials('a')).toBe('A')
+  it('returns first 2 chars when last name empty', () => {
+    expect(getInitials('alice', '')).toBe('AL')
   })
 
-  it('two words returns first letter of each word', () => {
-    expect(getInitials('Alice Example')).toBe('AE')
+  it('single char first name with empty last', () => {
+    expect(getInitials('a', '')).toBe('A')
   })
 
-  it('three words returns first and last initial', () => {
-    expect(getInitials('Alice Marie Example')).toBe('AE')
+  it('trims whitespace', () => {
+    expect(getInitials('  Alice  ', '  Example  ')).toBe('AE')
   })
 
-  it('extra whitespace is trimmed and collapsed', () => {
-    expect(getInitials('  Alice   Example  ')).toBe('AE')
-  })
-
-  it('all caps input preserved', () => {
-    expect(getInitials('ALICE EXAMPLE')).toBe('AE')
+  it('returns ? when both empty', () => {
+    expect(getInitials('', '')).toBe('?')
   })
 
   it('unicode names', () => {
-    expect(getInitials('Ångström Björk')).toBe('ÅB')
+    expect(getInitials('Ångström', 'Björk')).toBe('ÅB')
+  })
+})
+
+describe('getInitialsFromName', () => {
+  it('two words returns first letter of each', () => {
+    expect(getInitialsFromName('Alice Example')).toBe('AE')
+  })
+
+  it('single word returns first two chars', () => {
+    expect(getInitialsFromName('alice')).toBe('AL')
+  })
+
+  it('three words returns first and last initial', () => {
+    expect(getInitialsFromName('Alice Marie Example')).toBe('AE')
+  })
+
+  it('empty string returns ?', () => {
+    expect(getInitialsFromName('')).toBe('?')
   })
 })

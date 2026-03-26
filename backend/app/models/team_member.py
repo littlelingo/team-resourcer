@@ -3,11 +3,11 @@ from __future__ import annotations
 """SQLAlchemy model for the team_members table."""
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String, func
+from sqlalchemy import Date, DateTime, ForeignKey, Numeric, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -27,7 +27,9 @@ class TeamMember(Base):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     employee_id: Mapped[str] = mapped_column(String(50), nullable=False, unique=True, index=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    first_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    hire_date: Mapped[date | None] = mapped_column(Date(), nullable=True)
     title: Mapped[str | None] = mapped_column(String(255), nullable=True)
     location: Mapped[str | None] = mapped_column(String(255), nullable=True)
     image_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
@@ -55,6 +57,10 @@ class TeamMember(Base):
         onupdate=func.now(),
         nullable=False,
     )
+
+    @property
+    def name(self) -> str:
+        return f"{self.first_name} {self.last_name}".strip()
 
     # Relationships
     functional_area: Mapped[FunctionalArea] = relationship(

@@ -22,6 +22,17 @@ class EntityConfig:
     validators: list[Callable[[dict[str, Any], list[str]], None]] = field(default_factory=list)
 
 
+def _validate_hire_date(data: dict[str, Any], errors: list[str]) -> None:
+    val = data.get("hire_date")
+    if val and val != "":
+        try:
+            from datetime import date as _date
+
+            _date.fromisoformat(str(val))
+        except ValueError:
+            errors.append(f"'hire_date' must be ISO date format (YYYY-MM-DD), got '{val}'.")
+
+
 def _validate_email(data: dict[str, Any], errors: list[str]) -> None:
     email_val = data.get("email")
     if email_val and not _EMAIL_RE.fullmatch(str(email_val)):
@@ -32,7 +43,9 @@ ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
     "member": EntityConfig(
         target_fields={
             "employee_id",
-            "name",
+            "first_name",
+            "last_name",
+            "hire_date",
             "title",
             "location",
             "email",
@@ -47,10 +60,10 @@ ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
             "supervisor_employee_id",
             "program_role",
         },
-        required_fields={"employee_id", "name"},
+        required_fields={"employee_id", "first_name", "last_name"},
         numeric_fields={"salary", "bonus", "pto_used"},
         dedup_field="employee_id",
-        validators=[_validate_email],
+        validators=[_validate_email, _validate_hire_date],
     ),
     "program": EntityConfig(
         target_fields={"name", "description", "agency_name"},

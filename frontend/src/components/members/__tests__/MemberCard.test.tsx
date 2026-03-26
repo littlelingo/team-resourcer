@@ -5,7 +5,8 @@ import MemberCard from '@/components/members/MemberCard'
 const baseMember = {
   uuid: 'uuid-1',
   employee_id: 'E001',
-  name: 'Alice Example',
+  first_name: 'Alice',
+  last_name: 'Example',
   title: 'Engineer' as string | null,
   location: 'New York' as string | null,
   image_path: null,

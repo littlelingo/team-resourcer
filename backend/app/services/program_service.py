@@ -81,7 +81,7 @@ async def get_program_members(db: AsyncSession, program_id: int) -> list[TeamMem
             selectinload(TeamMember.functional_area),
             selectinload(TeamMember.team),
         )
-        .order_by(TeamMember.name)
+        .order_by(TeamMember.first_name, TeamMember.last_name)
     )
     result = await db.execute(stmt)
     return list(result.scalars().all())

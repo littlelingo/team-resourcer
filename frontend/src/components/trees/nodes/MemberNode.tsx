@@ -1,6 +1,6 @@
 import { Handle, Position } from '@xyflow/react'
 import type { NodeProps, Node } from '@xyflow/react'
-import { getInitials } from '@/lib/member-utils'
+import { getInitialsFromName } from '@/lib/member-utils'
 import { getImageUrl } from '@/lib/api-client'
 
 export type MemberNodeData = {
@@ -37,7 +37,7 @@ export default function MemberNode({ data }: NodeProps<MemberNodeType>) {
           />
         ) : (
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-600">
-            {getInitials(data.name)}
+            {getInitialsFromName(data.name)}
           </div>
         )}
 

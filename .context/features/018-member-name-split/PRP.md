@@ -1,6 +1,6 @@
 ---
 feature: 018-member-name-split
-status: APPROVED
+status: COMPLETE
 complexity: MEDIUM
 testing_strategy: implement-then-test
 created: 2026-03-26

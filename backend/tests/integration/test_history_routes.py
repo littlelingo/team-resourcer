@@ -6,7 +6,9 @@ from app.models.team_member import TeamMember
 
 
 async def test_get_history_empty(client, area, db_session):
-    m = TeamMember(employee_id="HIST001", name="No History", functional_area_id=area.id)
+    m = TeamMember(
+        employee_id="HIST001", first_name="No", last_name="History", functional_area_id=area.id
+    )
     db_session.add(m)
     await db_session.flush()
     resp = await client.get(f"/api/members/{m.uuid}/history/")
@@ -15,7 +17,9 @@ async def test_get_history_empty(client, area, db_session):
 
 
 async def test_get_history_returns_entries(client, area, db_session):
-    m = TeamMember(employee_id="HIST002", name="Has History", functional_area_id=area.id)
+    m = TeamMember(
+        employee_id="HIST002", first_name="Has", last_name="History", functional_area_id=area.id
+    )
     db_session.add(m)
     await db_session.flush()
     h1 = MemberHistory(
@@ -32,7 +36,9 @@ async def test_get_history_returns_entries(client, area, db_session):
 
 
 async def test_get_history_filtered_by_field(client, area, db_session):
-    m = TeamMember(employee_id="HIST003", name="Filter History", functional_area_id=area.id)
+    m = TeamMember(
+        employee_id="HIST003", first_name="Filter", last_name="History", functional_area_id=area.id
+    )
     db_session.add(m)
     await db_session.flush()
     h1 = MemberHistory(

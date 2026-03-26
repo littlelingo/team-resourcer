@@ -37,7 +37,7 @@ export default function MemberDetailSheet({
   if (!member) return null
 
   const imageUrl = getImageUrl(member.image_path)
-  const initials = getInitials(member.name)
+  const initials = getInitials(member.first_name, member.last_name)
 
   const sortedHistory = member.history
     ? [...member.history].sort(
@@ -84,7 +84,7 @@ export default function MemberDetailSheet({
               <Avatar.Root className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-slate-200">
                 <Avatar.Image
                   src={imageUrl}
-                  alt={member.name}
+                  alt={`${member.first_name} ${member.last_name}`}
                   className="h-full w-full object-cover"
                 />
                 <Avatar.Fallback className="flex h-full w-full items-center justify-center text-lg font-semibold text-slate-600">
@@ -92,7 +92,7 @@ export default function MemberDetailSheet({
                 </Avatar.Fallback>
               </Avatar.Root>
               <div className="min-w-0">
-                <h2 className="text-lg font-semibold text-slate-900 leading-tight">{member.name}</h2>
+                <h2 className="text-lg font-semibold text-slate-900 leading-tight">{`${member.first_name} ${member.last_name}`}</h2>
                 {member.title && (
                   <p className="mt-0.5 text-sm text-slate-500">{member.title}</p>
                 )}
@@ -166,6 +166,12 @@ export default function MemberDetailSheet({
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500">Supervisor ID</span>
                         <span className="font-mono text-xs">{member.supervisor_id}</span>
+                      </div>
+                    )}
+                    {member.hire_date && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">Hire Date</span>
+                        <span>{member.hire_date}</span>
                       </div>
                     )}
                   </div>

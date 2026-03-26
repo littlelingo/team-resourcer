@@ -10,8 +10,12 @@ async def test_org_tree_empty(client):
 
 
 async def test_org_tree_with_members(client, area, db_session):
-    alice = TeamMember(employee_id="ORG001", name="Alice", functional_area_id=area.id)
-    bob = TeamMember(employee_id="ORG002", name="Bob", functional_area_id=area.id)
+    alice = TeamMember(
+        employee_id="ORG001", first_name="Alice", last_name="Test", functional_area_id=area.id
+    )
+    bob = TeamMember(
+        employee_id="ORG002", first_name="Bob", last_name="Test", functional_area_id=area.id
+    )
     db_session.add_all([alice, bob])
     await db_session.flush()
     bob.supervisor_id = alice.uuid
@@ -29,8 +33,12 @@ async def test_org_tree_with_members(client, area, db_session):
 
 
 async def test_set_supervisor_success(client, area, db_session):
-    alice = TeamMember(employee_id="SUP001", name="Alice", functional_area_id=area.id)
-    bob = TeamMember(employee_id="SUP002", name="Bob", functional_area_id=area.id)
+    alice = TeamMember(
+        employee_id="SUP001", first_name="Alice", last_name="Test", functional_area_id=area.id
+    )
+    bob = TeamMember(
+        employee_id="SUP002", first_name="Bob", last_name="Test", functional_area_id=area.id
+    )
     db_session.add_all([alice, bob])
     await db_session.flush()
     resp = await client.put(
@@ -42,8 +50,12 @@ async def test_set_supervisor_success(client, area, db_session):
 
 
 async def test_set_supervisor_to_null(client, area, db_session):
-    alice = TeamMember(employee_id="NUL001", name="Alice", functional_area_id=area.id)
-    bob = TeamMember(employee_id="NUL002", name="Bob", functional_area_id=area.id)
+    alice = TeamMember(
+        employee_id="NUL001", first_name="Alice", last_name="Test", functional_area_id=area.id
+    )
+    bob = TeamMember(
+        employee_id="NUL002", first_name="Bob", last_name="Test", functional_area_id=area.id
+    )
     db_session.add_all([alice, bob])
     await db_session.flush()
     bob.supervisor_id = alice.uuid
@@ -57,7 +69,9 @@ async def test_set_supervisor_to_null(client, area, db_session):
 
 
 async def test_set_supervisor_self_reference_returns_400(client, area, db_session):
-    alice = TeamMember(employee_id="SELF001", name="Alice", functional_area_id=area.id)
+    alice = TeamMember(
+        employee_id="SELF001", first_name="Alice", last_name="Test", functional_area_id=area.id
+    )
     db_session.add(alice)
     await db_session.flush()
     resp = await client.put(
@@ -69,8 +83,12 @@ async def test_set_supervisor_self_reference_returns_400(client, area, db_sessio
 
 
 async def test_set_supervisor_cycle_returns_400(client, area, db_session):
-    alice = TeamMember(employee_id="CYC001", name="Alice", functional_area_id=area.id)
-    bob = TeamMember(employee_id="CYC002", name="Bob", functional_area_id=area.id)
+    alice = TeamMember(
+        employee_id="CYC001", first_name="Alice", last_name="Test", functional_area_id=area.id
+    )
+    bob = TeamMember(
+        employee_id="CYC002", first_name="Bob", last_name="Test", functional_area_id=area.id
+    )
     db_session.add_all([alice, bob])
     await db_session.flush()
     # Alice reports to Bob

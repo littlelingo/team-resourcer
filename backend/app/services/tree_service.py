@@ -16,7 +16,7 @@ from app.schemas.tree import TreeEdge, TreeNode, TreeResponse
 
 async def build_org_tree(db: AsyncSession) -> TreeResponse:
     """Build a flat node/edge tree of the full supervisor hierarchy."""
-    stmt = select(TeamMember).order_by(TeamMember.name)
+    stmt = select(TeamMember).order_by(TeamMember.last_name, TeamMember.first_name)
     result = await db.execute(stmt)
     members = result.scalars().all()
 
@@ -59,7 +59,7 @@ async def build_program_tree(db: AsyncSession, program_id: int) -> TreeResponse 
         select(ProgramAssignment, TeamMember)
         .join(TeamMember, TeamMember.uuid == ProgramAssignment.member_uuid)
         .where(ProgramAssignment.program_id == program_id)
-        .order_by(TeamMember.name)
+        .order_by(TeamMember.last_name, TeamMember.first_name)
     )
     rows = (await db.execute(stmt)).all()
 
@@ -120,7 +120,9 @@ async def build_area_tree(db: AsyncSession, area_id: int) -> TreeResponse | None
 
     # Load all members in this area
     members_result = await db.execute(
-        select(TeamMember).where(TeamMember.functional_area_id == area_id).order_by(TeamMember.name)
+        select(TeamMember)
+        .where(TeamMember.functional_area_id == area_id)
+        .order_by(TeamMember.last_name, TeamMember.first_name)
     )
     members = members_result.scalars().all()
 

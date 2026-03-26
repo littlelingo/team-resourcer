@@ -12,7 +12,9 @@ export interface TargetField {
 
 export const MEMBER_TARGET_FIELDS: TargetField[] = [
   { label: 'Employee ID', value: 'employee_id' },
-  { label: 'Full Name', value: 'name' },
+  { label: 'First Name', value: 'first_name' },
+  { label: 'Last Name', value: 'last_name' },
+  { label: 'Hire Date', value: 'hire_date' },
   { label: 'Job Title', value: 'title' },
   { label: 'Location', value: 'location' },
   { label: 'Email', value: 'email' },
@@ -83,7 +85,7 @@ export default function MapColumnsStep({
   initialColumnMap,
   onPreview,
   targetFields = MEMBER_TARGET_FIELDS,
-  requiredFields = ['employee_id', 'name'],
+  requiredFields = ['employee_id', 'first_name', 'last_name'],
   entityType = 'member',
 }: MapColumnsStepProps) {
   const [columnMap, setColumnMap] = useState<Record<string, string | null>>(() => {

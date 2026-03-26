@@ -280,7 +280,8 @@ async def _commit_members(
 
             member = TeamMember(
                 employee_id=emp_id,
-                name=str(data.get("name", "")),
+                first_name=str(data.get("first_name", "")),
+                last_name=str(data.get("last_name", "")),
                 functional_area_id=functional_area_id,
             )
             db.add(member)
@@ -291,11 +292,28 @@ async def _commit_members(
 
         employee_id_to_uuid[emp_id] = member.uuid
 
-        scalar_fields = ["name", "title", "location", "email", "phone", "slack_handle"]
+        scalar_fields = [
+            "first_name",
+            "last_name",
+            "title",
+            "location",
+            "email",
+            "phone",
+            "slack_handle",
+        ]
         for f in scalar_fields:
             val = data.get(f)
             if val is not None and val != "":
                 setattr(member, f, str(val))
+
+        hire_date_val = data.get("hire_date")
+        if hire_date_val and hire_date_val != "":
+            try:
+                from datetime import date as _date
+
+                member.hire_date = _date.fromisoformat(str(hire_date_val))
+            except ValueError:
+                pass  # Already caught at preview validation stage
 
         if functional_area_id is not None:
             member.functional_area_id = functional_area_id

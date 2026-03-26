@@ -77,7 +77,8 @@ export interface MemberHistory {
 export interface TeamMemberList {
   uuid: string
   employee_id: string
-  name: string
+  first_name: string
+  last_name: string
   title: string | null
   location: string | null
   image_path: string | null
@@ -95,6 +96,7 @@ export interface TeamMember extends TeamMemberList {
   bonus: string | null
   /** PTO used as string decimal e.g. "40.00" */
   pto_used: string | null
+  hire_date: string | null
   supervisor_id: string | null
   functional_area?: FunctionalArea
   team?: TeamListItem
@@ -108,7 +110,9 @@ export interface TeamMember extends TeamMemberList {
 
 export interface MemberFormInput {
   employee_id: string
-  name: string
+  first_name: string
+  last_name: string
+  hire_date?: string
   title?: string
   location?: string
   email: string

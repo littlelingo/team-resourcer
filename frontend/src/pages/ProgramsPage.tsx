@@ -75,15 +75,15 @@ function ProgramMembersSheet({
                     <Avatar.Root className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-slate-200">
                       <Avatar.Image
                         src={getImageUrl(member.image_path)}
-                        alt={member.name}
+                        alt={`${member.first_name} ${member.last_name}`}
                         className="h-full w-full object-cover"
                       />
                       <Avatar.Fallback className="flex h-full w-full items-center justify-center text-xs font-medium text-slate-600">
-                        {member.name.slice(0, 2).toUpperCase()}
+                        {`${member.first_name[0]}${member.last_name[0]}`.toUpperCase()}
                       </Avatar.Fallback>
                     </Avatar.Root>
                     <div>
-                      <p className="text-sm font-medium text-slate-900">{member.name}</p>
+                      <p className="text-sm font-medium text-slate-900">{`${member.first_name} ${member.last_name}`}</p>
                       {member.title && (
                         <p className="text-xs text-slate-500">{member.title}</p>
                       )}

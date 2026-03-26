@@ -21,7 +21,7 @@ interface EntityConfig {
 }
 
 const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
-  member: { targetFields: MEMBER_TARGET_FIELDS, requiredFields: ['employee_id', 'name'] },
+  member: { targetFields: MEMBER_TARGET_FIELDS, requiredFields: ['employee_id', 'first_name', 'last_name'] },
   program: { targetFields: PROGRAM_TARGET_FIELDS, requiredFields: ['name'] },
   area: { targetFields: AREA_TARGET_FIELDS, requiredFields: ['name'] },
   team: { targetFields: TEAM_TARGET_FIELDS, requiredFields: ['name'] },

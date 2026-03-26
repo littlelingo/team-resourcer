@@ -84,7 +84,8 @@ async def seed() -> None:
             db,
             TeamMemberCreate(
                 employee_id="E001",
-                name="Alice Johnson",
+                first_name="Alice",
+                last_name="Johnson",
                 title="Staff Engineer",
                 location="San Francisco, CA",
                 email="alice.johnson@example.com",
@@ -103,7 +104,8 @@ async def seed() -> None:
             db,
             TeamMemberCreate(
                 employee_id="E002",
-                name="Bob Smith",
+                first_name="Bob",
+                last_name="Smith",
                 title="Senior Engineer",
                 location="Austin, TX",
                 email="bob.smith@example.com",
@@ -122,7 +124,8 @@ async def seed() -> None:
             db,
             TeamMemberCreate(
                 employee_id="E003",
-                name="Carol Williams",
+                first_name="Carol",
+                last_name="Williams",
                 title="Senior Product Manager",
                 location="New York, NY",
                 email="carol.williams@example.com",

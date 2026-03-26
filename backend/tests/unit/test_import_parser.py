@@ -12,7 +12,8 @@ def test_parse_csv_valid_returns_headers_and_rows():
     result = parse_upload(file_bytes, "valid_members.csv")
     assert result.total_row_count == 5
     assert "employee_id" in result.headers
-    assert "name" in result.headers
+    assert "first_name" in result.headers
+    assert "last_name" in result.headers
     assert "email" in result.headers
     assert len(result.preview_rows) == 5
     assert result.raw_rows[0]["employee_id"] == "EMP001"

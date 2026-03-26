@@ -20,4 +20,4 @@
 | 013 | Per-Section Entity Import | COMPLETE | implement-then-test | .context/features/013-entity-import/PRP.md |
 | 016 | Bug: Select.Item empty value on Members page | APPROVED | implement-then-test | .context/features/016-member-select-value-bug/PRP.md |
 | 017 | Program Agency Entity | COMPLETE | implement-then-test | .context/features/017-program-agency/PRP.md |
-| 018 | Member Name Split + Hire Date | APPROVED | implement-then-test | .context/features/018-member-name-split/PRP.md |
+| 018 | Member Name Split + Hire Date | COMPLETE | implement-then-test | .context/features/018-member-name-split/PRP.md |

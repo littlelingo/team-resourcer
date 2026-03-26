@@ -26,19 +26,19 @@ export function buildMemberColumns(meta: ColumnMeta): ColumnDef<MemberRow>[] {
   return [
     {
       id: 'member',
-      accessorKey: 'name',
+      accessorFn: (row) => `${row.last_name}, ${row.first_name}`,
       header: 'Member',
       enableSorting: true,
       cell: ({ row }) => {
         const member = row.original
         const imageUrl = getImageUrl(member.image_path)
-        const initials = getInitials(member.name)
+        const initials = getInitials(member.first_name, member.last_name)
         return (
           <div className="flex items-center gap-3 min-w-0">
             <Avatar.Root className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-slate-200">
               <Avatar.Image
                 src={imageUrl}
-                alt={member.name}
+                alt={`${member.first_name} ${member.last_name}`}
                 className="h-full w-full object-cover"
               />
               <Avatar.Fallback className="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-600">
@@ -46,7 +46,7 @@ export function buildMemberColumns(meta: ColumnMeta): ColumnDef<MemberRow>[] {
               </Avatar.Fallback>
             </Avatar.Root>
             <div className="min-w-0">
-              <p className="font-medium text-slate-900 truncate">{member.name}</p>
+              <p className="font-medium text-slate-900 truncate">{`${member.first_name} ${member.last_name}`}</p>
               {member.title && (
                 <p className="text-xs text-slate-500 truncate">{member.title}</p>
               )}

@@ -260,13 +260,6 @@ export default function MemberFormDialog({
 
               {/* Basic info */}
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Employee ID" required error={errors.employee_id?.message}>
-                  <input
-                    {...register('employee_id')}
-                    className={inputCls}
-                    placeholder="EMP-001"
-                  />
-                </Field>
                 <Field label="First Name" required error={errors.first_name?.message}>
                   <input
                     {...register('first_name')}
@@ -274,23 +267,31 @@ export default function MemberFormDialog({
                     placeholder="First name"
                   />
                 </Field>
+                <Field label="Last Name" required error={errors.last_name?.message}>
+                  <input
+                    {...register('last_name')}
+                    className={inputCls}
+                    placeholder="Last name"
+                  />
+                </Field>
               </div>
 
-              <Field label="Last Name" required error={errors.last_name?.message}>
-                <input
-                  {...register('last_name')}
-                  className={inputCls}
-                  placeholder="Last name"
-                />
-              </Field>
-
-              <Field label="Hire Date" error={errors.hire_date?.message}>
-                <input
-                  {...register('hire_date')}
-                  type="date"
-                  className={inputCls}
-                />
-              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Hire Date" error={errors.hire_date?.message}>
+                  <input
+                    {...register('hire_date')}
+                    type="date"
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Employee ID" required error={errors.employee_id?.message}>
+                  <input
+                    {...register('employee_id')}
+                    className={inputCls}
+                    placeholder="EMP-001"
+                  />
+                </Field>
+              </div>
 
               <Field label="Title" error={errors.title?.message}>
                 <input {...register('title')} className={inputCls} placeholder="Job title" />

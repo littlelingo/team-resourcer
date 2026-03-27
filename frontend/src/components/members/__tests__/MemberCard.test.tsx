@@ -8,7 +8,8 @@ const baseMember = {
   first_name: 'Alice',
   last_name: 'Example',
   title: 'Engineer' as string | null,
-  location: 'New York' as string | null,
+  city: 'New York' as string | null,
+  state: null as string | null,
   image_path: null,
   email: 'alice@example.com',
   slack_handle: null,
@@ -77,7 +78,7 @@ describe('MemberCard', () => {
   })
 
   it('does not render location when member has no location', () => {
-    const member = { ...baseMember, location: null }
+    const member = { ...baseMember, city: null, state: null }
     render(<MemberCard {...defaultProps} member={member} />)
     expect(screen.queryByText('New York')).toBeNull()
   })

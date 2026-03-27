@@ -110,10 +110,12 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
       </div>
 
       {/* Location */}
-      {member.location && (
+      {(member.city || member.state) && (
         <div className="mt-3 flex items-center justify-center gap-1 text-xs text-slate-400">
           <MapPin className="h-3 w-3 flex-shrink-0" />
-          <span className="truncate">{member.location}</span>
+          <span className="truncate">
+            {[member.city, member.state].filter(Boolean).join(', ')}
+          </span>
         </div>
       )}
     </div>

@@ -84,7 +84,7 @@ export default function MemberDetailPanel({ memberId, onClose }: MemberDetailPan
                 <Separator.Root className="h-px bg-slate-100" />
 
                 {/* Contact */}
-                {(member.email || member.phone || member.slack_handle || member.location) && (
+                {(member.email || member.phone || member.slack_handle || member.city || member.state) && (
                   <>
                     <div>
                       <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -109,10 +109,10 @@ export default function MemberDetailPanel({ memberId, onClose }: MemberDetailPan
                             <span>{member.slack_handle}</span>
                           </div>
                         )}
-                        {member.location && (
+                        {(member.city || member.state) && (
                           <div className="flex items-center gap-2 text-sm text-slate-700">
                             <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
-                            <span>{member.location}</span>
+                            <span>{[member.city, member.state].filter(Boolean).join(', ')}</span>
                           </div>
                         )}
                       </div>

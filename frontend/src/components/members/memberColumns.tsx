@@ -95,11 +95,11 @@ export function buildMemberColumns(meta: ColumnMeta): ColumnDef<MemberRow>[] {
     },
     {
       id: 'location',
-      accessorKey: 'location',
+      accessorFn: (row) => [row.city, row.state].filter(Boolean).join(', '),
       header: 'Location',
       enableSorting: true,
       cell: ({ getValue }) => {
-        const val = getValue() as string | null
+        const val = getValue() as string
         return val ? (
           <span className="text-sm text-slate-700">{val}</span>
         ) : (

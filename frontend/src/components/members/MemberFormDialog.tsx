@@ -27,7 +27,8 @@ const memberFormSchema = z.object({
   email: z.string().email('Invalid email').or(z.literal('')),
   phone: z.string(),
   slack_handle: z.string(),
-  location: z.string(),
+  city: z.string(),
+  state: z.string(),
   functional_area_id: z.string().nullable(),
   team_id: z.string().nullable(),
   supervisor_id: z.string(),
@@ -92,7 +93,8 @@ export default function MemberFormDialog({
       email: member?.email ?? '',
       phone: member?.phone ?? '',
       slack_handle: member?.slack_handle ?? '',
-      location: member?.location ?? '',
+      city: member?.city ?? '',
+      state: member?.state ?? '',
       functional_area_id:
         member?.functional_area_id != null ? String(member.functional_area_id) : null,
       team_id: member?.team_id != null ? String(member.team_id) : null,
@@ -139,7 +141,8 @@ export default function MemberFormDialog({
             email: values.email || undefined,
             phone: values.phone || undefined,
             slack_handle: values.slack_handle || undefined,
-            location: values.location || undefined,
+            city: values.city || undefined,
+            state: values.state || undefined,
             functional_area_id: values.functional_area_id
               ? parseInt(values.functional_area_id, 10)
               : undefined,
@@ -162,7 +165,8 @@ export default function MemberFormDialog({
           email: values.email || '',
           phone: values.phone || undefined,
           slack_handle: values.slack_handle || undefined,
-          location: values.location || undefined,
+          city: values.city || undefined,
+          state: values.state || undefined,
           functional_area_id: values.functional_area_id
             ? parseInt(values.functional_area_id, 10)
             : undefined,
@@ -316,21 +320,29 @@ export default function MemberFormDialog({
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Slack Handle" error={errors.slack_handle?.message}>
+                <Field label="City" error={errors.city?.message}>
                   <input
-                    {...register('slack_handle')}
+                    {...register('city')}
                     className={inputCls}
-                    placeholder="@handle"
+                    placeholder="Austin"
                   />
                 </Field>
-                <Field label="Location" error={errors.location?.message}>
+                <Field label="State" error={errors.state?.message}>
                   <input
-                    {...register('location')}
+                    {...register('state')}
                     className={inputCls}
-                    placeholder="City, Country"
+                    placeholder="TX"
                   />
                 </Field>
               </div>
+
+              <Field label="Slack Handle" error={errors.slack_handle?.message}>
+                <input
+                  {...register('slack_handle')}
+                  className={inputCls}
+                  placeholder="@handle"
+                />
+              </Field>
 
               {/* Organization */}
               <div className="grid grid-cols-2 gap-3">

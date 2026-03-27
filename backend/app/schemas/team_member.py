@@ -21,7 +21,8 @@ class TeamMemberCreate(BaseModel):
     last_name: str
     hire_date: date | None = None
     title: str | None = None
-    location: str | None = None
+    city: str | None = None
+    state: str | None = None
     email: str | None = None
     phone: str | None = None
     slack_handle: str | None = None
@@ -53,7 +54,8 @@ class TeamMemberUpdate(BaseModel):
     last_name: str | None = None
     hire_date: date | None = None
     title: str | None = None
-    location: str | None = None
+    city: str | None = None
+    state: str | None = None
     email: str | None = None
     phone: str | None = None
     slack_handle: str | None = None
@@ -80,7 +82,8 @@ class TeamMemberListResponse(BaseModel):
     first_name: str
     last_name: str
     title: str | None
-    location: str | None
+    city: str | None
+    state: str | None
     image_path: str | None
     email: str | None
     slack_handle: str | None
@@ -97,7 +100,8 @@ class TeamMemberDetailResponse(BaseModel):
     last_name: str
     hire_date: date | None
     title: str | None
-    location: str | None
+    city: str | None
+    state: str | None
     image_path: str | None
     email: str | None
     slack_handle: str | None

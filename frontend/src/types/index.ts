@@ -80,7 +80,8 @@ export interface TeamMemberList {
   first_name: string
   last_name: string
   title: string | null
-  location: string | null
+  city: string | null
+  state: string | null
   image_path: string | null
   email: string
   slack_handle: string | null
@@ -114,7 +115,8 @@ export interface MemberFormInput {
   last_name: string
   hire_date?: string
   title?: string
-  location?: string
+  city?: string
+  state?: string
   email: string
   slack_handle?: string
   phone?: string

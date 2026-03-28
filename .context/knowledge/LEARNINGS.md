@@ -1,5 +1,13 @@
 # Learnings
 
+## 024-import-date-format (2026-03-28)
+
+### Date normalization belongs in the mapper validator, not the commit layer
+- The mapper is the single validation gate — normalizing dates there (writing ISO strings back into `row.data` in-place) means the commit layer's `date.fromisoformat()` calls become a cheap safety net with zero changes required.
+
+### MDY/DMY ambiguity is unresolvable without metadata
+- When both components are <= 12, there is no way to distinguish MM/DD/YYYY from DD/MM/YYYY. Defaulting to MDY (US convention) is the documented trade-off.
+
 ## 022-remove-main-import-button (2026-03-28)
 
 Clean removal — no new patterns or errors encountered. Reviewer noted that the catch-all redirect only covers `/` (index route), not arbitrary unknown paths like `/import`. A `<Route path="*">` catch-all would be a useful follow-up.

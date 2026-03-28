@@ -3,12 +3,12 @@ from __future__ import annotations
 """Apply a column mapping to raw session rows and validate each row."""
 
 import re
-from datetime import date
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
 
 from app.schemas.import_schemas import EntityType, MappedPreviewResult, MappedRow, MappingConfig
+from app.services.import_date_utils import parse_date
 from app.services.import_session import get_session
 
 _EMAIL_RE = re.compile(r"\S+@\S+\.\S+")
@@ -26,10 +26,11 @@ class EntityConfig:
 def _validate_hire_date(data: dict[str, Any], errors: list[str]) -> None:
     val = data.get("hire_date")
     if val and val != "":
-        try:
-            date.fromisoformat(str(val))
-        except ValueError:
-            errors.append(f"'hire_date' must be ISO date format (YYYY-MM-DD), got '{val}'.")
+        parsed = parse_date(str(val))
+        if parsed is None:
+            errors.append(f"'hire_date' could not be parsed as a date, got '{val}'.")
+        else:
+            data["hire_date"] = str(parsed)
 
 
 def _validate_email(data: dict[str, Any], errors: list[str]) -> None:
@@ -41,10 +42,11 @@ def _validate_email(data: dict[str, Any], errors: list[str]) -> None:
 def _validate_effective_date(data: dict[str, Any], errors: list[str]) -> None:
     val = data.get("effective_date")
     if val and val != "":
-        try:
-            date.fromisoformat(str(val))
-        except ValueError:
-            errors.append(f"'effective_date' must be ISO date format (YYYY-MM-DD), got '{val}'.")
+        parsed = parse_date(str(val))
+        if parsed is None:
+            errors.append(f"'effective_date' could not be parsed as a date, got '{val}'.")
+        else:
+            data["effective_date"] = str(parsed)
 
 
 ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {

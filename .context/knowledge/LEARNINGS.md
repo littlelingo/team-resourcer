@@ -1,5 +1,11 @@
 # Learnings
 
+## 026-cors-fix (2026-03-28)
+
+### FastAPI CORSMiddleware: `allow_headers=["*"]` with `allow_credentials=True`
+- FastAPI does NOT echo a literal `*` in the `Access-Control-Allow-Headers` response when credentials are enabled. It reflects back only the headers listed in the request's `Access-Control-Request-Headers`. This is correct RFC behaviour and means curl validation will show specific headers, not `*`.
+- The real CORS fix was widening `allow_headers`, not `allow_origins` — origins were already correct. Narrow `allow_headers` causes preflight failures that surface as "No Access-Control-Allow-Origin header" errors, which is misleading.
+
 ## 024-import-date-format (2026-03-28)
 
 ### Date normalization belongs in the mapper validator, not the commit layer

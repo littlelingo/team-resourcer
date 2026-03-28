@@ -1,6 +1,7 @@
 # PRP: CORS Fix
 
-## Status: APPROVED
+## Status: COMPLETE
+## Completed: 2026-03-28
 ## Complexity: LOW
 ## Testing Strategy: implement-then-test
 
@@ -16,7 +17,7 @@ Separately, `docker-compose.yml` sets `VITE_API_URL` but the frontend reads `VIT
 
 ## Implementation Steps
 
-### Step 1: Widen `allow_headers` in backend CORS middleware
+### Step 1: Widen `allow_headers` in backend CORS middleware [x]
 
 - **File**: `/Users/clint/Workspace/team-resourcer/backend/app/main.py`
 - **Change**: On line 38, replace `allow_headers=["Content-Type", "Accept"]` with `allow_headers=["*"]`
@@ -29,7 +30,7 @@ Separately, `docker-compose.yml` sets `VITE_API_URL` but the frontend reads `VIT
   ```
   Response must include `access-control-allow-origin: http://localhost:5173` and HTTP 200.
 
-### Step 2: Fix env var name in `docker-compose.yml`
+### Step 2: Fix env var name in `docker-compose.yml` [x]
 
 - **File**: `/Users/clint/Workspace/team-resourcer/docker-compose.yml`
 - **Change**: On line 43, rename the environment variable from `VITE_API_URL=http://localhost:8000` to `VITE_API_BASE_URL=http://localhost:8000`

@@ -114,6 +114,8 @@ All live in `frontend/src/components/import/`.
 ### `PROGRAM_TARGET_FIELDS` in `MapColumnsStep.tsx` (line 34) is missing `agency_name`
 The backend `ENTITY_CONFIGS["program"].target_fields` includes `agency_name` but `PROGRAM_TARGET_FIELDS` on the frontend only has `name` and `description`. This is a gap — users cannot map the agency column for programs via the wizard.
 
+**Backend is fully wired** (`_commit_programs` lines 172-200 does lookup-only name match, no auto-create). Fix is a single frontend line: add `{ label: 'Agency', value: 'agency_name' }` to `PROGRAM_TARGET_FIELDS`. See `.context/features/023-program-import-agency/NOTES.md`.
+
 ---
 
 ## Migrations (no history-specific migration)

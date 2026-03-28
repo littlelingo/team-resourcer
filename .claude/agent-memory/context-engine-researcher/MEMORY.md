@@ -23,3 +23,6 @@
 
 ## Research: Remove Main Import Nav / ImportPage (feature 022)
 - [`research_remove_import_page.md`](research_remove_import_page.md) — ImportPage is a thin member-only wrapper at /import; every section page now has its own inline import dialog; 3 touch points: App.tsx route, AppLayout.tsx nav entry + Upload icon, delete ImportPage.tsx
+
+## Research: Program Import Agency Column (feature 023)
+- Backend already handles agency_name in program import (lookup-only, no auto-create); fix is one frontend line in MapColumnsStep.tsx PROGRAM_TARGET_FIELDS; see `.context/features/023-program-import-agency/NOTES.md`

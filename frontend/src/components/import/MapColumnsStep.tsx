@@ -34,6 +34,7 @@ export const MEMBER_TARGET_FIELDS: TargetField[] = [
 export const PROGRAM_TARGET_FIELDS: TargetField[] = [
   { label: 'Name', value: 'name' },
   { label: 'Description', value: 'description' },
+  { label: 'Agency', value: 'agency_name' },
 ]
 
 export const AREA_TARGET_FIELDS: TargetField[] = [

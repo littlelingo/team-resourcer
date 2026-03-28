@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import Any, Callable
 
 from app.schemas.import_schemas import EntityType, MappedPreviewResult, MappedRow, MappingConfig
+from app.services.import_amount_utils import parse_amount
 from app.services.import_date_utils import parse_date
 from app.services.import_session import get_session
 
@@ -197,10 +198,11 @@ def apply_mapping(
         for num_field in config.numeric_fields:
             val = data.get(num_field)
             if val is not None and val != "":
-                try:
-                    Decimal(str(val))
-                except InvalidOperation:
+                result = parse_amount(str(val))
+                if result is None:
                     errors.append(f"'{num_field}' must be numeric, got '{val}'.")
+                else:
+                    data[num_field] = str(result)
 
         # Entity-specific validators
         for validator in config.validators:

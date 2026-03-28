@@ -1,5 +1,10 @@
 # Learnings
 
+## 027-import-amount-parsing (2026-03-28)
+
+### Python Decimal accepts NaN and Infinity without raising
+- `Decimal("NaN")` and `Decimal("Infinity")` do NOT raise `InvalidOperation`. They silently return special Decimal values that would corrupt financial data in `Numeric(12,2)` columns. Always check `result.is_finite()` after constructing a Decimal from user input.
+
 ## 026-cors-fix (2026-03-28)
 
 ### FastAPI CORSMiddleware: `allow_headers=["*"]` with `allow_credentials=True`

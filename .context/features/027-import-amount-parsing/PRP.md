@@ -1,6 +1,6 @@
 ---
 feature: 027-import-amount-parsing
-status: APPROVED
+status: COMPLETE
 complexity: LOW
 testing_strategy: implement-then-test
 created: 2026-03-28
@@ -21,7 +21,7 @@ Introduce a `parse_amount(raw: str) -> Decimal | None` utility in a new file `ba
 
 ## Implementation Steps
 
-### Step 1 — Create `backend/app/services/import_amount_utils.py`
+### Step 1 — Create `backend/app/services/import_amount_utils.py` [x]
 
 **File:** `backend/app/services/import_amount_utils.py` — CREATE
 
@@ -71,7 +71,7 @@ print('all ok')
 
 ---
 
-### Step 2 — Update numeric field validation in `backend/app/services/import_mapper.py`
+### Step 2 — Update numeric field validation in `backend/app/services/import_mapper.py` [x]
 
 **File:** `backend/app/services/import_mapper.py` — MODIFY
 
@@ -124,7 +124,7 @@ print('import ok')
 
 ---
 
-### Step 3 — Write tests for `parse_amount` in `backend/tests/test_import_amount_utils.py`
+### Step 3 — Write tests for `parse_amount` in `backend/tests/test_import_amount_utils.py` [x]
 
 **File:** `backend/tests/test_import_amount_utils.py` — CREATE
 

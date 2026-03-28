@@ -26,4 +26,5 @@
 | 021 | Financial History Import (Salary, Bonus, PTO) | COMPLETE | implement-then-test | .context/features/021-financial-history-import/PRP.md |
 | 022 | Remove Main Import Nav Item | COMPLETE | implement-then-test | .context/features/022-remove-main-import-button/PRP.md |
 | 023 | Program Import Agency Support | COMPLETE | implement-then-test | .context/features/023-program-import-agency/PRP.md |
-| 024 | Import Date Format Detection | COMPLETE | implement-then-test | .context/features/024-import-date-format/PRP.md | implement-then-test | .context/features/022-remove-main-import-button/PRP.md |
+| 024 | Import Date Format Detection | COMPLETE | implement-then-test | .context/features/024-import-date-format/PRP.md |
+| 025 | Makefile Port Cleanup | COMPLETE | implement-then-test | .context/features/025-makefile-port-cleanup/PRP.md | implement-then-test | .context/features/022-remove-main-import-button/PRP.md |

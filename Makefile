@@ -1,7 +1,9 @@
 .PHONY: up down logs migrate migration seed test lint format typecheck shell-db reload reload-backend reload-frontend rebuild rebuild-backend rebuild-frontend rebuild-db reset-db up-backend up-frontend up-db
 
 up:
+	docker compose down --remove-orphans 2>/dev/null || true
 	docker compose up -d
+	@docker compose ps
 
 down:
 	docker compose down
@@ -55,7 +57,10 @@ up-db:
 
 # rebuild individual services
 rebuild-db:
+	docker compose stop backend db 2>/dev/null || true
+	docker compose rm -f db 2>/dev/null || true
 	docker compose up -d --build db
+	docker compose start backend 2>/dev/null || true
 
 # drop and recreate the database, then run migrations
 reset-db:
@@ -69,10 +74,16 @@ reset-db:
 	@echo "Database reset complete."
 
 rebuild:
+	docker compose down
 	docker compose up -d --build
+	@docker compose ps
 
 rebuild-backend:
+	docker compose stop backend 2>/dev/null || true
+	docker compose rm -f backend 2>/dev/null || true
 	docker compose up -d --build backend
 
 rebuild-frontend:
+	docker compose stop frontend 2>/dev/null || true
+	docker compose rm -f frontend 2>/dev/null || true
 	docker compose up -d --build frontend

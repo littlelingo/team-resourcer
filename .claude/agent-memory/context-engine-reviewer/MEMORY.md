@@ -11,3 +11,4 @@
 - [project_018_member_name_split_review.md](project_018_member_name_split_review.md) — 018-member-name-split (first_name/last_name split + hire_date): key findings from review on 2026-03-26
 - [project_020_location_split_review.md](project_020_location_split_review.md) — 020-member-location-split (city + state split): key findings from review on 2026-03-27
 - [project_021_financial_history_review.md](project_021_financial_history_review.md) — 021-financial-history-import (salary/bonus/PTO import, _commit_financial_history): key findings from review on 2026-03-27
+- [project_024_date_format_review.md](project_024_date_format_review.md) — 024-import-date-format (parse_date utility, mapper normalization): key findings from review on 2026-03-28

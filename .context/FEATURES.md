@@ -29,3 +29,4 @@
 | 024 | Import Date Format Detection | COMPLETE | implement-then-test | .context/features/024-import-date-format/PRP.md |
 | 025 | Makefile Port Cleanup | COMPLETE | implement-then-test | .context/features/025-makefile-port-cleanup/PRP.md |
 | 026 | CORS Fix | COMPLETE | implement-then-test | .context/features/026-cors-fix/PRP.md |
+| 027 | Import Amount Parsing | RESEARCH | implement-then-test | .context/features/027-import-amount-parsing/NOTES.md |

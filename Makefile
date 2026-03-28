@@ -59,9 +59,11 @@ rebuild-db:
 
 # drop and recreate the database, then run migrations
 reset-db:
-	docker compose exec db psql -U resourcer -c "DROP DATABASE IF EXISTS team_resourcer;"
-	docker compose exec db psql -U resourcer -c "CREATE DATABASE team_resourcer;"
-	docker compose restart backend
+	docker compose stop backend
+	docker compose exec db psql -U resourcer -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'team_resourcer' AND pid <> pg_backend_pid();"
+	docker compose exec db psql -U resourcer -d postgres -c "DROP DATABASE IF EXISTS team_resourcer;"
+	docker compose exec db psql -U resourcer -d postgres -c "CREATE DATABASE team_resourcer;"
+	docker compose start backend
 	@sleep 2
 	docker compose exec backend alembic upgrade head
 	@echo "Database reset complete."

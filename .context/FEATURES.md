@@ -23,3 +23,4 @@
 | 018 | Member Name Split + Hire Date | COMPLETE | implement-then-test | .context/features/018-member-name-split/PRP.md |
 | 019 | Member Form Layout Adjustment | COMPLETE | implement-then-test | .context/features/019-member-form-layout/PRP.md |
 | 020 | Member Location Split (city + state) | COMPLETE | implement-then-test | .context/features/020-member-location-split/PRP.md |
+| 021 | Financial History Import (Salary, Bonus, PTO) | COMPLETE | implement-then-test | .context/features/021-financial-history-import/PRP.md |

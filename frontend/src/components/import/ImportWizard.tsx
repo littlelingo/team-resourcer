@@ -8,6 +8,9 @@ import MapColumnsStep, {
   AREA_TARGET_FIELDS,
   AGENCY_TARGET_FIELDS,
   TEAM_TARGET_FIELDS,
+  SALARY_HISTORY_TARGET_FIELDS,
+  BONUS_HISTORY_TARGET_FIELDS,
+  PTO_HISTORY_TARGET_FIELDS,
   type TargetField,
 } from './MapColumnsStep'
 import PreviewStep from './PreviewStep'
@@ -26,6 +29,18 @@ const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
   area: { targetFields: AREA_TARGET_FIELDS, requiredFields: ['name'] },
   team: { targetFields: TEAM_TARGET_FIELDS, requiredFields: ['name'] },
   agency: { targetFields: AGENCY_TARGET_FIELDS, requiredFields: ['name'] },
+  salary_history: {
+    targetFields: SALARY_HISTORY_TARGET_FIELDS,
+    requiredFields: ['employee_id', 'effective_date', 'amount'],
+  },
+  bonus_history: {
+    targetFields: BONUS_HISTORY_TARGET_FIELDS,
+    requiredFields: ['employee_id', 'effective_date', 'amount'],
+  },
+  pto_history: {
+    targetFields: PTO_HISTORY_TARGET_FIELDS,
+    requiredFields: ['employee_id', 'effective_date', 'amount'],
+  },
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────

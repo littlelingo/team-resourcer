@@ -1,7 +1,9 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import * as ToggleGroup from '@radix-ui/react-toggle-group'
-import { LayoutGrid, Table2, Plus } from 'lucide-react'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import * as Dialog from '@radix-ui/react-dialog'
+import { LayoutGrid, Table2, Plus, Upload, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import PageHeader from '@/components/layout/PageHeader'
@@ -18,6 +20,8 @@ import { usePrograms } from '@/hooks/usePrograms'
 import { useFunctionalAreas } from '@/hooks/useFunctionalAreas'
 import { useTeams } from '@/hooks/useTeams'
 import type { TeamMember, TeamMemberList } from '@/types'
+import ImportWizard from '@/components/import/ImportWizard'
+import type { EntityType } from '@/api/importApi'
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -40,6 +44,7 @@ export default function MembersPage() {
   const [pendingEditUuid, setPendingEditUuid] = useState<string | null>(null)
   const [deleteMember, setDeleteMember] = useState<TeamMemberList | null>(null)
   const [addOpen, setAddOpen] = useState(false)
+  const [importEntityType, setImportEntityType] = useState<EntityType | null>(null)
 
   // Fetch full member when an edit is triggered from the table
   const { data: pendingEditData } = useMember(pendingEditUuid ?? '')
@@ -159,6 +164,42 @@ export default function MembersPage() {
               </ToggleGroup.Item>
             </ToggleGroup.Root>
 
+            {/* Import dropdown */}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                >
+                  <Upload className="h-4 w-4" />
+                  Import
+                  <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  align="end"
+                  sideOffset={6}
+                  className="z-50 min-w-[200px] overflow-hidden rounded-md border border-slate-200 bg-white shadow-md"
+                >
+                  {([
+                    { label: 'Import Members', type: 'member' as EntityType },
+                    { label: 'Import Salary History', type: 'salary_history' as EntityType },
+                    { label: 'Import Bonus History', type: 'bonus_history' as EntityType },
+                    { label: 'Import PTO History', type: 'pto_history' as EntityType },
+                  ]).map(({ label, type }) => (
+                    <DropdownMenu.Item
+                      key={type}
+                      onSelect={() => setImportEntityType(type)}
+                      className="cursor-pointer px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-50 focus:bg-slate-50"
+                    >
+                      {label}
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+
             {/* Add button */}
             <button
               onClick={() => setAddOpen(true)}
@@ -275,6 +316,35 @@ export default function MembersPage() {
         onConfirm={handleDelete}
         loading={deleteMutation.isPending}
       />
+
+      {/* Import wizard dialog */}
+      <Dialog.Root
+        open={importEntityType !== null}
+        onOpenChange={(open) => {
+          if (!open) setImportEntityType(null)
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-0 shadow-xl max-h-[90vh] overflow-y-auto">
+            <Dialog.Title className="sr-only">
+              {importEntityType === 'member'
+                ? 'Import Members'
+                : importEntityType === 'salary_history'
+                  ? 'Import Salary History'
+                  : importEntityType === 'bonus_history'
+                    ? 'Import Bonus History'
+                    : 'Import PTO History'}
+            </Dialog.Title>
+            {importEntityType && (
+              <ImportWizard
+                entityType={importEntityType}
+                onComplete={() => setImportEntityType(null)}
+              />
+            )}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   )
 }

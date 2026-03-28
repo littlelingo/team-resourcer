@@ -52,6 +52,27 @@ export const TEAM_TARGET_FIELDS: TargetField[] = [
   { label: 'Description', value: 'description' },
 ]
 
+export const SALARY_HISTORY_TARGET_FIELDS: TargetField[] = [
+  { label: 'Employee ID', value: 'employee_id' },
+  { label: 'Effective Date', value: 'effective_date' },
+  { label: 'Amount', value: 'amount' },
+  { label: 'Notes', value: 'notes' },
+]
+
+export const BONUS_HISTORY_TARGET_FIELDS: TargetField[] = [
+  { label: 'Employee ID', value: 'employee_id' },
+  { label: 'Effective Date', value: 'effective_date' },
+  { label: 'Amount', value: 'amount' },
+  { label: 'Notes', value: 'notes' },
+]
+
+export const PTO_HISTORY_TARGET_FIELDS: TargetField[] = [
+  { label: 'Employee ID', value: 'employee_id' },
+  { label: 'Effective Date', value: 'effective_date' },
+  { label: 'Amount', value: 'amount' },
+  { label: 'Notes', value: 'notes' },
+]
+
 // Auto-suggest: try exact match first, then includes
 function suggestField(header: string, fields: TargetField[]): string | null {
   const normalized = header.trim().toLowerCase()

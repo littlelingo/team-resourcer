@@ -19,7 +19,7 @@ class EntityConfig:
     target_fields: set[str]
     required_fields: set[str]
     numeric_fields: set[str] = field(default_factory=set)
-    dedup_field: str = "name"
+    dedup_field: str | None = None
     validators: list[Callable[[dict[str, Any], list[str]], None]] = field(default_factory=list)
 
 
@@ -36,6 +36,15 @@ def _validate_email(data: dict[str, Any], errors: list[str]) -> None:
     email_val = data.get("email")
     if email_val and not _EMAIL_RE.fullmatch(str(email_val)):
         errors.append(f"Invalid email format: '{email_val}'.")
+
+
+def _validate_effective_date(data: dict[str, Any], errors: list[str]) -> None:
+    val = data.get("effective_date")
+    if val and val != "":
+        try:
+            date.fromisoformat(str(val))
+        except ValueError:
+            errors.append(f"'effective_date' must be ISO date format (YYYY-MM-DD), got '{val}'.")
 
 
 ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
@@ -68,18 +77,43 @@ ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
     "program": EntityConfig(
         target_fields={"name", "description", "agency_name"},
         required_fields={"name"},
+        dedup_field="name",
     ),
     "area": EntityConfig(
         target_fields={"name", "description"},
         required_fields={"name"},
+        dedup_field="name",
     ),
     "team": EntityConfig(
         target_fields={"name", "functional_area_name", "description"},
         required_fields={"name"},
+        dedup_field="name",
     ),
     "agency": EntityConfig(
         target_fields={"name", "description"},
         required_fields={"name"},
+        dedup_field="name",
+    ),
+    "salary_history": EntityConfig(
+        target_fields={"employee_id", "effective_date", "amount", "notes"},
+        required_fields={"employee_id", "effective_date", "amount"},
+        numeric_fields={"amount"},
+        dedup_field=None,
+        validators=[_validate_effective_date],
+    ),
+    "bonus_history": EntityConfig(
+        target_fields={"employee_id", "effective_date", "amount", "notes"},
+        required_fields={"employee_id", "effective_date", "amount"},
+        numeric_fields={"amount"},
+        dedup_field=None,
+        validators=[_validate_effective_date],
+    ),
+    "pto_history": EntityConfig(
+        target_fields={"employee_id", "effective_date", "amount", "notes"},
+        required_fields={"employee_id", "effective_date", "amount"},
+        numeric_fields={"amount"},
+        dedup_field=None,
+        validators=[_validate_effective_date],
     ),
 }
 
@@ -144,17 +178,18 @@ def apply_mapping(
                 errors.append(f"{req_field} is missing or blank.")
 
         # Deduplication
-        dedup_val = data.get(config.dedup_field, "")
-        if dedup_val:
-            dedup_str = str(dedup_val)
-            if dedup_str in seen_dedup:
-                warnings.append(
-                    f"Duplicate {config.dedup_field} '{dedup_str}' "
-                    f"(first seen at row {seen_dedup[dedup_str]}). "
-                    "This row will be skipped during commit."
-                )
-            else:
-                seen_dedup[dedup_str] = idx
+        if config.dedup_field is not None:
+            dedup_val = data.get(config.dedup_field, "")
+            if dedup_val:
+                dedup_str = str(dedup_val)
+                if dedup_str in seen_dedup:
+                    warnings.append(
+                        f"Duplicate {config.dedup_field} '{dedup_str}' "
+                        f"(first seen at row {seen_dedup[dedup_str]}). "
+                        "This row will be skipped during commit."
+                    )
+                else:
+                    seen_dedup[dedup_str] = idx
 
         # Numeric field validation
         for num_field in config.numeric_fields:

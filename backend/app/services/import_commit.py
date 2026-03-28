@@ -7,7 +7,7 @@ from datetime import date
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.agency import Agency
@@ -339,6 +339,100 @@ async def _commit_members(
     return created_count, updated_count
 
 
+async def _commit_financial_history(
+    db: AsyncSession,
+    rows: list[MappedRow],
+    error_rows: list[MappedRow],
+    field_name: str,
+) -> tuple[int, int]:
+    """Import financial history rows for salary, bonus, or pto_used. Returns (created, 0)."""
+    # Build employee_id lookup
+    emp_ids = [str(r.data.get("employee_id", "")).strip() for r in rows]
+    emp_ids = [e for e in emp_ids if e]
+    result = await db.execute(select(TeamMember).where(TeamMember.employee_id.in_(emp_ids)))
+    members = result.scalars().all()
+    emp_lookup: dict[str, TeamMember] = {m.employee_id: m for m in members}
+
+    created_count = 0
+    # Track which member+date+amount combos we just inserted to update scalar later
+    affected: dict[str, list[tuple[date, Decimal]]] = {}
+
+    for row in rows:
+        data = row.data
+        emp_id = str(data.get("employee_id", "")).strip()
+
+        if emp_id not in emp_lookup:
+            row.errors.append(f"No member found with employee_id '{emp_id}'")
+            error_rows.append(row)
+            continue
+
+        member = emp_lookup[emp_id]
+
+        # Parse amount
+        try:
+            amount = Decimal(str(data.get("amount", "")))
+        except InvalidOperation:
+            row.errors.append(f"'amount' could not be parsed as a number.")
+            error_rows.append(row)
+            continue
+
+        # Parse effective_date
+        try:
+            eff_date = date.fromisoformat(str(data.get("effective_date", "")))
+        except ValueError:
+            row.errors.append(f"'effective_date' could not be parsed as ISO date.")
+            error_rows.append(row)
+            continue
+
+        notes_val = data.get("notes") or None
+
+        # Dedup check: skip if identical record already exists
+        existing_result = await db.execute(
+            select(MemberHistory).where(
+                MemberHistory.member_uuid == member.uuid,
+                MemberHistory.field == field_name,
+                MemberHistory.value == amount,
+                MemberHistory.effective_date == eff_date,
+            )
+        )
+        if existing_result.scalar_one_or_none() is not None:
+            continue
+
+        entry = MemberHistory(
+            member_uuid=member.uuid,
+            field=field_name,
+            value=amount,
+            effective_date=eff_date,
+            notes=notes_val,
+        )
+        db.add(entry)
+        created_count += 1
+
+        if emp_id not in affected:
+            affected[emp_id] = []
+        affected[emp_id].append((eff_date, amount))
+
+    await db.flush()
+
+    # Scalar update pass: set member.field to the amount at the max effective_date
+    for emp_id, imported_entries in affected.items():
+        member = emp_lookup[emp_id]
+        max_result = await db.execute(
+            select(func.max(MemberHistory.effective_date)).where(
+                MemberHistory.member_uuid == member.uuid,
+                MemberHistory.field == field_name,
+            )
+        )
+        max_date = max_result.scalar_one_or_none()
+        if max_date is not None:
+            # Check if the max date is one we just imported
+            matching = [amt for (d, amt) in imported_entries if d == max_date]
+            if matching:
+                setattr(member, field_name, matching[-1])
+
+    return created_count, 0
+
+
 async def commit_import(
     session_id: str,
     mapping_config: MappingConfig,
@@ -358,8 +452,12 @@ async def commit_import(
     from app.services.import_mapper import ENTITY_CONFIGS
 
     dedup_field = ENTITY_CONFIGS[entity_type].dedup_field
-    deduped_valid = _dedup_rows(valid_rows, dedup_field)
-    dedup_skipped = len(valid_rows) - len(deduped_valid)
+    if dedup_field is not None:
+        deduped_valid = _dedup_rows(valid_rows, dedup_field)
+        dedup_skipped = len(valid_rows) - len(deduped_valid)
+    else:
+        deduped_valid = valid_rows
+        dedup_skipped = 0
 
     if entity_type == "area":
         created, updated = await _commit_areas(db, deduped_valid)
@@ -369,6 +467,14 @@ async def commit_import(
         created, updated = await _commit_teams(db, deduped_valid)
     elif entity_type == "agency":
         created, updated = await _commit_agencies(db, deduped_valid)
+    elif entity_type == "salary_history":
+        created, updated = await _commit_financial_history(db, deduped_valid, error_rows, "salary")
+    elif entity_type == "bonus_history":
+        created, updated = await _commit_financial_history(db, deduped_valid, error_rows, "bonus")
+    elif entity_type == "pto_history":
+        created, updated = await _commit_financial_history(
+            db, deduped_valid, error_rows, "pto_used"
+        )
     else:
         created, updated = await _commit_members(db, deduped_valid, error_rows)
 

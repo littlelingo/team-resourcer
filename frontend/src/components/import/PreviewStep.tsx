@@ -63,6 +63,8 @@ export default function PreviewStep({
         queryClient.invalidateQueries({ queryKey: areaKeys.all })
       } else if (entityType === 'agency') {
         queryClient.invalidateQueries({ queryKey: agencyKeys.all })
+      } else if (entityType === 'salary_history' || entityType === 'bonus_history' || entityType === 'pto_history') {
+        queryClient.invalidateQueries({ queryKey: memberKeys.all })
       }
       onCommit(data)
     },

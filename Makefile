@@ -3,6 +3,7 @@
 up:
 	docker compose down --remove-orphans 2>/dev/null || true
 	docker compose up -d
+	@docker compose exec backend alembic upgrade head
 	@docker compose ps
 
 down:
@@ -76,6 +77,7 @@ reset-db:
 rebuild:
 	docker compose down
 	docker compose up -d --build
+	@docker compose exec backend alembic upgrade head
 	@docker compose ps
 
 rebuild-backend:

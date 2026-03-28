@@ -26,3 +26,12 @@
 
 ## Research: Program Import Agency Column (feature 023)
 - Backend already handles agency_name in program import (lookup-only, no auto-create); fix is one frontend line in MapColumnsStep.tsx PROGRAM_TARGET_FIELDS; see `.context/features/023-program-import-agency/NOTES.md`
+
+## Research: Makefile Port Conflicts (feature 025)
+- All rebuild/up targets lack prior `down`; `docker compose up` exits 0 even on port-bind failure; db:5432 conflicts with local Postgres; see `.context/features/025-makefile-port-cleanup/NOTES.md`
+
+## Research: CORS Configuration
+- [`cors-research.md`](cors-research.md) — FastAPI CORSMiddleware, default allows localhost:5173, env var mismatch in Compose (VITE_API_URL vs VITE_API_BASE_URL), narrow allow_headers is likely bug trigger
+
+## Bug: All Endpoints 500 / CORS Headers Missing
+- [`cors-500-investigation.md`](cors-500-investigation.md) — Root cause: DB schema empty (migrations never run); fix is `make migrate`; CORS headers absent on 500s is a Starlette ServerErrorMiddleware behavior

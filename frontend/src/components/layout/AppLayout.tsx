@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Users, Briefcase, Layers, Network, GitBranch, Upload, Building2 } from 'lucide-react'
+import { Users, Briefcase, Layers, Network, GitBranch, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -8,7 +8,6 @@ const navItems = [
   { label: 'Agencies', icon: Building2, path: '/agencies' },
   { label: 'Functional Areas', icon: Layers, path: '/functional-areas' },
   { label: 'Teams', icon: Network, path: '/teams' },
-  { label: 'Import', icon: Upload, path: '/import' },
 ]
 
 const treeNavItems = [

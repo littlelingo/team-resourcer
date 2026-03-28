@@ -1,5 +1,9 @@
 # Learnings
 
+## 022-remove-main-import-button (2026-03-28)
+
+Clean removal — no new patterns or errors encountered. Reviewer noted that the catch-all redirect only covers `/` (index route), not arbitrary unknown paths like `/import`. A `<Route path="*">` catch-all would be a useful follow-up.
+
 ## 013-entity-import (2026-03-25)
 
 ### TanStack Query invalidation must use exported key constants

@@ -15,5 +15,11 @@
 ## Research: Entity Import Feature
 - [`research_entity_import.md`](research_entity_import.md) — 2026-03-25 findings on adding CSV/Sheets import for programs, areas, teams
 
+## Research: Import Architecture + Financial History (deep)
+- [`research_import_and_history.md`](research_import_and_history.md) — 2026-03-27 full audit: wizard steps, API routes, ENTITY_CONFIGS, commit flow, member_history EAV model, employee_id uniqueness, frontend components, known gap: agency_name missing from PROGRAM_TARGET_FIELDS
+
 ## Bug: Select.Item Empty String Value
 - [`bug_select_item_value.md`](bug_select_item_value.md) — SelectField "None" item uses value="" which Radix Select v2 rejects; fix is sentinel "__none__" like TeamFormDialog already does
+
+## Research: Remove Main Import Nav / ImportPage (feature 022)
+- [`research_remove_import_page.md`](research_remove_import_page.md) — ImportPage is a thin member-only wrapper at /import; every section page now has its own inline import dialog; 3 touch points: App.tsx route, AppLayout.tsx nav entry + Upload icon, delete ImportPage.tsx

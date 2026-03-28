@@ -9,3 +9,5 @@
 - [project_013_entity_import_review.md](project_013_entity_import_review.md) — 013-entity-import (per-section CSV/Sheets import for programs/areas/teams): key findings from review on 2026-03-25
 - [project_017_agency_review.md](project_017_agency_review.md) — 017-program-agency (Agency entity, program FK, import support): key findings from review on 2026-03-25
 - [project_018_member_name_split_review.md](project_018_member_name_split_review.md) — 018-member-name-split (first_name/last_name split + hire_date): key findings from review on 2026-03-26
+- [project_020_location_split_review.md](project_020_location_split_review.md) — 020-member-location-split (city + state split): key findings from review on 2026-03-27
+- [project_021_financial_history_review.md](project_021_financial_history_review.md) — 021-financial-history-import (salary/bonus/PTO import, _commit_financial_history): key findings from review on 2026-03-27

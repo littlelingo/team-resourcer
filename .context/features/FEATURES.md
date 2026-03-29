@@ -38,3 +38,4 @@
 | 033 | Import Salary No History | COMPLETE | implement-then-test | .context/features/033-import-salary-no-history/PRP.md |
 | 034 | Fix Stale Location Fixtures | COMPLETE | implement-then-test | .context/features/034-fix-stale-location-fixtures/PRP.md |
 | 035 | History Field Visual Cues | COMPLETE | implement-then-test | .context/features/035-history-field-visual-cues/PRP.md |
+| 036 | Member Card Employee ID Label | RESEARCH | implement-then-test | .context/features/036-member-card-employee-id-label/NOTES.md |

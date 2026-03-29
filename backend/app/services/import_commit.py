@@ -89,9 +89,8 @@ async def _append_history_if_changed(
     member: TeamMember,
     field: str,
     new_value: Any,
-    is_new: bool,
 ) -> None:
-    """Append a MemberHistory record if the financial value changed (or member is new)."""
+    """Append a MemberHistory record only when an existing member's financial value changes."""
     if new_value is None or new_value == "":
         return
     try:
@@ -100,7 +99,7 @@ async def _append_history_if_changed(
         return
 
     existing = getattr(member, field, None)
-    if is_new or existing != new_decimal:
+    if existing is not None and existing != new_decimal:
         entry = MemberHistory(
             member_uuid=member.uuid,
             field=field,
@@ -322,7 +321,7 @@ async def _commit_members(
         for fin_field in _FINANCIAL_FIELDS:
             val = data.get(fin_field)
             if val is not None and val != "":
-                await _append_history_if_changed(db, member, fin_field, val, is_new)
+                await _append_history_if_changed(db, member, fin_field, val)
                 setattr(member, fin_field, Decimal(str(val)))
 
         await db.flush()

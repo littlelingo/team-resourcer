@@ -1,7 +1,10 @@
+from decimal import Decimal
+
 from sqlalchemy import select
 
 import app.services.import_session as sess_mod
 from app.models.functional_area import FunctionalArea
+from app.models.member_history import MemberHistory
 from app.models.team import Team
 from app.models.team_member import TeamMember
 from app.schemas.import_schemas import MappingConfig
@@ -178,3 +181,99 @@ async def test_commit_skips_error_rows(db_session):
     result = await commit_import(sid, config, db_session)
     assert result.created_count == 1
     assert result.skipped_count == 1
+
+
+async def test_new_member_salary_no_history(db_session):
+    """Importing a new member with salary should NOT create a history entry."""
+    rows = [{"id": "CI_SAL_NEW_001", "fn": "Sal", "ln": "New", "sal": "75000"}]
+    sid = create_session(rows, ["id", "fn", "ln", "sal"])
+    config = make_commit_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name", "sal": "salary"}
+    )
+    result = await commit_import(sid, config, db_session)
+    assert result.created_count == 1
+
+    member = (
+        await db_session.execute(
+            select(TeamMember).where(TeamMember.employee_id == "CI_SAL_NEW_001")
+        )
+    ).scalar_one()
+    assert member.salary == Decimal("75000")
+
+    history = (
+        await db_session.execute(
+            select(MemberHistory).where(MemberHistory.member_uuid == member.uuid)
+        )
+    ).scalars().all()
+    assert history == []
+
+
+async def test_existing_member_changed_salary_creates_history(db_session, area):
+    """Importing an existing member with a different salary SHOULD create a history entry."""
+    member = TeamMember(
+        employee_id="CI_SAL_UPD_001",
+        first_name="Sal",
+        last_name="Upd",
+        functional_area_id=area.id,
+        salary=Decimal("50000"),
+    )
+    db_session.add(member)
+    await db_session.flush()
+
+    rows = [{"id": "CI_SAL_UPD_001", "fn": "Sal", "ln": "Upd", "sal": "80000"}]
+    sid = create_session(rows, ["id", "fn", "ln", "sal"])
+    config = make_commit_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name", "sal": "salary"}
+    )
+    result = await commit_import(sid, config, db_session)
+    assert result.updated_count == 1
+
+    updated = (
+        await db_session.execute(
+            select(TeamMember).where(TeamMember.employee_id == "CI_SAL_UPD_001")
+        )
+    ).scalar_one()
+    assert updated.salary == Decimal("80000")
+
+    history = (
+        await db_session.execute(
+            select(MemberHistory).where(MemberHistory.member_uuid == updated.uuid)
+        )
+    ).scalars().all()
+    assert len(history) == 1
+    assert history[0].field == "salary"
+    assert history[0].value == Decimal("80000")
+
+
+async def test_existing_member_same_salary_no_history(db_session, area):
+    """Importing an existing member with the same salary should NOT create a history entry."""
+    member = TeamMember(
+        employee_id="CI_SAL_SAME_001",
+        first_name="Sal",
+        last_name="Same",
+        functional_area_id=area.id,
+        salary=Decimal("60000"),
+    )
+    db_session.add(member)
+    await db_session.flush()
+
+    rows = [{"id": "CI_SAL_SAME_001", "fn": "Sal", "ln": "Same", "sal": "60000"}]
+    sid = create_session(rows, ["id", "fn", "ln", "sal"])
+    config = make_commit_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name", "sal": "salary"}
+    )
+    result = await commit_import(sid, config, db_session)
+    assert result.updated_count == 1
+
+    unchanged = (
+        await db_session.execute(
+            select(TeamMember).where(TeamMember.employee_id == "CI_SAL_SAME_001")
+        )
+    ).scalar_one()
+
+    history = (
+        await db_session.execute(
+            select(MemberHistory).where(MemberHistory.member_uuid == unchanged.uuid)
+        )
+    ).scalars().all()
+    assert history == []

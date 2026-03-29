@@ -73,6 +73,7 @@ Known error patterns encountered during development. Each entry captures the sig
 | ERR-045 | Port 5432 conflict when local Postgres is running alongside Docker db service | `docker-compose.yml` maps `5432:5432`; clashes with native Postgres | Document conflict; optionally remap to non-standard host port | Feature 025 |
 | ERR-046 | Frontend image `node:20-alpine` unpinned — non-reproducible builds | `frontend/Dockerfile` used `node:20-alpine` without patch version | Pin to `node:20.20.1-alpine3.23` matching backend convention | Feature 011 |
 | ERR-047 | `shadowedDatetime` import error — `datetime` imported twice in commit/mapper | `import_commit.py` and `import_mapper.py` had shadowed `datetime` imports after refactor | Remove duplicate import statements | Feature 018 |
+| ERR-048 | 4 test failures: `ValueError: Unknown target field(s) in column_map: location` | `valid_members.csv` fixture still has `location` column after city/state split (feature 020) | Replace `location` with `city` + `state` in CSV fixture; regenerate xlsx | Feature 034 |
 
 ## Anti-Pattern Cross-Reference
 

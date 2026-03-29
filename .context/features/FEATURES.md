@@ -36,3 +36,4 @@
 | 031 | Error Index Population | COMPLETE | implement-then-test | .context/features/031-error-index/NOTES.md |
 | 032 | React JSX Runtime Fix | COMPLETE | implement-then-test | .context/features/032-react-jsx-runtime-fix/NOTES.md |
 | 033 | Import Salary No History | COMPLETE | implement-then-test | .context/features/033-import-salary-no-history/PRP.md |
+| 034 | Fix Stale Location Fixtures | RESEARCH | implement-then-test | .context/features/034-fix-stale-location-fixtures/NOTES.md |

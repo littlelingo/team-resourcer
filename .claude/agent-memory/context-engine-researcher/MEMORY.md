@@ -35,3 +35,9 @@
 
 ## Bug: All Endpoints 500 / CORS Headers Missing
 - [`cors-500-investigation.md`](cors-500-investigation.md) — Root cause: DB schema empty (migrations never run); fix is `make migrate`; CORS headers absent on 500s is a Starlette ServerErrorMiddleware behavior
+
+## Research: Import Amount Parsing (feature 027 candidate)
+- [`import-amount-research.md`](import-amount-research.md) — 2026-03-28: "$75,000" / "1,500.00" fail Decimal() in mapper; fix is import_amount_utils.py + normalize-in-place in mapper; date utils (024) is the exact pattern to follow
+
+## Research: History Currency Display (feature 028)
+- History timeline in MemberDetailSheet.tsx renders entry.value raw ("120000.00"); Compensation section already has formatCurrency/formatNumber helpers (lines 17–29) — fix is extract to format-utils.ts + apply in history span; see `.context/features/028-history-currency-display/NOTES.md`

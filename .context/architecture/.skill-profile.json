@@ -1,0 +1,29 @@
+{
+  "detected_stack": ["python", "fastapi", "react", "typescript", "postgres", "docker", "tailwind"],
+  "relevant_skills": [
+    "python-backend",
+    "react-frontend",
+    "typescript",
+    "api-conventions",
+    "postgres",
+    "postgres-mcp",
+    "database-migrations",
+    "deployment-cicd",
+    "testing-conventions",
+    "git-workflow",
+    "auth-security",
+    "context-system",
+    "knowledge-base",
+    "prompt-efficiency",
+    "mcp-tools",
+    "context7-docs",
+    "sequential-thinking"
+  ],
+  "irrelevant_skills": [
+    "ruby",
+    "redis",
+    "node-backend",
+    "puppeteer",
+    "google-workspace"
+  ]
+}

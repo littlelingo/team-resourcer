@@ -1,84 +1,93 @@
 # Learnings
 
-## 027-import-amount-parsing (2026-03-28)
+## Phase 1 — Scaffold + Data Model + API (2026-03-22)
 
-### Python Decimal accepts NaN and Infinity without raising
-- `Decimal("NaN")` and `Decimal("Infinity")` do NOT raise `InvalidOperation`. They silently return special Decimal values that would corrupt financial data in `Numeric(12,2)` columns. Always check `result.is_finite()` after constructing a Decimal from user input.
+### What went well
+- Parallel agent execution for independent tracks (scaffold, frontend, schemas) saved significant time
+- SQLAlchemy 2.0 async patterns with DeclarativeBase worked cleanly
+- Alembic asyncpg→psycopg2 URL swap in env.py resolved the sync/async mismatch
+- Pillow was already in deps but unused — leveraged it for magic byte validation during review
 
-## 026-cors-fix (2026-03-28)
+### Issues caught in review
+- `exclude_none=True` bug: would have prevented clearing nullable fields in all 4 update endpoints
+- `set_supervisor` missing eager loads: would have caused MissingGreenlet at runtime
+- Team sub-router cross-area access: cosmetic URL provided false security — needed ownership checks
+- 4 dependency CVEs found: python-multipart, pillow, starlette (via fastapi)
+- Content-Type header spoofing on image upload: fixed with Pillow verify
 
-### FastAPI CORSMiddleware: `allow_headers=["*"]` with `allow_credentials=True`
-- FastAPI does NOT echo a literal `*` in the `Access-Control-Allow-Headers` response when credentials are enabled. It reflects back only the headers listed in the request's `Access-Control-Request-Headers`. This is correct RFC behaviour and means curl validation will show specific headers, not `*`.
-- The real CORS fix was widening `allow_headers`, not `allow_origins` — origins were already correct. Narrow `allow_headers` causes preflight failures that surface as "No Access-Control-Allow-Origin header" errors, which is misleading.
+### Architecture decisions
+- History auto-capture: append-only, triggered in service layer on financial field changes
+- Org tree: load all members flat, build tree in Python (not recursive SQL)
+- Image naming: UUID-based to prevent path traversal
+- Sub-routers: teams nested under areas, history nested under members
 
-## 024-import-date-format (2026-03-28)
+## Phase 2 — Card View + Table View (2026-03-23)
 
-### Date normalization belongs in the mapper validator, not the commit layer
-- The mapper is the single validation gate — normalizing dates there (writing ISO strings back into `row.data` in-place) means the commit layer's `date.fromisoformat()` calls become a cheap safety net with zero changes required.
+### What went well
+- Parallel agent execution: foundation (steps 1-5) + UI shell (steps 6-7) ran concurrently
+- shadcn CLI worked in interactive terminal for component generation
+- TanStack Query v5 object syntax + cache invalidation pattern clean
+- Custom Tailwind sidebar simpler and more reliable than shadcn Sidebar component
 
-### MDY/DMY ambiguity is unresolvable without metadata
-- When both components are <= 12, there is no way to distinguish MM/DD/YYYY from DD/MM/YYYY. Defaulting to MDY (US convention) is the documented trade-off.
+### Issues caught in review
+- PATCH→PUT mismatch: all 4 update mutations used wrong HTTP method (405 errors)
+- Program assignments silently discarded: form collected data it couldn't submit
+- Edit from table passed incomplete TeamMemberList, would overwrite salary/phone with blanks
+- ImageUpload had no client-side file type/size validation + object URL memory leak
+- getInitials duplicated 3x, actions dropdown duplicated 4x → extracted to shared
+- Two MemberFormDialog instances mounted simultaneously → consolidated to one
+- Stale team_id when area changes in form → added useEffect watcher
 
-## 022-remove-main-import-button (2026-03-28)
+### Architecture decisions
+- Teams endpoint is nested (/api/areas/{id}/teams/) — useAllTeams fans out queries per area
+- Backend returns salary/bonus/pto as string decimals — frontend parses with parseFloat
+- Program assignments managed via separate endpoints, not in member form
+- Detail sheet uses @radix-ui/react-dialog with Tailwind slide animation (not Sheet)
 
-Clean removal — no new patterns or errors encountered. Reviewer noted that the catch-all redirect only covers `/` (index route), not arbitrary unknown paths like `/import`. A `<Route path="*">` catch-all would be a useful follow-up.
+## Phase 3 — Interactive Tree Views (2026-03-23)
 
-## 013-entity-import (2026-03-25)
+### What went well
+- @xyflow/react v12 + dagre layout worked smoothly for all three tree types
+- Flat node/edge format from backend (positions at 0,0, layout client-side) was a clean separation
+- Parallel tracks: backend endpoints + frontend foundation ran concurrently
+- Custom node components with Tailwind styling matched Phase 2 card aesthetics
 
-### TanStack Query invalidation must use exported key constants
-- `queryClient.invalidateQueries({ queryKey: ['functional-areas'] })` does NOT match queries registered under `areaKeys.all = ["areas"]`. Always import and use the exported `*Keys.all` constants from hooks, never bare string literals. This was a stale-data bug caught in review.
+### Issues caught in review
+- PATCH→PUT mismatch AGAIN (3rd phase in a row) — this is the #1 recurring anti-pattern
+- Org drag-reassign bypassed dedicated supervisor endpoint (skipped circular ref validation)
+- Program reassign created duplicates (missing DELETE of old assignment before POST new)
+- image vs image_path field name mismatch between backend tree_service and frontend MemberNode
+- Org tree node data included PII (email, employee_id) not needed by the renderer
+- Dagre silently creates phantom nodes for orphaned edges — needed guard on setEdge
+- Dragged nodes not restored to position when no drop target found
 
-### Dedup-skipped rows should be surfaced in CommitResult
-- `_dedup_rows` silently removes duplicates from valid rows before commit. If the removed count isn't added to `skipped_count`, users see a total that doesn't add up (e.g., 10 rows uploaded but only 7 created + 0 skipped). Always compute `dedup_skipped = len(valid_rows) - len(deduped_valid)` and include it.
+### Architecture decisions
+- Tree endpoints return flat node/edge lists, not nested JSON — simpler client-side processing
+- Dagre layout runs client-side (useTreeLayout hook) — keeps API decoupled from layout
+- Drag-drop uses proximity detection (60px threshold) since ReactFlow lacks native parent-assignment
+- Program reassign requires DELETE old + POST new (not a single PATCH)
+- Node data should contain only rendering fields — relational IDs go in edges
 
-## 012-adapt-security-2 (2026-03-25)
+## Phase 4 — Data Import (2026-03-23)
 
-### Pillow verify() invalidates the image object
-- After `img.verify()`, the Image object cannot be reused — Pillow's documented behavior. Must call `Image.open()` a second time to read `.format`. This double-open is intentional and should not be collapsed into a single open.
+### What went well
+- Backend + frontend tracks ran fully in parallel with clean separation
+- Session cache pattern (in-memory dict with UUID key + TTL) worked well for single-user
+- Four-step wizard state machine (source → map → preview → result) was clean to implement
+- Auto-suggest column mapping via case-insensitive label matching saved UX effort
 
-## 002-test-coverage-backend (2026-03-24)
+### Issues caught in review
+- No file size limit on upload — could OOM the server with large files (added 10MB limit)
+- Team get_or_create silently re-parented existing teams to different areas (scoped by area_id)
+- No circular supervisor detection in two-pass import (added cycle walk)
+- Row index off-by-one: already 1-based from mapper but frontend added +1 again
+- Credential file path leaked in 422 error response (now logs internally, generic message to client)
+- Session not cleaned up on DB commit failure (added try/finally)
+- Bare except:pass on Decimal conversion — removed (mapper already validates)
+- No query cache invalidation after import commit (added invalidateQueries)
 
-### SQLite + aiosqlite test isolation
-- **Transaction rollback doesn't work** with SQLite in-memory + `StaticPool` when service layer calls `db.commit()`. Savepoints (`join_transaction_mode="create_savepoint"`) fail silently on SQLite.
-- **DELETE-after isolation** (truncate all tables in `autouse` fixture) is reliable and fast (<1s for 108 tests).
-- Use `StaticPool` to ensure a single connection to the in-memory DB across all fixtures.
-
-### SQLAlchemy async lazy-loading bug pattern
-- `db.refresh(obj)` only reloads scalar columns, NOT relationships. Accessing unloaded relationships in async mode raises `MissingGreenlet`.
-- **Fix**: Use `get_<entity>(db, id)` with `selectinload()` instead of `db.refresh()` when the response schema includes relationship fields.
-- This bug existed in `member_service.create_member`, `member_service.update_member`, `team_service.create_team`, `team_service.update_team`, and `program_service.assign_member`.
-
-### Duplicate index on SQLite
-- The `Team` model has both `index=True` on `functional_area_id` column AND an explicit `Index("ix_teams_functional_area_id", ...)` in `__table_args__`. PostgreSQL tolerates this (different internal names), but SQLite's `CREATE INDEX` fails on the duplicate name.
-- **Fix**: Use `@compiles(CreateIndex, "sqlite")` to emit `CREATE INDEX IF NOT EXISTS`.
-
-### FastAPI router prefix + trailing slash
-- History routes mounted at prefix `/api/members/{uuid}/history` with `@router.get("/")` require a trailing slash in test URLs: `/api/members/{uuid}/history/`. Without it, FastAPI returns 307 redirect.
-
-### Import commit cycle detection (backend)
-- `_has_cycle()` in `import_commit.py` checks both directions of a mutual A↔B cycle. Both links get skipped (result: 0 supervisors set), not just one. Tests must assert `== 0`, not `<= 1`.
-
-## 002-test-coverage-frontend (2026-03-24)
-
-### Vitest + MSW v2 setup pattern
-- MSW v2 uses `http` from `'msw'` and `HttpResponse` from `'msw'` (not `rest`/`ctx` from v1).
-- Handler pattern: `http.get(url, () => HttpResponse.json(data))`. For 204: `new HttpResponse(null, { status: 204 })`.
-- Server lifecycle must be in every file that uses MSW: `beforeAll(() => server.listen())`, `afterEach(() => server.resetHandlers())`, `afterAll(() => server.close())`.
-
-### TanStack Query hook testing
-- Each test needs a fresh `QueryClient` with `{ retry: false }` to prevent timeout on error paths.
-- Use `React.createElement(QueryClientProvider, { client, children })` in `.ts` files to avoid needing `.tsx` extension.
-- Mutation tests: call `.mutate()` then `waitFor(() => isSuccess)` — no `act()` wrapping needed.
-
-### MapColumnsStep: duplicate text matching
-- Component renders headers both as `<span>` labels and as `<option>` text in selects. `getByText('Employee ID')` finds multiple elements.
-- Fix: use `getAllByText()` and filter by tag, or use more specific selectors.
-
-### Docker image tag pinning: pin both runtime AND distro
-- `node:20.20.1-alpine` pins the Node patch but floats the Alpine version. If Docker Hub remaps `-alpine` to a new distro release, the OS packages shift silently.
-- Pin both: `node:20.20.1-alpine3.23`. This matches the backend convention (`python:3.12.8-slim-bookworm`).
-- `node:20.20.1-alpine3.21` does NOT exist — Node 20.20.1 was only built against Alpine 3.23. Always verify the tag exists before committing.
-
-### Coverage config scope matters
-- Setting `coverage.include: ['src/lib/**', 'src/hooks/**']` means ALL files in those dirs count toward thresholds, including hooks not in the PRP scope.
-- Either test everything in the included dirs, or narrow the include pattern. We chose to test everything — resulted in 100% coverage.
+### Architecture decisions
+- Import uses stateless session cache (in-memory dict, 30-min TTL) — acceptable for single-user
+- Two-pass supervisor resolution: first pass upserts all members, second pass sets supervisor_id
+- get_or_create for FK-by-name fields (areas, teams, programs) — creates missing entities atomically
+- Column mapping is advisory — auto-suggest helps but user always has final say

@@ -32,6 +32,7 @@ class TeamMemberCreate(BaseModel):
     functional_area_id: int
     team_id: int | None = None
     supervisor_id: UUID | None = None
+    functional_manager_id: UUID | None = None
 
     @field_validator("employee_id")
     @classmethod
@@ -65,6 +66,7 @@ class TeamMemberUpdate(BaseModel):
     functional_area_id: int | None = None
     team_id: int | None = None
     supervisor_id: UUID | None = None
+    functional_manager_id: UUID | None = None
 
     @field_validator("email")
     @classmethod
@@ -89,6 +91,16 @@ class TeamMemberListResponse(BaseModel):
     slack_handle: str | None
     functional_area_id: int
     team_id: int | None
+    supervisor_name: str | None = None
+    functional_manager_name: str | None = None
+
+
+class MemberRefResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    uuid: UUID
+    first_name: str
+    last_name: str
 
 
 class TeamMemberDetailResponse(BaseModel):
@@ -112,6 +124,9 @@ class TeamMemberDetailResponse(BaseModel):
     bonus: Decimal | None
     pto_used: Decimal | None
     supervisor_id: UUID | None
+    functional_manager_id: UUID | None
+    supervisor: MemberRefResponse | None = None
+    functional_manager: MemberRefResponse | None = None
     functional_area: FunctionalAreaListResponse | None
     team: TeamListResponse | None
     program_assignments: list[ProgramAssignmentResponse]

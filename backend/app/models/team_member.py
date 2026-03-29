@@ -49,6 +49,11 @@ class TeamMember(Base):
         ForeignKey("team_members.uuid"),
         nullable=True,
     )
+    functional_manager_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("team_members.uuid"),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -62,6 +67,18 @@ class TeamMember(Base):
     @property
     def name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
+
+    @property
+    def supervisor_name(self) -> str | None:
+        if self.supervisor is not None:
+            return self.supervisor.name
+        return None
+
+    @property
+    def functional_manager_name(self) -> str | None:
+        if self.functional_manager is not None:
+            return self.functional_manager.name
+        return None
 
     # Relationships
     functional_area: Mapped[FunctionalArea] = relationship(
@@ -87,6 +104,17 @@ class TeamMember(Base):
         "TeamMember",
         back_populates="supervisor",
         foreign_keys="TeamMember.supervisor_id",
+    )
+    functional_manager: Mapped[TeamMember | None] = relationship(
+        "TeamMember",
+        back_populates="functional_reports",
+        foreign_keys=[functional_manager_id],
+        remote_side="TeamMember.uuid",
+    )
+    functional_reports: Mapped[list[TeamMember]] = relationship(
+        "TeamMember",
+        back_populates="functional_manager",
+        foreign_keys="TeamMember.functional_manager_id",
     )
     history: Mapped[list[MemberHistory]] = relationship("MemberHistory", back_populates="member")
     program_assignments: Mapped[list[ProgramAssignment]] = relationship(

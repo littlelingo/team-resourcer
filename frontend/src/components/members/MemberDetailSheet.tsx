@@ -130,7 +130,7 @@ export default function MemberDetailSheet({
             )}
 
             {/* 3. Organization */}
-            {(member.functional_area || member.team || member.supervisor_id) && (
+            {(member.functional_area || member.team || member.supervisor_id || member.functional_manager_id) && (
               <>
                 <div>
                   <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -149,10 +149,16 @@ export default function MemberDetailSheet({
                         <span>{member.team.name}</span>
                       </div>
                     )}
-                    {member.supervisor_id && (
+                    {member.supervisor && (
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Supervisor ID</span>
-                        <span className="font-mono text-xs">{member.supervisor_id}</span>
+                        <span className="text-slate-500">Direct Manager</span>
+                        <span>{member.supervisor.first_name} {member.supervisor.last_name}</span>
+                      </div>
+                    )}
+                    {member.functional_manager && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">Functional Manager</span>
+                        <span>{member.functional_manager.first_name} {member.functional_manager.last_name}</span>
                       </div>
                     )}
                     {member.hire_date && (

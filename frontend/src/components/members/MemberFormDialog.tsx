@@ -32,6 +32,7 @@ const memberFormSchema = z.object({
   functional_area_id: z.string().nullable(),
   team_id: z.string().nullable(),
   supervisor_id: z.string(),
+  functional_manager_id: z.string(),
   salary: z.string(),
   bonus: z.string(),
   pto_used: z.string(),
@@ -99,6 +100,7 @@ export default function MemberFormDialog({
         member?.functional_area_id != null ? String(member.functional_area_id) : null,
       team_id: member?.team_id != null ? String(member.team_id) : null,
       supervisor_id: member?.supervisor_id ?? '',
+      functional_manager_id: member?.functional_manager_id ?? '',
       salary: member?.salary ?? '',
       bonus: member?.bonus ?? '',
       pto_used: member?.pto_used ?? '',
@@ -148,6 +150,7 @@ export default function MemberFormDialog({
               : undefined,
             team_id: values.team_id ? parseInt(values.team_id, 10) : undefined,
             supervisor_id: values.supervisor_id || undefined,
+            functional_manager_id: values.functional_manager_id || undefined,
             salary: values.salary || undefined,
             bonus: values.bonus || undefined,
             pto_used: values.pto_used || undefined,
@@ -172,6 +175,7 @@ export default function MemberFormDialog({
             : undefined,
           team_id: values.team_id ? parseInt(values.team_id, 10) : undefined,
           supervisor_id: values.supervisor_id || undefined,
+          functional_manager_id: values.functional_manager_id || undefined,
           salary: values.salary || undefined,
           bonus: values.bonus || undefined,
           pto_used: values.pto_used || undefined,
@@ -377,7 +381,7 @@ export default function MemberFormDialog({
                 </Field>
               </div>
 
-              <Field label="Supervisor">
+              <Field label="Direct Manager">
                 <Controller
                   control={control}
                   name="supervisor_id"
@@ -385,7 +389,22 @@ export default function MemberFormDialog({
                     <SelectField
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="Select supervisor"
+                      placeholder="Select direct manager"
+                      options={supervisorOptions}
+                    />
+                  )}
+                />
+              </Field>
+
+              <Field label="Functional Manager">
+                <Controller
+                  control={control}
+                  name="functional_manager_id"
+                  render={({ field }) => (
+                    <SelectField
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select functional manager"
                       options={supervisorOptions}
                     />
                   )}

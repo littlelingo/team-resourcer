@@ -87,6 +87,8 @@ export interface TeamMemberList {
   slack_handle: string | null
   functional_area_id: number | null
   team_id: number | null
+  supervisor_name: string | null
+  functional_manager_name: string | null
 }
 
 export interface TeamMember extends TeamMemberList {
@@ -99,6 +101,9 @@ export interface TeamMember extends TeamMemberList {
   pto_used: string | null
   hire_date: string | null
   supervisor_id: string | null
+  functional_manager_id: string | null
+  supervisor?: { uuid: string; first_name: string; last_name: string } | null
+  functional_manager?: { uuid: string; first_name: string; last_name: string } | null
   functional_area?: FunctionalArea
   team?: TeamListItem
   program_assignments?: ProgramAssignment[]
@@ -124,6 +129,7 @@ export interface MemberFormInput {
   bonus?: string
   pto_used?: string
   supervisor_id?: string
+  functional_manager_id?: string
   functional_area_id?: number
   team_id?: number
 }

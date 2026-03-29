@@ -14,7 +14,7 @@ from app.schemas.member_history import (
     HistoryFieldEnum,
     MemberHistoryResponse,
 )
-from app.schemas.org import OrgTreeNode, SupervisorUpdate
+from app.schemas.org import FunctionalManagerUpdate, OrgTreeNode, SupervisorUpdate
 from app.schemas.program import (
     ProgramCreate,
     ProgramListResponse,
@@ -32,6 +32,7 @@ from app.schemas.team import (
     TeamUpdate,
 )
 from app.schemas.team_member import (
+    MemberRefResponse,
     TeamMemberCreate,
     TeamMemberDetailResponse,
     TeamMemberListResponse,
@@ -74,6 +75,9 @@ __all__ = [
     # org
     "OrgTreeNode",
     "SupervisorUpdate",
+    "FunctionalManagerUpdate",
+    # team_member extras
+    "MemberRefResponse",
     # tree
     "TreeNodePosition",
     "TreeNode",

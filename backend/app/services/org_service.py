@@ -71,6 +71,27 @@ async def set_supervisor(
     return await get_member(db, member_uuid)
 
 
+async def set_functional_manager(
+    db: AsyncSession,
+    member_uuid: uuid.UUID,
+    functional_manager_id: uuid.UUID | None,
+) -> TeamMember | None:
+    """Set a member's functional manager, guarding against circular references."""
+    result = await db.execute(select(TeamMember).where(TeamMember.uuid == member_uuid))
+    member = result.scalar_one_or_none()
+    if member is None:
+        return None
+
+    if functional_manager_id is not None:
+        if functional_manager_id == member_uuid:
+            raise ValueError("A member cannot be their own functional manager.")
+        await _check_no_functional_cycle(db, member_uuid, functional_manager_id)
+
+    member.functional_manager_id = functional_manager_id
+    await db.commit()
+    return await get_member(db, member_uuid)
+
+
 async def _check_no_cycle(
     db: AsyncSession,
     member_uuid: uuid.UUID,
@@ -96,6 +117,37 @@ async def _check_no_cycle(
 
         result = await db.execute(
             select(TeamMember.supervisor_id).where(TeamMember.uuid == current_id)
+        )
+        row = result.one_or_none()
+        if row is None:
+            break
+        current_id = row[0]
+
+
+async def _check_no_functional_cycle(
+    db: AsyncSession,
+    member_uuid: uuid.UUID,
+    functional_manager_id: uuid.UUID,
+) -> None:
+    """
+    Walk up the functional manager chain starting from functional_manager_id.
+    Raise ValueError if member_uuid is found, indicating a cycle.
+    """
+    visited: set[uuid.UUID] = set()
+    current_id: uuid.UUID | None = functional_manager_id
+
+    while current_id is not None:
+        if current_id in visited:
+            break
+        visited.add(current_id)
+
+        if current_id == member_uuid:
+            raise ValueError(
+                "Setting this functional manager would create a circular reference."
+            )
+
+        result = await db.execute(
+            select(TeamMember.functional_manager_id).where(TeamMember.uuid == current_id)
         )
         row = result.one_or_none()
         if row is None:

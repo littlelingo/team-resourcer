@@ -118,6 +118,14 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
           </span>
         </div>
       )}
+
+      {/* Functional Manager */}
+      {member.functional_manager_name && (
+        <div className="mt-2 flex items-center justify-center gap-1 text-xs text-slate-400">
+          <span className="text-slate-500">FM:</span>
+          <span className="truncate">{member.functional_manager_name}</span>
+        </div>
+      )}
     </div>
   )
 }

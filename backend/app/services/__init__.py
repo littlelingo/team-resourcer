@@ -22,7 +22,7 @@ from app.services.member_service import (
     update_member,
     update_member_image,
 )
-from app.services.org_service import get_org_tree, set_supervisor
+from app.services.org_service import get_org_tree, set_functional_manager, set_supervisor
 from app.services.program_service import (
     assign_member,
     create_program,
@@ -72,6 +72,7 @@ __all__ = [
     # org
     "get_org_tree",
     "set_supervisor",
+    "set_functional_manager",
     # tree
     "build_org_tree",
     "build_program_tree",

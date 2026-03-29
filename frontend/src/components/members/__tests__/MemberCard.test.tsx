@@ -15,6 +15,8 @@ const baseMember = {
   slack_handle: null,
   functional_area_id: 1,
   team_id: 1,
+  supervisor_name: null as string | null,
+  functional_manager_name: null as string | null,
   functional_area: { id: 1, name: 'Engineering', description: null },
   program_assignments: [{ program: { id: 1, name: 'Alpha' }, role: 'Lead' }],
 }
@@ -81,6 +83,17 @@ describe('MemberCard', () => {
     const member = { ...baseMember, city: null, state: null }
     render(<MemberCard {...defaultProps} member={member} />)
     expect(screen.queryByText('New York')).toBeNull()
+  })
+
+  it('renders functional manager name when present', () => {
+    const member = { ...baseMember, functional_manager_name: 'Bob Smith' }
+    render(<MemberCard {...defaultProps} member={member} />)
+    expect(screen.getByText('Bob Smith')).toBeInTheDocument()
+  })
+
+  it('does not render functional manager line when functional_manager_name is null', () => {
+    render(<MemberCard {...defaultProps} />)
+    expect(screen.queryByText('FM:')).toBeNull()
   })
 
   it('dropdown menu shows Edit and Delete options after opening', async () => {

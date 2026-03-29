@@ -1,7 +1,7 @@
 ---
 feature: "029 — Functional Manager + Direct Report Rename"
 phase: implementation
-status: APPROVED
+status: COMPLETE
 testing: implement-then-test
 complexity: MEDIUM
 depends_on: "d8e2f3a4c501 (member_location_split)"

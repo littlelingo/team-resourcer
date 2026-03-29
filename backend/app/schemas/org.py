@@ -20,3 +20,7 @@ OrgTreeNode.model_rebuild()
 
 class SupervisorUpdate(BaseModel):
     supervisor_id: UUID | None = None
+
+
+class FunctionalManagerUpdate(BaseModel):
+    functional_manager_id: UUID | None = None

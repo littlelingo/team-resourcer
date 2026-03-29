@@ -29,6 +29,8 @@ async def list_members(
         .options(
             selectinload(TeamMember.functional_area),
             selectinload(TeamMember.team),
+            selectinload(TeamMember.supervisor),
+            selectinload(TeamMember.functional_manager),
         )
         .order_by(TeamMember.last_name, TeamMember.first_name)
     )
@@ -58,6 +60,7 @@ async def get_member(
             selectinload(TeamMember.functional_area),
             selectinload(TeamMember.team),
             selectinload(TeamMember.supervisor),
+            selectinload(TeamMember.functional_manager),
             selectinload(TeamMember.history),
             selectinload(TeamMember.program_assignments).selectinload(ProgramAssignment.program),
         )

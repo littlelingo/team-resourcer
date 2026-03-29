@@ -5,6 +5,7 @@ import { X, Mail, Phone, Hash, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getImageUrl } from '@/lib/api-client'
 import { getInitials } from '@/lib/member-utils'
+import { formatCurrency, formatNumber } from '@/lib/format-utils'
 import type { TeamMember } from '@/types'
 
 interface MemberDetailSheetProps {
@@ -12,20 +13,6 @@ interface MemberDetailSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onEdit: (member: TeamMember) => void
-}
-
-function formatCurrency(value: string | null | undefined): string | null {
-  if (!value) return null
-  const num = parseFloat(value)
-  if (isNaN(num)) return value
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num)
-}
-
-function formatNumber(value: string | null | undefined): string | null {
-  if (!value) return null
-  const num = parseFloat(value)
-  if (isNaN(num)) return value
-  return num.toString()
 }
 
 export default function MemberDetailSheet({
@@ -254,7 +241,13 @@ export default function MemberDetailSheet({
                         <p className="mt-0.5 text-sm font-medium text-slate-700 capitalize">
                           {entry.field.replace(/_/g, ' ')}
                           {': '}
-                          <span className="font-normal">{entry.value}</span>
+                          <span className="font-normal">
+                            {entry.field === 'salary' || entry.field === 'bonus'
+                              ? formatCurrency(entry.value)
+                              : entry.field === 'pto_used'
+                                ? `${formatNumber(entry.value)} hrs`
+                                : entry.value}
+                          </span>
                         </p>
                         {entry.notes && (
                           <p className="mt-0.5 text-xs text-slate-400">{entry.notes}</p>

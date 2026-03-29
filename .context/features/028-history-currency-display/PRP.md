@@ -1,7 +1,7 @@
 ---
 feature: 028-history-currency-display
 phase: bugfix
-status: APPROVED
+status: COMPLETE
 testing: implement-then-test
 complexity: LOW
 depends_on: []

@@ -1,6 +1,6 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Avatar from '@radix-ui/react-avatar'
-import { MoreVertical, MapPin } from 'lucide-react'
+import { MoreVertical, MapPin, Hash } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getImageUrl } from '@/lib/api-client'
 import { getInitials } from '@/lib/member-utils'
@@ -116,6 +116,14 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
           <span className="truncate">
             {[member.city, member.state].filter(Boolean).join(', ')}
           </span>
+        </div>
+      )}
+
+      {/* Employee ID */}
+      {member.employee_id && (
+        <div className="mt-2 flex items-center justify-center gap-1 text-xs text-slate-400">
+          <Hash className="h-3 w-3 flex-shrink-0" />
+          <span className="truncate">{member.employee_id}</span>
         </div>
       )}
 

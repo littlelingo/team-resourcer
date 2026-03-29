@@ -97,6 +97,11 @@ describe('MemberCard', () => {
     expect(screen.queryByText('FM:')).toBeNull()
   })
 
+  it('renders employee ID with hash icon', () => {
+    render(<MemberCard {...defaultProps} />)
+    expect(screen.getByText('E001')).toBeInTheDocument()
+  })
+
   it('dropdown menu shows Edit and Delete options after opening', async () => {
     const user = userEvent.setup()
     render(<MemberCard {...defaultProps} />)

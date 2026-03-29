@@ -62,6 +62,11 @@ async def set_supervisor(
         if supervisor_id == member_uuid:
             raise ValueError("A member cannot be their own supervisor.")
 
+        # Guard: supervisor must exist
+        sup = await db.execute(select(TeamMember.uuid).where(TeamMember.uuid == supervisor_id))
+        if sup.scalar_one_or_none() is None:
+            raise ValueError("Supervisor not found.")
+
         # Guard: the proposed supervisor must not be a descendant of the member
         # Walk up the supervisor chain from supervisor_id to check for member_uuid
         await _check_no_cycle(db, member_uuid, supervisor_id)
@@ -85,6 +90,14 @@ async def set_functional_manager(
     if functional_manager_id is not None:
         if functional_manager_id == member_uuid:
             raise ValueError("A member cannot be their own functional manager.")
+
+        # Guard: functional manager must exist
+        fm = await db.execute(
+            select(TeamMember.uuid).where(TeamMember.uuid == functional_manager_id)
+        )
+        if fm.scalar_one_or_none() is None:
+            raise ValueError("Functional manager not found.")
+
         await _check_no_functional_cycle(db, member_uuid, functional_manager_id)
 
     member.functional_manager_id = functional_manager_id

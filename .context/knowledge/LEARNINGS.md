@@ -91,3 +91,20 @@
 - Two-pass supervisor resolution: first pass upserts all members, second pass sets supervisor_id
 - get_or_create for FK-by-name fields (areas, teams, programs) — creates missing entities atomically
 - Column mapping is advisory — auto-suggest helps but user always has final say
+
+## Feature 029 — Functional Manager + Direct Report Rename (2026-03-29)
+
+### What went well
+- Self-referencing FK pattern was already established — second FK followed it exactly
+- ORM `@property` for `supervisor_name`/`functional_manager_name` cleanly bridged list response serialization without extra queries
+- `MemberRefResponse` inline schema pattern resolved the raw-UUID display gap for both supervisor and functional manager
+
+### Issues caught in review
+- Generic CRUD paths (`create_member`, `update_member`) bypassed cycle detection for both `supervisor_id` and `functional_manager_id` — this was already documented as an anti-pattern but was present for `supervisor_id` since Phase 1
+- FK existence checks were missing on both dedicated and generic endpoints — nonexistent UUIDs would cause unhandled `IntegrityError` → 500
+- Detail sheet section guard checked `_id` fields but rows rendered on resolved objects — could show empty section header
+
+### Architecture decisions
+- Cycle detection is per-chain: supervisor and functional manager are independent DAGs
+- `_validate_member_fks` helper in member_service centralizes FK existence + cycle checks for generic CRUD
+- Section visibility in MemberDetailSheet now gates on resolved objects, not raw IDs

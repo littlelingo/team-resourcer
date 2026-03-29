@@ -15,6 +15,41 @@ from app.schemas.team_member import TeamMemberCreate, TeamMemberUpdate
 from app.services.history_service import create_history_entry
 
 _FINANCIAL_FIELDS = ("salary", "bonus", "pto_used")
+_MEMBER_FK_FIELDS = ("supervisor_id", "functional_manager_id")
+
+
+async def _validate_member_fks(
+    db: AsyncSession,
+    member_uuid: uuid.UUID | None,
+    data: dict,
+) -> None:
+    """Validate that supervisor_id/functional_manager_id exist and don't create cycles."""
+    from app.services.org_service import _check_no_cycle, _check_no_functional_cycle
+
+    for fk_field in _MEMBER_FK_FIELDS:
+        fk_value = data.get(fk_field)
+        if fk_value is None:
+            continue
+
+        # Self-reference guard
+        if member_uuid is not None and fk_value == member_uuid:
+            label = "supervisor" if fk_field == "supervisor_id" else "functional manager"
+            raise ValueError(f"A member cannot be their own {label}.")
+
+        # FK existence check
+        exists = await db.execute(
+            select(TeamMember.uuid).where(TeamMember.uuid == fk_value)
+        )
+        if exists.scalar_one_or_none() is None:
+            label = "Supervisor" if fk_field == "supervisor_id" else "Functional manager"
+            raise ValueError(f"{label} not found.")
+
+        # Cycle detection (only meaningful for updates where member already exists)
+        if member_uuid is not None:
+            if fk_field == "supervisor_id":
+                await _check_no_cycle(db, member_uuid, fk_value)
+            else:
+                await _check_no_functional_cycle(db, member_uuid, fk_value)
 
 
 async def list_members(
@@ -71,7 +106,9 @@ async def get_member(
 
 async def create_member(db: AsyncSession, data: TeamMemberCreate) -> TeamMember:
     """Create a member and record initial history entries for financial fields."""
-    member = TeamMember(**data.model_dump())
+    dump = data.model_dump()
+    await _validate_member_fks(db, None, dump)
+    member = TeamMember(**dump)
     db.add(member)
     await db.flush()
 
@@ -97,6 +134,7 @@ async def update_member(
 
     today = date.today()
     update_data = data.model_dump(exclude_unset=True)
+    await _validate_member_fks(db, member_uuid, update_data)
 
     # Record history for changed financial fields
     for field in _FINANCIAL_FIELDS:

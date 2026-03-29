@@ -7,6 +7,11 @@
 - Use `exclude_unset=True` (not `exclude_none`) in `model_dump()` for update operations — allows explicit null clearing
 - Financial fields (salary, bonus, pto_used) auto-capture history on change via `_FINANCIAL_FIELDS` constant
 
+## Backend Member FK Validation
+- Generic CRUD paths (`create_member`, `update_member`) must validate self-referencing FKs (supervisor_id, functional_manager_id)
+- `_validate_member_fks` centralizes: existence check, self-reference guard, and per-chain cycle detection
+- Dedicated endpoints (`set_supervisor`, `set_functional_manager`) also validate existence independently
+
 ## Backend API Routes
 - Routes delegate entirely to service layer — no DB queries in handlers
 - Use `Depends(get_db)` for session injection

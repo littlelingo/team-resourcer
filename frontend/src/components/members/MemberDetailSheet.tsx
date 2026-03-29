@@ -130,7 +130,7 @@ export default function MemberDetailSheet({
             )}
 
             {/* 3. Organization */}
-            {(member.functional_area || member.team || member.supervisor_id || member.functional_manager_id) && (
+            {(member.functional_area || member.team || member.supervisor || member.functional_manager) && (
               <>
                 <div>
                   <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">

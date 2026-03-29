@@ -242,10 +242,11 @@ export default function MemberDetailSheet({
                           {entry.field.replace(/_/g, ' ')}
                           {': '}
                           <span className="font-normal">
+                            {/* Keep field list in sync with _FINANCIAL_FIELDS in backend/app/services/import_commit.py */}
                             {entry.field === 'salary' || entry.field === 'bonus'
-                              ? formatCurrency(entry.value)
+                              ? (formatCurrency(entry.value) ?? entry.value)
                               : entry.field === 'pto_used'
-                                ? `${formatNumber(entry.value)} hrs`
+                                ? `${formatNumber(entry.value) ?? entry.value} hrs`
                                 : entry.value}
                           </span>
                         </p>

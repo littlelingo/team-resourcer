@@ -15,3 +15,4 @@
 - [project_026_cors_fix_review.md](project_026_cors_fix_review.md) — 026-cors-fix (allow_headers wildcard, VITE_API_BASE_URL rename): key findings from review on 2026-03-28
 - [project_027_amount_parsing_review.md](project_027_amount_parsing_review.md) — 027-import-amount-parsing (parse_amount utility, mapper numeric validation): key findings from review on 2026-03-28
 - [project_028_currency_display_review.md](project_028_currency_display_review.md) — 028-history-currency-display (format-utils extraction, history timeline conditional): key findings from review on 2026-03-28
+- [project_029_functional_manager_review.md](project_029_functional_manager_review.md) — 029-functional-manager (two self-ref FKs, cycle detection, rename supervisor→direct manager): key findings from review on 2026-03-29

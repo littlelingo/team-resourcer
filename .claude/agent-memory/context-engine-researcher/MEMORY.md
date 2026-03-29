@@ -41,3 +41,6 @@
 
 ## Research: History Currency Display (feature 028)
 - History timeline in MemberDetailSheet.tsx renders entry.value raw ("120000.00"); Compensation section already has formatCurrency/formatNumber helpers (lines 17–29) — fix is extract to format-utils.ts + apply in history span; see `.context/features/028-history-currency-display/NOTES.md`
+
+## Research: Functional Manager + Direct Report Rename (feature 029)
+- Add functional_manager_id self-ref FK to team_members (mirrors supervisor_id pattern); requires explicit foreign_keys= on both new relationships; dedicated set endpoint in org.py follows existing supervisor route; MemberCard uses TeamMemberList (no FK fields) so showing manager name needs extra prop or type widening; supervisor currently displays as raw UUID in detail sheet (existing UX gap); see `.context/features/029-functional-manager/NOTES.md`

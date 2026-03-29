@@ -33,4 +33,4 @@
 | 028 | History Currency Display | COMPLETE | implement-then-test | .context/features/028-history-currency-display/PRP.md |
 | 029 | Functional Manager + Direct Report Rename | COMPLETE | implement-then-test | .context/features/029-functional-manager/PRP.md |
 | 030 | Record Feature Metrics | RESEARCH | implement-then-test | .context/features/030-record-metrics/NOTES.md |
-| 031 | Error Index Population | RESEARCH | implement-then-test | .context/features/031-error-index/NOTES.md |
+| 031 | Error Index Population | COMPLETE | implement-then-test | .context/features/031-error-index/NOTES.md |

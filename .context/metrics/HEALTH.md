@@ -37,7 +37,7 @@
 
 | Total Indexed | Hits | Novel | Repeats | Hit Rate % |
 |---------------|------|-------|---------|------------|
-| 0 | 0 | 0 | 0 | - |
+| 47 | 0 | 47 | 0 | 0% |
 
 ## Knowledge Growth
 

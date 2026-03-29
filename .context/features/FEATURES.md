@@ -32,3 +32,4 @@
 | 027 | Import Amount Parsing | COMPLETE | implement-then-test | .context/features/027-import-amount-parsing/PRP.md |
 | 028 | History Currency Display | COMPLETE | implement-then-test | .context/features/028-history-currency-display/PRP.md |
 | 029 | Functional Manager + Direct Report Rename | COMPLETE | implement-then-test | .context/features/029-functional-manager/PRP.md |
+| 030 | Record Feature Metrics | RESEARCH | implement-then-test | .context/features/030-record-metrics/NOTES.md |

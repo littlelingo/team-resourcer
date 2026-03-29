@@ -8,6 +8,14 @@ import { getInitials } from '@/lib/member-utils'
 import { formatCurrency, formatNumber } from '@/lib/format-utils'
 import type { TeamMember } from '@/types'
 
+/* Keep field list in sync with _FINANCIAL_FIELDS in backend/app/services/import_commit.py */
+const HISTORY_FIELD_STYLES: Record<string, { label: string; dot: string; badge: string }> = {
+  salary:   { label: 'Salary', dot: 'border-emerald-400 bg-emerald-50', badge: 'bg-emerald-50 text-emerald-700' },
+  bonus:    { label: 'Bonus',  dot: 'border-violet-400 bg-violet-50',   badge: 'bg-violet-50 text-violet-700' },
+  pto_used: { label: 'PTO',    dot: 'border-amber-400 bg-amber-50',     badge: 'bg-amber-50 text-amber-700' },
+}
+const DEFAULT_FIELD_STYLE = { label: '', dot: 'border-blue-300 bg-white', badge: 'bg-slate-100 text-slate-600' }
+
 interface MemberDetailSheetProps {
   member: TeamMember | null
   open: boolean
@@ -237,30 +245,31 @@ export default function MemberDetailSheet({
                   <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
                     History
                   </h3>
-                  <ol className="relative border-l-2 border-blue-100 space-y-4 pl-4">
-                    {sortedHistory.map((entry) => (
-                      <li key={entry.id} className="relative">
-                        <span className="absolute -left-[21px] top-1 h-3 w-3 rounded-full border-2 border-blue-300 bg-white" />
-                        <p className="text-xs text-slate-400">
-                          {new Date(entry.effective_date).toLocaleDateString()}
-                        </p>
-                        <p className="mt-0.5 text-sm font-medium text-slate-700 capitalize">
-                          {entry.field.replace(/_/g, ' ')}
-                          {': '}
-                          <span className="font-normal">
-                            {/* Keep field list in sync with _FINANCIAL_FIELDS in backend/app/services/import_commit.py */}
+                  <ol className="relative border-l-2 border-slate-200 space-y-4 pl-4">
+                    {sortedHistory.map((entry) => {
+                      const style = HISTORY_FIELD_STYLES[entry.field] ?? DEFAULT_FIELD_STYLE
+                      return (
+                        <li key={entry.id} className="relative">
+                          <span className={cn('absolute -left-[21px] top-1 h-3 w-3 rounded-full border-2', style.dot)} />
+                          <p className="text-xs text-slate-400">
+                            {new Date(entry.effective_date).toLocaleDateString()}
+                          </p>
+                          <p className="mt-0.5 text-sm text-slate-700">
+                            <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium mr-1.5', style.badge)}>
+                              {style.label || entry.field.replace(/_/g, ' ')}
+                            </span>
                             {entry.field === 'salary' || entry.field === 'bonus'
                               ? (formatCurrency(entry.value) ?? entry.value)
                               : entry.field === 'pto_used'
                                 ? `${formatNumber(entry.value) ?? entry.value} hrs`
                                 : entry.value}
-                          </span>
-                        </p>
-                        {entry.notes && (
-                          <p className="mt-0.5 text-xs text-slate-400">{entry.notes}</p>
-                        )}
-                      </li>
-                    ))}
+                          </p>
+                          {entry.notes && (
+                            <p className="mt-0.5 text-xs text-slate-400">{entry.notes}</p>
+                          )}
+                        </li>
+                      )
+                    })}
                   </ol>
                 </div>
               </>

@@ -73,7 +73,7 @@ ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
             "program_role",
         },
         required_fields={"employee_id", "first_name", "last_name"},
-        numeric_fields={"salary", "bonus", "pto_used"},
+        numeric_fields={"salary", "bonus", "pto_used"},  # Keep in sync with _FINANCIAL_FIELDS in import_commit.py
         dedup_field="employee_id",
         validators=[_validate_email, _validate_hire_date],
     ),

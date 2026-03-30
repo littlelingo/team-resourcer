@@ -9,6 +9,7 @@ export interface UploadResponse {
   total_row_count: number
 }
 
+// Keep in sync with EntityType in backend/app/schemas/import_schemas.py
 export type EntityType = 'member' | 'program' | 'area' | 'team' | 'agency' | 'salary_history' | 'bonus_history' | 'pto_history'
 
 export interface MappingConfig {

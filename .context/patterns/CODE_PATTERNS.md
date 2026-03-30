@@ -62,6 +62,12 @@
 - Apply at system boundaries: EAV/history values, API responses, any data not fully controlled by the form layer
 - History timeline (feature 028) established this pattern; Compensation section and future financial displays should follow it
 
+## Cross-Stack Coupling
+- When frontend replicates backend constants (field names, entity types, config), add `// Keep in sync with [file]::[constant]`
+- When backend sources must agree on the same values, add `# Keep in sync with [file]::[constant]`
+- `grep -r "Keep in sync"` during code review catches all coupling points
+- Key coupling points: `_FINANCIAL_FIELDS` ↔ `HISTORY_FIELD_STYLES`, `ENTITY_CONFIGS` ↔ `*_TARGET_FIELDS`, `EntityType` (Python Literal ↔ TS union)
+
 ## Image Upload
 - Validate via Pillow magic bytes, not just Content-Type header
 - UUID-based filenames: `{member_uuid}.{ext}` — no path traversal risk

@@ -23,6 +23,7 @@ interface EntityConfig {
   requiredFields: string[]
 }
 
+// Keep in sync with ENTITY_CONFIGS in backend/app/services/import_mapper.py (target_fields, required_fields)
 const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
   member: { targetFields: MEMBER_TARGET_FIELDS, requiredFields: ['employee_id', 'first_name', 'last_name'] },
   program: { targetFields: PROGRAM_TARGET_FIELDS, requiredFields: ['name'] },

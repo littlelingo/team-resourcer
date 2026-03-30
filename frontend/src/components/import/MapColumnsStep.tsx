@@ -10,6 +10,7 @@ export interface TargetField {
   value: string
 }
 
+// Keep in sync with ENTITY_CONFIGS in backend/app/services/import_mapper.py
 export const MEMBER_TARGET_FIELDS: TargetField[] = [
   { label: 'Employee ID', value: 'employee_id' },
   { label: 'First Name', value: 'first_name' },

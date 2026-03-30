@@ -22,6 +22,7 @@ from app.services.import_mapper import apply_mapping
 from app.services.import_session import delete_session
 from app.services.import_supervisor import resolve_supervisors
 
+# Keep in sync with: import_mapper.py numeric_fields, frontend HISTORY_FIELD_STYLES
 _FINANCIAL_FIELDS = ("salary", "bonus", "pto_used")
 
 

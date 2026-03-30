@@ -91,8 +91,9 @@ export default function MemberDetailSheet({
                 {member.title && (
                   <p className="mt-0.5 text-sm text-slate-500">{member.title}</p>
                 )}
-                <span className="mt-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                  Employee Id {member.employee_id}
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                  <Hash className="h-3 w-3" />
+                  {member.employee_id}
                 </span>
               </div>
             </div>

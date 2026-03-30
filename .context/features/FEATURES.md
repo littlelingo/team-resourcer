@@ -45,4 +45,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 044 | member-card-eid-text-label | APPROVED | `.context/features/044-member-card-eid-text-label/` |
 | 045 | edit-member-form-prefill | APPROVED | `.context/features/045-edit-member-form-prefill/` |
 | 046 | member-program-assignment | APPROVED | `.context/features/046-member-program-assignment/` |
-| 047 | entity-member-management | researched | `.context/features/047-entity-member-management/` |
+| 047 | entity-member-management | APPROVED | `.context/features/047-entity-member-management/` |

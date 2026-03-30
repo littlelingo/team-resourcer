@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/api-client"
-import type { Team, TeamFormInput } from "@/types"
+import { memberKeys } from "@/hooks/useMembers"
+import type { Team, TeamFormInput, TeamMemberList } from "@/types"
 
 export const teamKeys = {
   all: ["teams"] as const,
   list: (areaId?: number) => ["teams", "list", areaId] as const,
   detail: (areaId: number, id: number) => ["teams", "detail", areaId, id] as const,
+  members: (teamId: number) => ["teams", "members", teamId] as const,
 }
 
 /**
@@ -60,6 +62,43 @@ export function useDeleteTeam(areaId: number) {
       apiFetch<void>(`/api/areas/${areaId}/teams/${id}`, { method: "DELETE" }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: teamKeys.all })
+    },
+  })
+}
+
+export function useTeamMembers(teamId: number) {
+  return useQuery({
+    queryKey: teamKeys.members(teamId),
+    queryFn: () => apiFetch<TeamMemberList[]>(`/api/members/?team_id=${teamId}`),
+    enabled: Boolean(teamId),
+  })
+}
+
+export function useAddTeamMember(areaId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ teamId, memberUuid }: { teamId: number; memberUuid: string }) =>
+      apiFetch(`/api/areas/${areaId}/teams/${teamId}/members`, {
+        method: "POST",
+        body: JSON.stringify({ member_uuid: memberUuid }),
+      }),
+    onSuccess: (_result, { teamId }) => {
+      void qc.invalidateQueries({ queryKey: teamKeys.members(teamId) })
+      void qc.invalidateQueries({ queryKey: memberKeys.all })
+    },
+  })
+}
+
+export function useRemoveTeamMember(areaId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ teamId, memberUuid }: { teamId: number; memberUuid: string }) =>
+      apiFetch<void>(`/api/areas/${areaId}/teams/${teamId}/members/${memberUuid}`, {
+        method: "DELETE",
+      }),
+    onSuccess: (_result, { teamId }) => {
+      void qc.invalidateQueries({ queryKey: teamKeys.members(teamId) })
+      void qc.invalidateQueries({ queryKey: memberKeys.all })
     },
   })
 }

@@ -1,106 +1,17 @@
 import { useState, useMemo } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import * as Avatar from '@radix-ui/react-avatar'
-import { X } from 'lucide-react'
-import { getInitials } from '@/lib/member-utils'
 import { toast } from 'sonner'
-import { getImageUrl } from '@/lib/api-client'
 import ImportWizard from '@/components/import/ImportWizard'
 import PageHeader from '@/components/layout/PageHeader'
 import { DataTable } from '@/components/shared/DataTable'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
+import EntityMembersSheet from '@/components/shared/EntityMembersSheet'
 import PageError from '@/components/shared/PageError'
 import ProgramFormDialog from '@/components/programs/ProgramFormDialog'
 import { getProgramColumns } from '@/components/programs/programColumns'
-import { usePrograms, useDeleteProgram, useProgramMembers } from '@/hooks/usePrograms'
+import { usePrograms, useDeleteProgram, useProgramMembers, useAssignProgram, useUnassignProgram } from '@/hooks/usePrograms'
+import { useMembers } from '@/hooks/useMembers'
 import type { Program } from '@/types'
-
-// ─── Members Sheet ────────────────────────────────────────────────────────────
-
-function ProgramMembersSheet({
-  program,
-  onClose,
-}: {
-  program: Program | null
-  onClose: () => void
-}) {
-  const membersQuery = useProgramMembers(program?.id ?? 0)
-
-  return (
-    <Dialog.Root open={program !== null} onOpenChange={(open) => { if (!open) onClose() }}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/30 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <Dialog.Content className="fixed right-0 top-0 z-50 h-full w-80 bg-white shadow-xl flex flex-col data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right duration-300">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-            <Dialog.Title className="text-base font-semibold text-slate-900">
-              {program?.name ?? ''}
-            </Dialog.Title>
-            <Dialog.Close
-              onClick={onClose}
-              className="rounded-md p-1 text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-            >
-              <X className="h-4 w-4" />
-            </Dialog.Close>
-          </div>
-
-          {/* Body */}
-          <div className="flex-1 overflow-y-auto px-5 py-4">
-            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
-              Assigned Members
-            </p>
-
-            {membersQuery.isLoading && (
-              <div className="space-y-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-slate-200 animate-pulse" />
-                    <div className="h-4 w-32 rounded bg-slate-200 animate-pulse" />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {membersQuery.isError && (
-              <p className="text-sm text-red-600">Failed to load members.</p>
-            )}
-
-            {membersQuery.data && membersQuery.data.length === 0 && (
-              <p className="text-sm text-slate-500">No members assigned.</p>
-            )}
-
-            {membersQuery.data && membersQuery.data.length > 0 && (
-              <ul className="space-y-2">
-                {membersQuery.data.map((member) => (
-                  <li key={member.uuid} className="flex items-center gap-3">
-                    <Avatar.Root className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-slate-200">
-                      <Avatar.Image
-                        src={getImageUrl(member.image_path)}
-                        alt={`${member.first_name} ${member.last_name}`}
-                        className="h-full w-full object-cover"
-                      />
-                      <Avatar.Fallback className="flex h-full w-full items-center justify-center text-xs font-medium text-slate-600">
-                        {getInitials(member.first_name, member.last_name)}
-                      </Avatar.Fallback>
-                    </Avatar.Root>
-                    <div>
-                      <p className="text-sm font-medium text-slate-900">{`${member.first_name} ${member.last_name}`}</p>
-                      {member.title && (
-                        <p className="text-xs text-slate-500">{member.title}</p>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  )
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ProgramsPage() {
   const [addOpen, setAddOpen] = useState(false)
@@ -111,6 +22,10 @@ export default function ProgramsPage() {
 
   const programsQuery = usePrograms()
   const deleteMutation = useDeleteProgram()
+  const membersQuery = useProgramMembers(selectedProgram?.id ?? 0)
+  const allMembersQuery = useMembers()
+  const assignProgram = useAssignProgram()
+  const unassignProgram = useUnassignProgram()
 
   const columns = useMemo(
     () =>
@@ -199,9 +114,27 @@ export default function ProgramsPage() {
       />
 
       {/* Members sheet */}
-      <ProgramMembersSheet
-        program={selectedProgram}
-        onClose={() => setSelectedProgram(null)}
+      <EntityMembersSheet
+        open={selectedProgram !== null}
+        onOpenChange={(open) => { if (!open) setSelectedProgram(null) }}
+        title={selectedProgram?.name ?? ''}
+        members={membersQuery.data ?? []}
+        isLoading={membersQuery.isLoading}
+        allMembers={allMembersQuery.data ?? []}
+        onAdd={(uuid) => {
+          if (!selectedProgram) return
+          assignProgram.mutate(
+            { programId: selectedProgram.id, memberUuid: uuid },
+            { onError: (err) => toast.error(err.message) },
+          )
+        }}
+        onRemove={(uuid) => {
+          if (!selectedProgram) return
+          unassignProgram.mutate(
+            { programId: selectedProgram.id, memberUuid: uuid },
+            { onError: (err) => toast.error(err.message) },
+          )
+        }}
       />
 
       {/* Import dialog */}

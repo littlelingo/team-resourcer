@@ -7,6 +7,7 @@ interface TeamColumnsOptions {
   members: TeamMemberList[]
   onEdit: (team: Team) => void
   onDelete: (team: Team) => void
+  onSelect: (team: Team) => void
 }
 
 export function getTeamColumns({
@@ -14,6 +15,7 @@ export function getTeamColumns({
   members,
   onEdit,
   onDelete,
+  onSelect,
 }: TeamColumnsOptions): ColumnDef<Team>[] {
   const areaMap = new Map(areas.map((a) => [a.id, a.name]))
   const memberMap = new Map(members.map((m) => [m.uuid, `${m.first_name} ${m.last_name}`]))
@@ -24,7 +26,13 @@ export function getTeamColumns({
       header: 'Name',
       enableSorting: true,
       cell: ({ row }) => (
-        <span className="font-medium text-slate-900">{row.original.name}</span>
+        <button
+          type="button"
+          onClick={() => onSelect(row.original)}
+          className="font-medium text-slate-900 hover:text-blue-600 hover:underline text-left"
+        >
+          {row.original.name}
+        </button>
       ),
     },
     {

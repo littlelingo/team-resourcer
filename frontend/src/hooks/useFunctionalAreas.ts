@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/api-client"
-import type { FunctionalArea, FunctionalAreaFormInput } from "@/types"
+import type { FunctionalArea, FunctionalAreaFormInput, TeamMemberList } from "@/types"
 
 export const areaKeys = {
   all: ["areas"] as const,
   list: () => ["areas", "list"] as const,
   detail: (id: number) => ["areas", "detail", id] as const,
+  members: (id: number) => ["areas", "members", id] as const,
 }
 
 export function useFunctionalAreas() {
@@ -52,5 +53,13 @@ export function useDeleteFunctionalArea() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: areaKeys.all })
     },
+  })
+}
+
+export function useAreaMembers(areaId: number) {
+  return useQuery({
+    queryKey: areaKeys.members(areaId),
+    queryFn: () => apiFetch<TeamMemberList[]>(`/api/members/?area_id=${areaId}`),
+    enabled: Boolean(areaId),
   })
 }

@@ -8,12 +8,13 @@ import { teamKeys } from '@/hooks/useTeams'
 import PageHeader from '@/components/layout/PageHeader'
 import { DataTable } from '@/components/shared/DataTable'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
+import EntityMembersSheet from '@/components/shared/EntityMembersSheet'
 import PageError from '@/components/shared/PageError'
 import TeamFormDialog from '@/components/teams/TeamFormDialog'
 import { getTeamColumns } from '@/components/teams/teamColumns'
 import { useFunctionalAreas } from '@/hooks/useFunctionalAreas'
 import { useMembers } from '@/hooks/useMembers'
-import { useDeleteTeam } from '@/hooks/useTeams'
+import { useDeleteTeam, useTeamMembers, useAddTeamMember, useRemoveTeamMember } from '@/hooks/useTeams'
 import type { Team } from '@/types'
 
 // Fetches teams for ALL functional areas by running one query per area.
@@ -40,6 +41,7 @@ export default function TeamsPage() {
   const [importOpen, setImportOpen] = useState(false)
   const [editTeam, setEditTeam] = useState<Team | null>(null)
   const [deleteTeam, setDeleteTeam] = useState<Team | null>(null)
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
 
   const areasQuery = useFunctionalAreas()
   const membersQuery = useMembers()
@@ -51,8 +53,12 @@ export default function TeamsPage() {
 
   const teamsResult = useAllTeams(areaIds)
 
-  // Delete hook — area id is determined per team at click time. We keep the hook
-  // stable with 0 and call mutate with overridden area via a wrapper.
+  const selectedAreaId = selectedTeam?.functional_area_id ?? 0
+  const teamMembersQuery = useTeamMembers(selectedTeam?.id ?? 0)
+  const addTeamMember = useAddTeamMember(selectedAreaId)
+  const removeTeamMember = useRemoveTeamMember(selectedAreaId)
+
+  // Delete hook — area id is determined per team at click time.
   const deleteAreaId = deleteTeam?.functional_area_id ?? 0
   const deleteMutation = useDeleteTeam(deleteAreaId)
 
@@ -63,6 +69,7 @@ export default function TeamsPage() {
         members: membersQuery.data ?? [],
         onEdit: setEditTeam,
         onDelete: setDeleteTeam,
+        onSelect: setSelectedTeam,
       }),
     [areasQuery.data, membersQuery.data],
   )
@@ -151,6 +158,30 @@ export default function TeamsPage() {
         description={`Are you sure you want to delete "${deleteTeam?.name ?? ''}"? This action cannot be undone.`}
         onConfirm={handleDeleteConfirm}
         loading={deleteMutation.isPending}
+      />
+
+      {/* Members sheet */}
+      <EntityMembersSheet
+        open={selectedTeam !== null}
+        onOpenChange={(open) => { if (!open) setSelectedTeam(null) }}
+        title={selectedTeam?.name ?? ''}
+        members={teamMembersQuery.data ?? []}
+        isLoading={teamMembersQuery.isLoading}
+        allMembers={membersQuery.data ?? []}
+        onAdd={(uuid) => {
+          if (!selectedTeam) return
+          addTeamMember.mutate(
+            { teamId: selectedTeam.id, memberUuid: uuid },
+            { onError: (err) => toast.error(err.message) },
+          )
+        }}
+        onRemove={(uuid) => {
+          if (!selectedTeam) return
+          removeTeamMember.mutate(
+            { teamId: selectedTeam.id, memberUuid: uuid },
+            { onError: (err) => toast.error(err.message) },
+          )
+        }}
       />
 
       {/* Import dialog */}

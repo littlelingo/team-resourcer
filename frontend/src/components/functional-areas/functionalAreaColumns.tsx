@@ -5,11 +5,13 @@ import type { FunctionalArea } from '@/types'
 interface FunctionalAreaColumnsOptions {
   onEdit: (area: FunctionalArea) => void
   onDelete: (area: FunctionalArea) => void
+  onSelect: (area: FunctionalArea) => void
 }
 
 export function getFunctionalAreaColumns({
   onEdit,
   onDelete,
+  onSelect,
 }: FunctionalAreaColumnsOptions): ColumnDef<FunctionalArea>[] {
   return [
     {
@@ -17,7 +19,13 @@ export function getFunctionalAreaColumns({
       header: 'Name',
       enableSorting: true,
       cell: ({ row }) => (
-        <span className="font-medium text-slate-900">{row.original.name}</span>
+        <button
+          type="button"
+          onClick={() => onSelect(row.original)}
+          className="font-medium text-slate-900 hover:text-blue-600 hover:underline text-left"
+        >
+          {row.original.name}
+        </button>
       ),
     },
     {

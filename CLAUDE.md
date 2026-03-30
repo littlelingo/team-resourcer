@@ -41,3 +41,19 @@ Full-stack team resource management app (FastAPI + React/Vite + PostgreSQL).
 ## Context Engine
 
 This project uses the Context Engine plugin. See `.context/` for architecture docs, patterns, and learnings.
+
+### Workflow
+1. `/research [topic]` — Explore before coding
+2. `/plan` or `/implement` — Generate PRP, then implement
+3. `/debug` — Investigate and fix bugs
+4. `/validate` — Post-implementation verification
+5. `/adapt` — Audit project against best practices
+
+### Auto-Learning
+- Capture non-obvious fixes to `.context/knowledge/LEARNINGS.md`
+- Index recurring errors in `.context/errors/INDEX.md`
+- Record architecture decisions in `.context/decisions/`
+
+### Feature Tracking
+- 38 features tracked in `.context/features/FEATURES.md`
+- Each feature has research notes, PRPs, and metrics in `.context/features/<id>/`

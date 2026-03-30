@@ -56,6 +56,12 @@
 - Frontend `ImportWizard` accepts `entityType` prop; `MapColumnsStep` accepts `targetFields` and `requiredFields` props
 - Per-section import opens the wizard in a Radix Dialog modal from each page's header
 
+## Defensive Formatting
+- `formatCurrency` / `formatNumber` return `null` on falsy input — `null` in JSX renders nothing (blank spot)
+- Always use `formatCurrency(value) ?? value` when displaying formatted values — the `??` fallback shows the raw value if the formatter returns null
+- Apply at system boundaries: EAV/history values, API responses, any data not fully controlled by the form layer
+- History timeline (feature 028) established this pattern; Compensation section and future financial displays should follow it
+
 ## Image Upload
 - Validate via Pillow magic bytes, not just Content-Type header
 - UUID-based filenames: `{member_uuid}.{ext}` — no path traversal risk

@@ -123,7 +123,6 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
       {member.employee_id && (
         <div className="mt-2 flex items-center justify-center gap-1 text-xs text-slate-400">
           <Hash className="h-3 w-3 flex-shrink-0" />
-          <span className="text-slate-500">Employee Id</span>
           <span className="truncate">{member.employee_id}</span>
         </div>
       )}

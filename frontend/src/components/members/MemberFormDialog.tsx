@@ -165,7 +165,7 @@ export default function MemberFormDialog({
           last_name: values.last_name,
           hire_date: values.hire_date || undefined,
           title: values.title || undefined,
-          email: values.email || '',
+          email: values.email || undefined,
           phone: values.phone || undefined,
           slack_handle: values.slack_handle || undefined,
           city: values.city || undefined,

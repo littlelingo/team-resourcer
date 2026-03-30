@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.schemas import (
     TeamCreate,
+    TeamMemberAddResponse,
     TeamResponse,
     TeamUpdate,
 )
@@ -89,7 +90,7 @@ async def delete_team_route(
     return Response(status_code=204)
 
 
-@router.post("/{team_id}/members")
+@router.post("/{team_id}/members", response_model=TeamMemberAddResponse)
 async def add_member_route(
     area_id: int,
     team_id: int,

@@ -35,6 +35,10 @@ class TeamResponse(BaseModel):
     updated_at: datetime
 
 
+class TeamMemberAddResponse(BaseModel):
+    ok: bool
+
+
 class TeamListResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

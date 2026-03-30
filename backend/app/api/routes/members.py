@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.schemas import (
+    ImageUploadResponse,
     TeamMemberCreate,
     TeamMemberDetailResponse,
     TeamMemberListResponse,
@@ -82,7 +83,7 @@ async def delete_member_route(
     return Response(status_code=204)
 
 
-@router.post("/{member_uuid}/image")
+@router.post("/{member_uuid}/image", response_model=ImageUploadResponse)
 async def upload_image_route(
     member_uuid: UUID,
     file: UploadFile = File(...),

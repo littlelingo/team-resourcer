@@ -28,10 +28,12 @@ from app.schemas.program_assignment import (
 from app.schemas.team import (
     TeamCreate,
     TeamListResponse,
+    TeamMemberAddResponse,
     TeamResponse,
     TeamUpdate,
 )
 from app.schemas.team_member import (
+    ImageUploadResponse,
     MemberRefResponse,
     TeamMemberCreate,
     TeamMemberDetailResponse,
@@ -56,6 +58,7 @@ __all__ = [
     "TeamUpdate",
     "TeamResponse",
     "TeamListResponse",
+    "TeamMemberAddResponse",
     # member_history
     "HistoryFieldEnum",
     "MemberHistoryResponse",
@@ -77,6 +80,7 @@ __all__ = [
     "SupervisorUpdate",
     "FunctionalManagerUpdate",
     # team_member extras
+    "ImageUploadResponse",
     "MemberRefResponse",
     # tree
     "TreeNodePosition",

@@ -45,7 +45,7 @@ class TeamMemberCreate(BaseModel):
     @field_validator("email")
     @classmethod
     def validate_email_format(cls, v: str | None) -> str | None:
-        if v is not None and not _EMAIL_RE.match(v):
+        if v is not None and not _EMAIL_RE.fullmatch(v):
             raise ValueError("Invalid email format")
         return v
 
@@ -71,9 +71,13 @@ class TeamMemberUpdate(BaseModel):
     @field_validator("email")
     @classmethod
     def validate_email_format(cls, v: str | None) -> str | None:
-        if v is not None and not _EMAIL_RE.match(v):
+        if v is not None and not _EMAIL_RE.fullmatch(v):
             raise ValueError("Invalid email format")
         return v
+
+
+class ImageUploadResponse(BaseModel):
+    image_path: str
 
 
 class TeamMemberListResponse(BaseModel):

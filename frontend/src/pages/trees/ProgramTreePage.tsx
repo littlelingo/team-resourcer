@@ -46,7 +46,7 @@ export default function ProgramTreePage() {
 
   useEffect(() => {
     setEdges(rawEdges)
-  }, [rawEdges])
+  }, [rawEdges, setEdges])
 
   const nodesWithSelect = searchedNodes.map((node) => ({
     ...node,

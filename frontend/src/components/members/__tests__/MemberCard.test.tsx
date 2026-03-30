@@ -97,8 +97,9 @@ describe('MemberCard', () => {
     expect(screen.queryByText('FM:')).toBeNull()
   })
 
-  it('renders employee ID with hash icon', () => {
+  it('renders employee ID with label', () => {
     render(<MemberCard {...defaultProps} />)
+    expect(screen.getByText('Employee Id')).toBeInTheDocument()
     expect(screen.getByText('E001')).toBeInTheDocument()
   })
 

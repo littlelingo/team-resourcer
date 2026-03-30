@@ -42,4 +42,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 036 | member-card-employee-id-label | implemented | `.context/features/036-member-card-employee-id-label/` |
 | 037 | defensive-formatting-pattern | implemented | `.context/features/037-defensive-formatting-pattern/` |
 | 038 | backend-frontend-sync-comments | implemented | `.context/features/038-backend-frontend-sync-comments/` |
-| 044 | member-card-eid-text-label | researched | `.context/features/044-member-card-eid-text-label/` |
+| 044 | member-card-eid-text-label | APPROVED | `.context/features/044-member-card-eid-text-label/` |

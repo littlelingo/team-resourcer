@@ -43,4 +43,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 037 | defensive-formatting-pattern | implemented | `.context/features/037-defensive-formatting-pattern/` |
 | 038 | backend-frontend-sync-comments | implemented | `.context/features/038-backend-frontend-sync-comments/` |
 | 044 | member-card-eid-text-label | APPROVED | `.context/features/044-member-card-eid-text-label/` |
-| 045 | edit-member-form-prefill | researched | `.context/features/045-edit-member-form-prefill/` |
+| 045 | edit-member-form-prefill | APPROVED | `.context/features/045-edit-member-form-prefill/` |

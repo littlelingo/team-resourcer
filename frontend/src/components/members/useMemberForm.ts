@@ -94,6 +94,31 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
     isFirstRender.current = true
   }, [open, member])
 
+  // Reset form values when dialog opens with member data (edit) or without (add)
+  useEffect(() => {
+    if (!open) return
+    form.reset({
+      employee_id: member?.employee_id ?? '',
+      first_name: member?.first_name ?? '',
+      last_name: member?.last_name ?? '',
+      hire_date: member?.hire_date ?? '',
+      title: member?.title ?? '',
+      email: member?.email ?? '',
+      phone: member?.phone ?? '',
+      slack_handle: member?.slack_handle ?? '',
+      city: member?.city ?? '',
+      state: member?.state ?? '',
+      functional_area_id:
+        member?.functional_area_id != null ? String(member.functional_area_id) : null,
+      team_id: member?.team_id != null ? String(member.team_id) : null,
+      supervisor_id: member?.supervisor_id ?? '',
+      functional_manager_id: member?.functional_manager_id ?? '',
+      salary: member?.salary ?? '',
+      bonus: member?.bonus ?? '',
+      pto_used: member?.pto_used ?? '',
+    })
+  }, [open, member])
+
   // ─── Submit ───────────────────────────────────────────────────────────────
 
   async function onSubmit(values: MemberFormValues) {

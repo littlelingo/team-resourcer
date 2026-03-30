@@ -62,6 +62,8 @@ rebuild-db:
 	docker compose rm -f db 2>/dev/null || true
 	docker compose up -d --build db
 	docker compose start backend 2>/dev/null || true
+	@sleep 2
+	@docker compose exec backend alembic upgrade head
 
 # drop and recreate the database, then run migrations
 reset-db:

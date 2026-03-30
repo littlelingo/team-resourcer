@@ -133,7 +133,7 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
           last_name: values.last_name,
           hire_date: values.hire_date || undefined,
           title: values.title || undefined,
-          email: values.email || undefined,
+          email: values.email,
           phone: values.phone || undefined,
           slack_handle: values.slack_handle || undefined,
           city: values.city || undefined,

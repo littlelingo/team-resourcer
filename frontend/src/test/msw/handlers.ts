@@ -132,6 +132,23 @@ export const handlers = [
     new HttpResponse(null, { status: 204 }),
   ),
 
+  // ─── Agencies ─────────────────────────────────────────────────────────────────
+  http.get(`${BASE}/api/agencies/`, () =>
+    HttpResponse.json([{ id: 1, name: 'Acme Corp', description: 'External agency' }]),
+  ),
+
+  http.post(`${BASE}/api/agencies/`, () =>
+    HttpResponse.json({ id: 2, name: 'New Agency', description: null }, { status: 201 }),
+  ),
+
+  http.put(`${BASE}/api/agencies/:id`, () =>
+    HttpResponse.json({ id: 1, name: 'Acme Corp Updated', description: 'External agency' }),
+  ),
+
+  http.delete(`${BASE}/api/agencies/:id`, () =>
+    new HttpResponse(null, { status: 204 }),
+  ),
+
   // ─── Import ───────────────────────────────────────────────────────────────────
   http.post(`${BASE}/api/import/preview`, () =>
     HttpResponse.json({ rows: [], error_count: 0, warning_count: 0 }),

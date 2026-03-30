@@ -158,6 +158,27 @@ async def test_list_members_filtered_by_area(client, db_session, area):
     assert resp.json()[0]["employee_id"] == "T007"
 
 
+async def test_upload_image_success(client, member):
+    """Uploading a valid PNG returns 200 with the image_path."""
+    # Minimal valid 1x1 red PNG (created via Pillow)
+    import io
+    from PIL import Image
+
+    buf = io.BytesIO()
+    img = Image.new("RGB", (1, 1), color="red")
+    img.save(buf, format="PNG")
+    png_bytes = buf.getvalue()
+
+    resp = await client.post(
+        f"/api/members/{member.uuid}/image",
+        files={"file": ("photo.png", png_bytes, "image/png")},
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "image_path" in data
+    assert data["image_path"].endswith(".png")
+
+
 async def test_upload_image_member_not_found(client):
     resp = await client.post(
         "/api/members/00000000-0000-0000-0000-000000000000/image",

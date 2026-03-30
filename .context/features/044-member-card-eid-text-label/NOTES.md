@@ -1,48 +1,52 @@
-# Research: Add Text Label for Employee ID on Member Card
+# Research: Add Text Label for Employee ID on Member Detail Views
 
 ## Problem
 
-The member card displays the employee ID with only a `Hash` (#) icon prefix. Users cannot tell what that value represents without prior context. A text label like "EID:" is needed in front of the value.
+The member detail views display the employee ID as a bare badge pill with no label. Users see a number like "182" but can't tell what it represents. An "Employee Id" label needs to be added in front of the value.
+
+## Correction
+
+Initial research (and implementation) targeted `MemberCard.tsx` (the grid tile), which already had a `Hash` icon. The user was actually looking at the **detail sheet/panel** views where the employee ID appears as an unlabeled badge pill.
 
 ## Current State
 
-- **MemberCard.tsx** (lines 122-128): Employee ID row uses `Hash` icon + raw value, no text label.
-- **Functional Manager row** (lines 130-136): Uses `FM:` text prefix pattern — this is the UI precedent for labeled card rows.
-- **Feature 036** added the employee ID row originally but only with an icon, not a text label.
+Two components render the identical unlabeled badge:
 
-## Current Employee ID Rendering (line 122-128)
-
+### MemberDetailSheet.tsx (lines 94-96) — slide-out on Members page
 ```tsx
-{member.employee_id && (
-  <div className="mt-2 flex items-center justify-center gap-1 text-xs text-slate-400">
-    <Hash className="h-3 w-3 flex-shrink-0" />
-    <span className="truncate">{member.employee_id}</span>
-  </div>
-)}
+<span className="mt-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+  {member.employee_id}
+</span>
 ```
+
+### MemberDetailPanel.tsx (lines 78-80) — inline panel on tree views
+```tsx
+<span className="mt-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+  {member.employee_id}
+</span>
+```
+
+Both are the third child of the avatar-adjacent text column (below name h2 and optional title p). Neither has a guard on `employee_id` being present.
 
 ## Proposed Fix
 
-Replace the `Hash` icon with a text label prefix matching the FM pattern:
+Add "Employee Id" text before the badge value in both components:
 
 ```tsx
-{member.employee_id && (
-  <div className="mt-2 flex items-center justify-center gap-1 text-xs text-slate-400">
-    <span className="text-slate-500">EID:</span>
-    <span className="truncate">{member.employee_id}</span>
-  </div>
-)}
+<span className="mt-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+  Employee Id {member.employee_id}
+</span>
 ```
 
-- Remove `Hash` icon, add `EID:` text span with `text-slate-500` (matches FM row)
-- If `Hash` import is no longer used elsewhere, remove it from the import line
+Or as a separate label span before the badge, depending on preferred visual style.
 
 ## Files to Modify
 
 | File | Change |
 |------|--------|
-| `frontend/src/components/members/MemberCard.tsx` | Replace Hash icon with "EID:" text label |
-| `frontend/src/components/members/__tests__/MemberCard.test.tsx` | Update test to assert label text |
+| `frontend/src/components/members/MemberDetailSheet.tsx` | Add "Employee Id" label to badge |
+| `frontend/src/components/trees/panels/MemberDetailPanel.tsx` | Add "Employee Id" label to badge |
+| Tests for both components | Assert "Employee Id" text is present |
 
 ## Dependencies
 
@@ -50,4 +54,4 @@ Replace the `Hash` icon with a text label prefix matching the FM pattern:
 
 ## Risks
 
-- None. The Hash icon may still be used in the import line by other parts — verify before removing.
+- None. Both components use the identical markup so the change is symmetric.

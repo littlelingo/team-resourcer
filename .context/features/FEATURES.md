@@ -44,3 +44,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 038 | backend-frontend-sync-comments | implemented | `.context/features/038-backend-frontend-sync-comments/` |
 | 044 | member-card-eid-text-label | APPROVED | `.context/features/044-member-card-eid-text-label/` |
 | 045 | edit-member-form-prefill | APPROVED | `.context/features/045-edit-member-form-prefill/` |
+| 046 | member-program-assignment | researched | `.context/features/046-member-program-assignment/` |

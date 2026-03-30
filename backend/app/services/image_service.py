@@ -3,12 +3,15 @@ from __future__ import annotations
 """Profile image validation and persistence."""
 
 import io
+import logging
 import os
 import uuid
 
 import aiofiles
 from fastapi import UploadFile
 from PIL import Image, UnidentifiedImageError
+
+logger = logging.getLogger(__name__)
 
 from app.core.config import settings
 
@@ -42,7 +45,8 @@ async def save_profile_image(member_uuid: uuid.UUID, file: UploadFile) -> str:
     try:
         img = Image.open(io.BytesIO(data))
         img.verify()
-    except (UnidentifiedImageError, SyntaxError):
+    except (UnidentifiedImageError, SyntaxError) as exc:
+        logger.debug("Rejected image upload for member %s: %s", member_uuid, exc)
         raise ValueError("File is not a valid image.")
 
     # Derive extension from actual image format, not Content-Type header

@@ -1,5 +1,6 @@
 """FastAPI application factory with router registration and CORS configuration."""
 
+import logging
 import os
 from contextlib import asynccontextmanager
 
@@ -30,9 +31,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Team Resourcer API", version="1.0.0", lifespan=lifespan)
 
+_cors_origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+if not _cors_origins:
+    logging.getLogger(__name__).warning(
+        "CORS_ORIGINS is empty — no cross-origin requests will be allowed. "
+        "Set CORS_ORIGINS in .env for development (e.g. http://localhost:5173)."
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in settings.cors_origins.split(",") if o.strip()],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],

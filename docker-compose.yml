@@ -24,6 +24,7 @@ services:
     # OR set GOOGLE_SERVICE_ACCOUNT_JSON to the base64-encoded JSON content.
     # If neither is set, Google Sheets import will return a 422 error with instructions.
     environment:
+      CORS_ORIGINS: "http://localhost:5173,http://localhost:3000"
       GOOGLE_SERVICE_ACCOUNT_FILE: /run/secrets/gcp-service-account
       GOOGLE_SERVICE_ACCOUNT_JSON: ${GOOGLE_SERVICE_ACCOUNT_JSON:-}
     volumes:

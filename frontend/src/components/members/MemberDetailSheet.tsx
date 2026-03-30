@@ -172,7 +172,7 @@ export default function MemberDetailSheet({
                     {member.hire_date && (
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500">Hire Date</span>
-                        <span>{member.hire_date}</span>
+                        <span>{new Date(member.hire_date).toLocaleDateString()}</span>
                       </div>
                     )}
                   </div>
@@ -217,19 +217,19 @@ export default function MemberDetailSheet({
                     {member.salary && (
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500">Salary</span>
-                        <span>{formatCurrency(member.salary)}</span>
+                        <span>{formatCurrency(member.salary) ?? member.salary}</span>
                       </div>
                     )}
                     {member.bonus && (
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500">Bonus</span>
-                        <span>{formatCurrency(member.bonus)}</span>
+                        <span>{formatCurrency(member.bonus) ?? member.bonus}</span>
                       </div>
                     )}
                     {member.pto_used && (
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500">PTO Used</span>
-                        <span>{formatNumber(member.pto_used)} hrs</span>
+                        <span>{(formatNumber(member.pto_used) ?? member.pto_used) + ' hrs'}</span>
                       </div>
                     )}
                   </div>

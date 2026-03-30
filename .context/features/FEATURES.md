@@ -39,4 +39,4 @@
 | 034 | Fix Stale Location Fixtures | COMPLETE | implement-then-test | .context/features/034-fix-stale-location-fixtures/PRP.md |
 | 035 | History Field Visual Cues | COMPLETE | implement-then-test | .context/features/035-history-field-visual-cues/PRP.md |
 | 036 | Member Card Employee ID Label | COMPLETE | implement-then-test | .context/features/036-member-card-employee-id-label/PRP.md |
-| 037 | Defensive Formatting Pattern | RESEARCH | implement-then-test | .context/features/037-defensive-formatting-pattern/NOTES.md |
+| 037 | Defensive Formatting Pattern | COMPLETE | implement-then-test | .context/features/037-defensive-formatting-pattern/PRP.md |

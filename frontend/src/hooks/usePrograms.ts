@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/api-client"
+import { memberKeys } from "@/hooks/useMembers"
 import type { Program, TeamMemberList, ProgramFormInput } from "@/types"
 
 export const programKeys = {
@@ -68,6 +69,35 @@ export function useDeleteProgram() {
       apiFetch<void>(`/api/programs/${id}`, { method: "DELETE" }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: programKeys.all })
+    },
+  })
+}
+
+export function useAssignProgram() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ programId, memberUuid }: { programId: number; memberUuid: string }) =>
+      apiFetch(`/api/programs/${programId}/assignments`, {
+        method: "POST",
+        body: JSON.stringify({ member_uuid: memberUuid, program_id: programId }),
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: programKeys.all })
+      void qc.invalidateQueries({ queryKey: memberKeys.all })
+    },
+  })
+}
+
+export function useUnassignProgram() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ programId, memberUuid }: { programId: number; memberUuid: string }) =>
+      apiFetch<void>(`/api/programs/${programId}/assignments/${memberUuid}`, {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: programKeys.all })
+      void qc.invalidateQueries({ queryKey: memberKeys.all })
     },
   })
 }

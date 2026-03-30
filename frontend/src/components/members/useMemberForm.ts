@@ -7,6 +7,7 @@ import { apiFetch } from '@/lib/api-client'
 import { useMembers, useCreateMember, useUpdateMember } from '@/hooks/useMembers'
 import { useFunctionalAreas } from '@/hooks/useFunctionalAreas'
 import { useTeams } from '@/hooks/useTeams'
+import { usePrograms } from '@/hooks/usePrograms'
 import type { TeamMember } from '@/types'
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ const memberFormSchema = z.object({
   salary: z.string(),
   bonus: z.string(),
   pto_used: z.string(),
+  program_ids: z.array(z.string()).optional(),
 })
 
 export type MemberFormValues = z.infer<typeof memberFormSchema>
@@ -50,6 +52,7 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
   const updateMember = useUpdateMember()
   const { data: areas = [] } = useFunctionalAreas()
   const { data: allMembers = [] } = useMembers()
+  const { data: programs = [] } = usePrograms()
 
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
@@ -72,6 +75,7 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
       salary: member?.salary ?? '',
       bonus: member?.bonus ?? '',
       pto_used: member?.pto_used ?? '',
+      program_ids: member?.program_assignments?.map((pa) => String(pa.program_id)) ?? [],
     },
   })
 
@@ -116,6 +120,7 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
       salary: member?.salary ?? '',
       bonus: member?.bonus ?? '',
       pto_used: member?.pto_used ?? '',
+      program_ids: member?.program_assignments?.map((pa) => String(pa.program_id)) ?? [],
     })
   }, [open, member])
 
@@ -187,6 +192,31 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
         })
       }
 
+      // Sync program assignments (diff current vs selected)
+      const currentProgramIds = new Set(
+        member?.program_assignments?.map((pa) => pa.program_id) ?? [],
+      )
+      const selectedProgramIds = new Set(
+        (values.program_ids ?? []).map((id) => parseInt(id, 10)),
+      )
+
+      for (const id of selectedProgramIds) {
+        if (!currentProgramIds.has(id)) {
+          await apiFetch(`/api/programs/${id}/assignments`, {
+            method: 'POST',
+            body: JSON.stringify({ member_uuid: memberUuid, program_id: id }),
+          })
+        }
+      }
+
+      for (const id of currentProgramIds) {
+        if (!selectedProgramIds.has(id)) {
+          await apiFetch(`/api/programs/${id}/assignments/${memberUuid}`, {
+            method: 'DELETE',
+          })
+        }
+      }
+
       onSuccess?.()
       onOpenChange(false)
       form.reset()
@@ -203,6 +233,7 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
 
   const areaOptions = areas.map((a) => ({ value: String(a.id), label: a.name }))
   const teamOptions = teams.map((t) => ({ value: String(t.id), label: t.name }))
+  const programOptions = programs.map((p) => ({ value: String(p.id), label: p.name }))
 
   return {
     form,
@@ -212,6 +243,7 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
     supervisorOptions,
     areaOptions,
     teamOptions,
+    programOptions,
     selectedAreaId,
   }
 }

@@ -6,6 +6,7 @@ import { getImageUrl } from '@/lib/api-client'
 import Field from '@/components/shared/Field'
 import ImageUpload from '@/components/shared/ImageUpload'
 import SelectField from '@/components/shared/SelectField'
+import MultiSelectField from '@/components/shared/MultiSelectField'
 import { useMemberForm } from '@/components/members/useMemberForm'
 import type { TeamMember } from '@/types'
 
@@ -42,6 +43,7 @@ export default function MemberFormDialog({
     supervisorOptions,
     areaOptions,
     teamOptions,
+    programOptions,
     selectedAreaId,
   } = useMemberForm({ member, onSuccess, onOpenChange, open })
 
@@ -222,6 +224,21 @@ export default function MemberFormDialog({
                   />
                 </Field>
               </div>
+
+              <Field label="Programs">
+                <Controller
+                  control={control}
+                  name="program_ids"
+                  render={({ field }) => (
+                    <MultiSelectField
+                      value={field.value ?? []}
+                      onChange={field.onChange}
+                      placeholder="Select programs"
+                      options={programOptions}
+                    />
+                  )}
+                />
+              </Field>
 
               <Field label="Direct Manager">
                 <Controller

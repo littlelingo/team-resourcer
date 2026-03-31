@@ -18,7 +18,7 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 012 | adapt-security-2 | completed | `.context/features/012-adapt-security-2/` |
 | 013 | entity-import | completed | `.context/features/013-entity-import/` |
 | 014 | tanstack-devtools | researched | `.context/features/014-tanstack-devtools/` |
-| 015 | team-create-422 | researched | `.context/features/015-team-create-422/` |
+| 015 | team-create-422 | IMPLEMENTED | `.context/features/015-team-create-422/` |
 | 016 | member-select-value-bug | implemented | `.context/features/016-member-select-value-bug/` |
 | 017 | program-agency | completed | `.context/features/017-program-agency/` |
 | 018 | member-name-split | completed | `.context/features/018-member-name-split/` |
@@ -46,3 +46,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 045 | edit-member-form-prefill | APPROVED | `.context/features/045-edit-member-form-prefill/` |
 | 046 | member-program-assignment | APPROVED | `.context/features/046-member-program-assignment/` |
 | 047 | entity-member-management | APPROVED | `.context/features/047-entity-member-management/` |
+| 048 | team-assignment-display | researched | `.context/features/048-team-assignment-display/` |

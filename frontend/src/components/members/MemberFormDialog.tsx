@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils'
 import { getImageUrl } from '@/lib/api-client'
 import Field from '@/components/shared/Field'
 import ImageUpload from '@/components/shared/ImageUpload'
-import SelectField from '@/components/shared/SelectField'
-import MultiSelectField from '@/components/shared/MultiSelectField'
+import ComboboxField from '@/components/shared/ComboboxField'
+import MultiComboboxField from '@/components/shared/MultiComboboxField'
 import { useMemberForm } from '@/components/members/useMemberForm'
 import type { TeamMember } from '@/types'
 
@@ -199,7 +199,7 @@ export default function MemberFormDialog({
                     control={control}
                     name="functional_area_id"
                     render={({ field }) => (
-                      <SelectField
+                      <ComboboxField
                         value={field.value ?? ''}
                         onChange={field.onChange}
                         placeholder="Select area"
@@ -213,7 +213,7 @@ export default function MemberFormDialog({
                     control={control}
                     name="team_id"
                     render={({ field }) => (
-                      <SelectField
+                      <ComboboxField
                         value={field.value ?? ''}
                         onChange={field.onChange}
                         placeholder="Select team"
@@ -230,7 +230,7 @@ export default function MemberFormDialog({
                   control={control}
                   name="program_ids"
                   render={({ field }) => (
-                    <MultiSelectField
+                    <MultiComboboxField
                       value={field.value ?? []}
                       onChange={field.onChange}
                       placeholder="Select programs"
@@ -245,7 +245,7 @@ export default function MemberFormDialog({
                   control={control}
                   name="supervisor_id"
                   render={({ field }) => (
-                    <SelectField
+                    <ComboboxField
                       value={field.value}
                       onChange={field.onChange}
                       placeholder="Select direct manager"
@@ -260,7 +260,7 @@ export default function MemberFormDialog({
                   control={control}
                   name="functional_manager_id"
                   render={({ field }) => (
-                    <SelectField
+                    <ComboboxField
                       value={field.value}
                       onChange={field.onChange}
                       placeholder="Select functional manager"

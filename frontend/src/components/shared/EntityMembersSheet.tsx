@@ -4,7 +4,7 @@ import * as Avatar from '@radix-ui/react-avatar'
 import { X, UserPlus, Trash2 } from 'lucide-react'
 import { getImageUrl } from '@/lib/api-client'
 import { getInitials } from '@/lib/member-utils'
-import SelectField from '@/components/shared/SelectField'
+import ComboboxField from '@/components/shared/ComboboxField'
 import type { TeamMemberList } from '@/types'
 
 interface EntityMembersSheetProps {
@@ -63,7 +63,7 @@ export default function EntityMembersSheet({
               {adding ? (
                 <div className="flex items-center gap-2">
                   <div className="flex-1">
-                    <SelectField
+                    <ComboboxField
                       value=""
                       onChange={handleAdd}
                       placeholder="Select member..."

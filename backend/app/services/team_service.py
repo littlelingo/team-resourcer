@@ -29,9 +29,9 @@ async def get_team(db: AsyncSession, team_id: int) -> Team | None:
     return result.scalar_one_or_none()
 
 
-async def create_team(db: AsyncSession, data: TeamCreate) -> Team:
+async def create_team(db: AsyncSession, data: TeamCreate, functional_area_id: int) -> Team:
     """Create a new team."""
-    team = Team(**data.model_dump())
+    team = Team(**data.model_dump(), functional_area_id=functional_area_id)
     db.add(team)
     await db.commit()
     return await get_team(db, team.id)
@@ -68,6 +68,7 @@ async def add_member_to_team(db: AsyncSession, team_id: int, member_uuid: uuid.U
     if member is None:
         return False
     member.team_id = team_id
+    member.functional_area_id = team.functional_area_id
     await db.commit()
     return True
 

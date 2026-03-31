@@ -11,7 +11,6 @@ from app.schemas.functional_area import FunctionalAreaListResponse
 class TeamCreate(BaseModel):
     name: str
     description: str | None = None
-    functional_area_id: int
     lead_id: UUID | None = None
 
 

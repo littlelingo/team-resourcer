@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.schemas import (
     TeamCreate,
+    TeamListResponse,
     TeamMemberAddResponse,
     TeamResponse,
     TeamUpdate,
@@ -23,6 +24,17 @@ from app.services import (
 )
 
 router = APIRouter()
+
+# Standalone router for top-level /api/teams/ (not nested under areas)
+teams_top_router = APIRouter()
+
+
+@teams_top_router.get("/", response_model=list[TeamListResponse])
+async def list_all_teams_route(
+    db: AsyncSession = Depends(get_db),
+) -> list[TeamListResponse]:
+    """List all teams across all functional areas."""
+    return await list_teams(db)
 
 
 @router.get("/", response_model=list[TeamResponse])
@@ -54,9 +66,7 @@ async def create_team_route(
     db: AsyncSession = Depends(get_db),
 ) -> TeamResponse:
     """Create a new team within a functional area."""
-    # Override functional_area_id from path parameter
-    data = data.model_copy(update={"functional_area_id": area_id})
-    return await create_team(db, data)
+    return await create_team(db, data, functional_area_id=area_id)
 
 
 @router.put("/{team_id}", response_model=TeamResponse)

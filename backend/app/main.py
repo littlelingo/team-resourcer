@@ -15,6 +15,7 @@ from app.api.routes.import_router import router as import_router
 from app.api.routes.members import router as members_router
 from app.api.routes.org import router as org_router
 from app.api.routes.programs import router as programs_router
+from app.api.routes.teams import teams_top_router
 from app.core.config import settings
 from app.services.import_session import start_cleanup_task
 
@@ -65,6 +66,7 @@ app.include_router(
 )
 app.include_router(programs_router, prefix="/api/programs", tags=["programs"])
 app.include_router(agencies_router, prefix="/api/agencies", tags=["agencies"])
+app.include_router(teams_top_router, prefix="/api/teams", tags=["teams"])
 app.include_router(areas_router, prefix="/api/areas", tags=["areas", "teams"])
 app.include_router(org_router, prefix="/api/org", tags=["org"])
 app.include_router(import_router, prefix="/api/import", tags=["import"])

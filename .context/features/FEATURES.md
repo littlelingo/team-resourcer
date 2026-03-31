@@ -46,4 +46,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 045 | edit-member-form-prefill | APPROVED | `.context/features/045-edit-member-form-prefill/` |
 | 046 | member-program-assignment | APPROVED | `.context/features/046-member-program-assignment/` |
 | 047 | entity-member-management | APPROVED | `.context/features/047-entity-member-management/` |
-| 048 | team-assignment-display | researched | `.context/features/048-team-assignment-display/` |
+| 048 | team-assignment-display | IMPLEMENTED | `.context/features/048-team-assignment-display/` |

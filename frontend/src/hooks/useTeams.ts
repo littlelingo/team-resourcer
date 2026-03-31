@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/api-client"
 import { memberKeys } from "@/hooks/useMembers"
-import type { Team, TeamFormInput, TeamMemberList } from "@/types"
+import type { Team, TeamFormInput, TeamListItem, TeamMemberList } from "@/types"
 
 export const teamKeys = {
   all: ["teams"] as const,
+  listAll: ["teams", "listAll"] as const,
   list: (areaId?: number) => ["teams", "list", areaId] as const,
   detail: (areaId: number, id: number) => ["teams", "detail", areaId, id] as const,
   members: (teamId: number) => ["teams", "members", teamId] as const,
@@ -23,6 +24,14 @@ export function useTeams(areaId?: number) {
       return apiFetch<Team[]>(`/api/areas/${areaId}/teams/`)
     },
     enabled: areaId !== undefined ? Boolean(areaId) : true,
+  })
+}
+
+/** Fetch all teams across all functional areas. */
+export function useAllTeams() {
+  return useQuery({
+    queryKey: teamKeys.listAll,
+    queryFn: () => apiFetch<TeamListItem[]>("/api/teams/"),
   })
 }
 

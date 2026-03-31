@@ -167,7 +167,7 @@ export default function TeamsPage() {
         title={selectedTeam?.name ?? ''}
         members={teamMembersQuery.data ?? []}
         isLoading={teamMembersQuery.isLoading}
-        allMembers={membersQuery.data ?? []}
+        allMembers={(membersQuery.data ?? []).filter(m => m.functional_area_id === selectedTeam?.functional_area_id)}
         onAdd={(uuid) => {
           if (!selectedTeam) return
           addTeamMember.mutate(

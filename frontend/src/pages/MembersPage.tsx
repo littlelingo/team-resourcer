@@ -18,7 +18,7 @@ import { buildMemberColumns } from '@/components/members/memberColumns'
 import { useMembers, useMember, useDeleteMember } from '@/hooks/useMembers'
 import { usePrograms } from '@/hooks/usePrograms'
 import { useFunctionalAreas } from '@/hooks/useFunctionalAreas'
-import { useTeams } from '@/hooks/useTeams'
+import { useAllTeams } from '@/hooks/useTeams'
 import type { TeamMember, TeamMemberList } from '@/types'
 import ImportWizard from '@/components/import/ImportWizard'
 import type { EntityType } from '@/api/importApi'
@@ -80,7 +80,7 @@ export default function MembersPage() {
   )
   const { data: programs = [] } = usePrograms()
   const { data: areas = [] } = useFunctionalAreas()
-  const { data: teams = [] } = useTeams()
+  const { data: teams = [] } = useAllTeams()
 
   const deleteMutation = useDeleteMember()
 

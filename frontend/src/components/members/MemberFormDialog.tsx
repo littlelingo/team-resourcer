@@ -6,7 +6,7 @@ import { getImageUrl } from '@/lib/api-client'
 import Field from '@/components/shared/Field'
 import ImageUpload from '@/components/shared/ImageUpload'
 import ComboboxField from '@/components/shared/ComboboxField'
-import MultiComboboxField from '@/components/shared/MultiComboboxField'
+import MultiSelectField from '@/components/shared/MultiSelectField'
 import { useMemberForm } from '@/components/members/useMemberForm'
 import type { TeamMember } from '@/types'
 
@@ -230,7 +230,7 @@ export default function MemberFormDialog({
                   control={control}
                   name="program_ids"
                   render={({ field }) => (
-                    <MultiComboboxField
+                    <MultiSelectField
                       value={field.value ?? []}
                       onChange={field.onChange}
                       placeholder="Select programs"

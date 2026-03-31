@@ -45,5 +45,14 @@
 ## Research: Import Salary History Gap (feature candidate)
 - [`research_import_salary_history_gap.md`](research_import_salary_history_gap.md) — `_append_history_if_changed` in import_commit.py writes history for new members (is_new=True); salary column during member import should NOT create history; fix is in lines 87–112 / call site line 325; no existing tests cover salary history in import
 
+## Research: Program-Member Relationship (deep audit)
+- [`research_program_member.md`](research_program_member.md) — Many-to-many via program_assignments; backend assign/unassign endpoints exist; no frontend assign hooks; list response never includes program_assignments so card-view badges are always empty
+
+## Research: Team Assignment Display in Member Detail/Edit (feature candidate)
+- [`research_team_assignment_display.md`](research_team_assignment_display.md) — 2026-03-30: team assignment is a direct FK (team_id on team_members); backend detail response includes team object; detail sheet and edit form are wired; invalidation covers detail cache via prefix match; possible edge: team dropdown only loads teams for member's area
+
 ## Research: Functional Manager + Direct Report Rename (feature 029)
 - Add functional_manager_id self-ref FK to team_members (mirrors supervisor_id pattern); requires explicit foreign_keys= on both new relationships; dedicated set endpoint in org.py follows existing supervisor route; MemberCard uses TeamMemberList (no FK fields) so showing manager name needs extra prop or type widening; supervisor currently displays as raw UUID in detail sheet (existing UX gap); see `.context/features/029-functional-manager/NOTES.md`
+
+## Research: Searchable Select / Combobox (feature 049 candidate)
+- [`research_searchable_select.md`](research_searchable_select.md) — 2026-03-30: SelectField uses Radix Select (no search); MultiSelectField uses Radix DropdownMenu (no search); cmdk@1.1.1 already installed; @radix-ui/react-popover NOT installed; 5 SelectField usages (2 files), 1 MultiSelectField usage; highest feature ID is 048

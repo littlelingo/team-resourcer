@@ -96,6 +96,11 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
             {member.functional_area.name}
           </span>
         )}
+        {member.team && (
+          <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+            {member.team.name}
+          </span>
+        )}
         {member.program_assignments?.map((pa, i) => (
           <span
             key={i}

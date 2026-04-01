@@ -48,4 +48,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 047 | entity-member-management | APPROVED | `.context/features/047-entity-member-management/` |
 | 048 | team-assignment-display | IMPLEMENTED | `.context/features/048-team-assignment-display/` |
 | 049 | searchable-select | IMPLEMENTED | `.context/features/049-searchable-select/` |
-| 050 | member-field-visibility | researched | `.context/features/050-member-field-visibility/` |
+| 050 | member-field-visibility | COMPLETE | `.context/features/050-member-field-visibility/` |

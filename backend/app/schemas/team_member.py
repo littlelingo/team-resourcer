@@ -97,6 +97,9 @@ class TeamMemberListResponse(BaseModel):
     team_id: int | None
     supervisor_name: str | None = None
     functional_manager_name: str | None = None
+    functional_area: FunctionalAreaListResponse | None = None
+    team: TeamListResponse | None = None
+    program_assignments: list[ProgramAssignmentResponse] = []
 
 
 class MemberRefResponse(BaseModel):

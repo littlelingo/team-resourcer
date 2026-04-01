@@ -1,4 +1,9 @@
+import uuid as uuid_mod
+
 from app.models.functional_area import FunctionalArea
+from app.models.program import Program
+from app.models.program_assignment import ProgramAssignment
+from app.models.team import Team
 
 
 async def test_list_members_empty(client, area):
@@ -185,3 +190,69 @@ async def test_upload_image_member_not_found(client):
         files={"file": ("test.png", b"\x89PNG\r\n\x1a\n" + b"\x00" * 100, "image/png")},
     )
     assert resp.status_code == 404
+
+
+async def test_list_members_includes_nested_objects(client, db_session, area):
+    """List endpoint serializes functional_area, team, and program_assignments."""
+    team = Team(name="Backend", functional_area_id=area.id)
+    db_session.add(team)
+    await db_session.flush()
+
+    resp = await client.post(
+        "/api/members/",
+        json={
+            "employee_id": "T100",
+            "first_name": "Nested",
+            "last_name": "Test",
+            "functional_area_id": area.id,
+            "team_id": team.id,
+        },
+    )
+    member_uuid = resp.json()["uuid"]
+
+    prog = Program(name="Phoenix")
+    db_session.add(prog)
+    await db_session.flush()
+    pa = ProgramAssignment(
+        member_uuid=uuid_mod.UUID(member_uuid), program_id=prog.id, role="Lead"
+    )
+    db_session.add(pa)
+    await db_session.commit()
+
+    resp = await client.get("/api/members/")
+    assert resp.status_code == 200
+    members = resp.json()
+    member = next(m for m in members if m["uuid"] == member_uuid)
+
+    assert member["functional_area"] == {
+        "id": area.id,
+        "name": "Engineering",
+        "description": None,
+    }
+    assert member["team"] == {
+        "id": team.id,
+        "name": "Backend",
+        "functional_area_id": area.id,
+    }
+    assert len(member["program_assignments"]) == 1
+    assert member["program_assignments"][0]["program"]["name"] == "Phoenix"
+    assert member["program_assignments"][0]["role"] == "Lead"
+
+
+async def test_list_members_no_team_returns_null(client, area):
+    """A member with no team returns team: null without error."""
+    resp = await client.post(
+        "/api/members/",
+        json={
+            "employee_id": "T101",
+            "first_name": "No",
+            "last_name": "Team",
+            "functional_area_id": area.id,
+        },
+    )
+    member_uuid = resp.json()["uuid"]
+
+    resp = await client.get("/api/members/")
+    member = next(m for m in resp.json() if m["uuid"] == member_uuid)
+    assert member["team"] is None
+    assert member["program_assignments"] == []

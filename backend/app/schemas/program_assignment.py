@@ -19,4 +19,4 @@ class ProgramAssignmentResponse(BaseModel):
     member_uuid: UUID
     program_id: int
     role: str | None
-    program: ProgramListResponse
+    program: ProgramListResponse | None = None

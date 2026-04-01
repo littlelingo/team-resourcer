@@ -89,6 +89,9 @@ export interface TeamMemberList {
   team_id: number | null
   supervisor_name: string | null
   functional_manager_name: string | null
+  functional_area?: FunctionalArea | null
+  team?: TeamListItem | null
+  program_assignments?: ProgramAssignment[]
 }
 
 export interface TeamMember extends TeamMemberList {

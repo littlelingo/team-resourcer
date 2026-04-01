@@ -66,6 +66,9 @@ async def list_members(
             selectinload(TeamMember.team),
             selectinload(TeamMember.supervisor),
             selectinload(TeamMember.functional_manager),
+            selectinload(TeamMember.program_assignments).selectinload(
+                ProgramAssignment.program
+            ),
         )
         .order_by(TeamMember.last_name, TeamMember.first_name)
     )

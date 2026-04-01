@@ -7,13 +7,10 @@ import { getInitials } from '@/lib/member-utils'
 import type { TeamMemberList } from '@/types'
 
 interface MemberCardProps {
-  member: TeamMemberList & {
-    functional_area?: { id: number; name: string; description: string | null }
-    program_assignments?: { program?: { id: number; name: string }; role: string | null }[]
-  }
-  onEdit: (member: MemberCardProps['member']) => void
-  onDelete: (member: MemberCardProps['member']) => void
-  onClick: (member: MemberCardProps['member']) => void
+  member: TeamMemberList
+  onEdit: (member: TeamMemberList) => void
+  onDelete: (member: TeamMemberList) => void
+  onClick: (member: TeamMemberList) => void
 }
 
 export default function MemberCard({ member, onEdit, onDelete, onClick }: MemberCardProps) {

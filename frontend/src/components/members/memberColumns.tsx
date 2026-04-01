@@ -5,24 +5,12 @@ import { getInitials } from '@/lib/member-utils'
 import RowActionsMenu from '@/components/shared/RowActionsMenu'
 import type { TeamMemberList } from '@/types'
 
-// Extended type for the columns — members list items may have embedded relations
-// when fetched with full detail, but TeamMemberList is the base shape.
-type MemberRow = TeamMemberList & {
-  functional_area?: { id: number; name: string; description: string | null }
-  team?: { id: number; name: string; functional_area_id: number }
-  program_assignments?: {
-    program_id: number
-    role: string | null
-    program?: { id: number; name: string }
-  }[]
-}
-
 interface ColumnMeta {
-  onEdit: (member: MemberRow) => void
-  onDelete: (member: MemberRow) => void
+  onEdit: (member: TeamMemberList) => void
+  onDelete: (member: TeamMemberList) => void
 }
 
-export function buildMemberColumns(meta: ColumnMeta): ColumnDef<MemberRow>[] {
+export function buildMemberColumns(meta: ColumnMeta): ColumnDef<TeamMemberList>[] {
   return [
     {
       id: 'member',

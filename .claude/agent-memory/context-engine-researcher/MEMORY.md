@@ -54,5 +54,8 @@
 ## Research: Functional Manager + Direct Report Rename (feature 029)
 - Add functional_manager_id self-ref FK to team_members (mirrors supervisor_id pattern); requires explicit foreign_keys= on both new relationships; dedicated set endpoint in org.py follows existing supervisor route; MemberCard uses TeamMemberList (no FK fields) so showing manager name needs extra prop or type widening; supervisor currently displays as raw UUID in detail sheet (existing UX gap); see `.context/features/029-functional-manager/NOTES.md`
 
+## Research: Member Views — Missing functional_area / programs / team
+- [`research_member_views.md`](research_member_views.md) — 2026-03-31: card/table views always show "—" for area/team/programs because list schema strips nested objects; detail sheet works fine; fix is frontend join (area/team) + extend list schema (programs)
+
 ## Research: Searchable Select / Combobox (feature 049 candidate)
 - [`research_searchable_select.md`](research_searchable_select.md) — 2026-03-30: SelectField uses Radix Select (no search); MultiSelectField uses Radix DropdownMenu (no search); cmdk@1.1.1 already installed; @radix-ui/react-popover NOT installed; 5 SelectField usages (2 files), 1 MultiSelectField usage; highest feature ID is 048

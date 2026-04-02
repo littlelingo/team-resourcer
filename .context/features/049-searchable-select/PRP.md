@@ -1,6 +1,6 @@
 # PRP: Searchable Select Dropdowns
 
-## Status: IMPLEMENTED
+## Status: COMPLETE
 ## Testing Strategy: implement-then-test
 
 ## Context

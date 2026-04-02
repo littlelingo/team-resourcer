@@ -1,6 +1,6 @@
 # PRP: Fix Team Assignment Display in Member Detail/Edit
 
-## Status: IMPLEMENTED
+## Status: COMPLETE
 ## Testing Strategy: implement-then-test
 
 ## Context

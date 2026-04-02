@@ -18,17 +18,27 @@ from app.schemas.program_assignment import ProgramAssignmentCreate
 async def list_programs(db: AsyncSession) -> list[Program]:
     """Return all programs ordered by name."""
     result = await db.execute(
-        select(Program).options(selectinload(Program.agency)).order_by(Program.name)
+        select(Program)
+        .options(selectinload(Program.agency), selectinload(Program.assignments))
+        .order_by(Program.name)
     )
-    return list(result.scalars().all())
+    programs = list(result.scalars().all())
+    for p in programs:
+        p.member_count = len(p.assignments)  # type: ignore[attr-defined]
+    return programs
 
 
 async def get_program(db: AsyncSession, program_id: int) -> Program | None:
     """Fetch a single program by ID."""
     result = await db.execute(
-        select(Program).options(selectinload(Program.agency)).where(Program.id == program_id)
+        select(Program)
+        .options(selectinload(Program.agency), selectinload(Program.assignments))
+        .where(Program.id == program_id)
     )
-    return result.scalar_one_or_none()
+    program = result.scalar_one_or_none()
+    if program is not None:
+        program.member_count = len(program.assignments)  # type: ignore[attr-defined]
+    return program
 
 
 async def create_program(db: AsyncSession, data: ProgramCreate) -> Program:
@@ -38,9 +48,13 @@ async def create_program(db: AsyncSession, data: ProgramCreate) -> Program:
     await db.commit()
     await db.refresh(program)
     result = await db.execute(
-        select(Program).options(selectinload(Program.agency)).where(Program.id == program.id)
+        select(Program)
+        .options(selectinload(Program.agency), selectinload(Program.assignments))
+        .where(Program.id == program.id)
     )
-    return result.scalar_one()
+    program = result.scalar_one()
+    program.member_count = len(program.assignments)  # type: ignore[attr-defined]
+    return program
 
 
 async def update_program(db: AsyncSession, program_id: int, data: ProgramUpdate) -> Program | None:
@@ -53,9 +67,13 @@ async def update_program(db: AsyncSession, program_id: int, data: ProgramUpdate)
     await db.commit()
     await db.refresh(program)
     result = await db.execute(
-        select(Program).options(selectinload(Program.agency)).where(Program.id == program.id)
+        select(Program)
+        .options(selectinload(Program.agency), selectinload(Program.assignments))
+        .where(Program.id == program.id)
     )
-    return result.scalar_one()
+    program = result.scalar_one()
+    program.member_count = len(program.assignments)  # type: ignore[attr-defined]
+    return program
 
 
 async def delete_program(db: AsyncSession, program_id: int) -> bool:

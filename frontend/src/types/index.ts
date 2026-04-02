@@ -48,6 +48,7 @@ export interface Program {
   description: string | null
   agency_id: number | null
   agency?: Agency
+  member_count: number
   created_at: string
   updated_at: string
 }

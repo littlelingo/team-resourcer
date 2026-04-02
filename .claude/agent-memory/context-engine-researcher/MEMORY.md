@@ -57,5 +57,8 @@
 ## Research: Member Views — Missing functional_area / programs / team
 - [`research_member_views.md`](research_member_views.md) — 2026-03-31: card/table views always show "—" for area/team/programs because list schema strips nested objects; detail sheet works fine; fix is frontend join (area/team) + extend list schema (programs)
 
+## Research: Programs Table — Total Members Column
+- [`research_program_member_count.md`](research_program_member_count.md) — 2026-04-02: ProgramResponse has no member_count; list_programs loads assignments rel but doesn't count; fix is selectinload(Program.assignments) on all 4 ProgramResponse routes + @computed_field + frontend type + new column; MissingGreenlet risk if any of the 4 routes miss the eager-load
+
 ## Research: Searchable Select / Combobox (feature 049 candidate)
 - [`research_searchable_select.md`](research_searchable_select.md) — 2026-03-30: SelectField uses Radix Select (no search); MultiSelectField uses Radix DropdownMenu (no search); cmdk@1.1.1 already installed; @radix-ui/react-popover NOT installed; 5 SelectField usages (2 files), 1 MultiSelectField usage; highest feature ID is 048

@@ -49,6 +49,14 @@ export function getProgramColumns({
       ),
     },
     {
+      accessorKey: 'member_count',
+      header: 'Members',
+      enableSorting: true,
+      cell: ({ row }) => (
+        <span className="text-slate-700">{row.original.member_count}</span>
+      ),
+    },
+    {
       id: 'actions',
       header: '',
       enableSorting: false,

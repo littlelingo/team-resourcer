@@ -27,6 +27,7 @@ class ProgramResponse(BaseModel):
     description: str | None
     agency_id: int | None
     agency: AgencyListResponse | None = None
+    member_count: int = 0
     created_at: datetime
     updated_at: datetime
 

@@ -53,7 +53,7 @@ export function getProgramColumns({
       header: 'Members',
       enableSorting: true,
       cell: ({ row }) => (
-        <span className="text-slate-700">{row.original.member_count}</span>
+        <span className="text-slate-700">{row.original.member_count ?? 0}</span>
       ),
     },
     {

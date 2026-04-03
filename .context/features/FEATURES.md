@@ -52,3 +52,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 051 | program-member-count | COMPLETE | `.context/features/051-program-member-count/` |
 | 052 | entity-member-counts | COMPLETE | `.context/features/052-entity-member-counts/` |
 | 053 | tree-lead-on-team-node | COMPLETE | `.context/features/053-tree-lead-on-team-node/` |
+| 054 | team-lead-badge | researched | `.context/features/054-team-lead-badge/` |

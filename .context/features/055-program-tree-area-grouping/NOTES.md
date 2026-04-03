@@ -1,74 +1,100 @@
-# Feature 055: Program Tree — Group Members by Functional Area
+# Feature 055: Program Teams — Program-Specific Team Structure
 
 ## Goal
 
-Update the program tree visualization from a flat star (program → members) to a grouped hierarchy: **Program → Functional Areas → Members**. Members are organized under their functional area within the program.
+Add program-specific teams that allow programs to define their own organizational structure independent of the org chart. Each program can have named teams (e.g., "Frontend Squad", "API Squad") with their own leads, and members assigned to those teams within the program context.
+
+**Tree visualization**: Program → Program Teams → Members (with team leads shown on team nodes)
 
 ## Current State
 
-### Backend — `build_program_tree` (tree_service.py lines 51-102)
-- Emits one `program` root node and one `member` node per assignment
-- Direct edges from program to each member — **flat star, no grouping**
-- Query joins `ProgramAssignment` + `TeamMember` but does NOT load `TeamMember.functional_area`
-- `functional_area_id` is available on `TeamMember` (non-nullable FK) but unused
-- Member data includes `role` from `ProgramAssignment.role`
+### What exists
+- `Program` model with `assignments` relationship (many-to-many with members via `program_assignments`)
+- `ProgramAssignment` has `member_uuid`, `program_id`, `role` (free-text, nullable)
+- No concept of sub-teams within a program
+- Program tree is a flat star: program → all members directly
 
-### Frontend — ProgramTreePage.tsx
-- `nodeTypes` map: only `{ program: ProgramNode, member: MemberNode }` — no area node type
-- Uses `useProgramTree` hook → `useTreeLayout` (Dagre, TB) → `useTreeSearch` → injects `onSelect` on member nodes
-- `useDragReassign` wired with context `'program'`
+### What's needed
+- New `program_teams` table: id, program_id, name, description, lead_id
+- `program_team_id` FK on `program_assignments` to assign members to program teams
+- Full CRUD for program teams (nested under `/api/programs/{id}/teams/`)
+- Frontend management UI (form dialog, list, members sheet)
+- Updated tree visualization: Program → Program Teams → Members
 
-### Existing Components
-- **AreaNode.tsx**: exists with green styling (`border-green-200 bg-green-50`), but only has a `source` handle (bottom) — needs `target` handle (top) to serve as mid-level grouping node
-- **ProgramNode.tsx**: blue styling, source handle only (root node)
-- **MemberNode.tsx**: has `role` badge support, `onSelect` click handler
+## Data Model
 
-## Implementation Touch Points
-
-### Backend (1 file)
-| File | Change |
-|------|--------|
-| `backend/app/services/tree_service.py` | Rewrite `build_program_tree`: load `TeamMember.functional_area`, group members by area, emit area grouping nodes + edges |
-
-**New tree structure:**
+### New table: `program_teams`
 ```
-program-{id}           (program node — root)
-  ├── area-{area_id}   (functional area node — grouping)
-  │   ├── member-{uuid} (member node — leaf)
-  │   └── member-{uuid}
-  ├── area-{area_id}
-  │   └── member-{uuid}
-  └── unassigned       (members with no functional_area — edge case, shouldn't happen since FK is non-nullable)
+program_teams
+├── id: int (PK, autoincrement)
+├── program_id: int (FK → programs.id, NOT NULL)
+├── name: str (VARCHAR 255, NOT NULL)
+├── description: str | None (TEXT)
+├── lead_id: UUID | None (FK → team_members.uuid, use_alter=True)
+├── created_at: datetime
+└── updated_at: datetime
 ```
 
-**Query change:** Add `selectinload(TeamMember.functional_area)` to the member query, or join `FunctionalArea` directly.
+### Modified table: `program_assignments`
+```
++ program_team_id: int | None (FK → program_teams.id, nullable)
+```
 
-**Grouping logic:**
-1. Collect all members from assignments
-2. Group by `member.functional_area_id`
-3. For each unique area: emit an area node + edge from program
-4. For each member in that area: emit a member node + edge from area node
+This keeps the existing `program_assignments` table but adds an optional link to a program team. Members can be assigned to a program without being on a specific team (unassigned group).
 
-### Frontend (2 files)
+## Implementation Scope
+
+### Backend (high — ~8 new/modified files)
+
 | File | Change |
 |------|--------|
-| `frontend/src/components/trees/nodes/AreaNode.tsx` | Add `target` handle (top) so it can receive edges from parent program node |
-| `frontend/src/pages/trees/ProgramTreePage.tsx` | Register `area: AreaNode` in `nodeTypes` map |
+| `backend/app/models/program_team.py` | **NEW** — ProgramTeam model |
+| `backend/app/models/program_assignment.py` | Add `program_team_id` FK + relationship |
+| `backend/app/models/__init__.py` | Register ProgramTeam model |
+| `backend/alembic/versions/xxx_add_program_teams.py` | **NEW** — migration |
+| `backend/app/schemas/program_team.py` | **NEW** — Create, Update, Response schemas |
+| `backend/app/services/program_team_service.py` | **NEW** — CRUD + member management |
+| `backend/app/api/routes/program_teams.py` | **NEW** — REST endpoints |
+| `backend/app/api/routes/programs.py` | Mount program_teams router |
+| `backend/app/services/tree_service.py` | Rewrite `build_program_tree` for grouped hierarchy |
 
-## Risks & Known Errors
+### Frontend (high — ~6 new/modified files)
 
-- **MissingGreenlet (error index, feature 050)**: If `selectinload(TeamMember.functional_area)` is missing, accessing `member.functional_area.name` during tree building will crash. Must eager-load.
-- **AreaNode shared component**: Adding a `target` handle to `AreaNode.tsx` affects the area tree too (where it's the root). However, having an unused target handle on a root node is harmless — React Flow simply won't draw an edge to it.
-- **useDragReassign**: Adding a new `area` node type may affect drag behavior. Need to verify `useDragReassign` doesn't treat area nodes as valid drop targets for member reassignment.
-- **useTreeSearch**: Area nodes should be searchable by name — the search hook operates on `node.data.name` generically, so this should work automatically.
+| File | Change |
+|------|--------|
+| `frontend/src/types/index.ts` | Add `ProgramTeam` interface |
+| `frontend/src/hooks/useProgramTeams.ts` | **NEW** — CRUD hooks |
+| `frontend/src/components/programs/ProgramTeamFormDialog.tsx` | **NEW** — create/edit dialog |
+| `frontend/src/pages/ProgramsPage.tsx` | Add program teams management (sheet or sub-tab) |
+| `frontend/src/pages/trees/ProgramTreePage.tsx` | Register team node type, update nodeTypes |
+| `frontend/src/components/trees/nodes/AreaNode.tsx` | Add target handle for mid-level usage (or create ProgramTeamNode) |
+
+## Patterns to Follow
+
+- **Model**: Mirror `backend/app/models/team.py` — `lead_id` with `use_alter=True`, relationships
+- **Schema**: Mirror `backend/app/schemas/team.py` — no `program_id` in Create (injected from path)
+- **Service**: Mirror `backend/app/services/team_service.py` — selectinload, member_count pattern
+- **Routes**: Mirror `backend/app/api/routes/teams.py` — nested under program, CRUD + member management
+- **Nesting**: Mirror `backend/app/api/routes/areas.py` line 27 — include_router with prefix
+- **Migration**: `make migration name="add_program_teams"` → `make migrate`
+- **Frontend hooks**: Mirror `frontend/src/hooks/useTeams.ts` — query keys, mutations, invalidation
+
+## Risks
+
+- **MissingGreenlet**: All service functions returning ProgramTeamResponse must selectinload relationships
+- **Circular FK**: `lead_id → team_members.uuid` needs `use_alter=True` (same as Team model)
+- **Migration ordering**: New table + FK on existing table in same migration — alembic autogenerate handles this but verify
+- **program_team_id nullable**: Existing program assignments have no team — the FK must be nullable to avoid breaking existing data
+- **Scope creep**: This is the biggest feature yet (~14 files). Consider splitting into two PRPs: (1) backend model/CRUD, (2) frontend UI + tree visualization
 
 ## Open Questions
 
-1. Should members with no functional area be grouped under an "Unassigned" node? (`functional_area_id` is non-nullable, so this shouldn't happen)
-2. Should the area grouping nodes be clickable? (Probably not — they're just organizational)
-3. Should area nodes show a member count? (Nice to have, but not required for initial implementation)
+1. **Member assignment flow**: When adding a member to a program team, do they automatically get a program assignment too? Or must they first be assigned to the program, then to a team within it?
+2. **UI placement**: Should program teams be managed from the Programs page (as a sub-section when clicking a program), or as a separate page?
+3. **Tree node type**: Reuse `AreaNode` (add target handle) or create a new `ProgramTeamNode` with distinct styling?
+4. **Split into phases?**: Backend CRUD first, then frontend + tree as a follow-up?
 
 ## Dependencies
 
-- Feature 053 (tree-lead-on-team-node) established the pattern for modifying tree_service.py
-- AreaNode.tsx already exists — just needs a target handle
+- Feature 054 (team-lead-badge) — EntityMembersSheet `leadId` prop pattern to reuse
+- Feature 053 (tree-lead-on-team-node) — tree lead display pattern to reuse

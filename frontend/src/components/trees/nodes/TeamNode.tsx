@@ -4,14 +4,29 @@ import type { NodeProps, Node } from '@xyflow/react'
 export type TeamNodeData = {
   id: number
   name: string
+  lead_id?: string | null
   lead_name?: string | null
+  onSelect?: (uuid: string) => void
 }
 
 export type TeamNodeType = Node<TeamNodeData, 'team'>
 
 export default function TeamNode({ data }: NodeProps<TeamNodeType>) {
+  const isClickable = !!data.lead_id && !!data.onSelect
+
+  function handleClick() {
+    if (data.lead_id && data.onSelect) {
+      data.onSelect(data.lead_id)
+    }
+  }
+
   return (
-    <div className="w-[200px] rounded-lg border border-amber-200 bg-amber-50 shadow-sm">
+    <div
+      className={`w-[200px] rounded-lg border border-amber-200 bg-amber-50 shadow-sm${
+        isClickable ? ' cursor-pointer hover:shadow-md transition-shadow' : ''
+      }`}
+      onClick={isClickable ? handleClick : undefined}
+    >
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
 
       <div className="p-3">

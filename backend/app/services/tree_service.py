@@ -160,7 +160,14 @@ async def build_area_tree(db: AsyncSession, area_id: int) -> TreeResponse | None
             )
         )
 
+    # Map lead UUIDs to the team they lead (for excluding from member nodes)
+    lead_team_map = {team.lead_id: team.id for team in teams if team.lead_id}
+
     for member in members:
+        # Skip member node if this member is the lead of the team they belong to
+        if member.uuid in lead_team_map and lead_team_map[member.uuid] == member.team_id:
+            continue
+
         member_node_id = f"member-{member.uuid}"
         nodes.append(
             TreeNode(

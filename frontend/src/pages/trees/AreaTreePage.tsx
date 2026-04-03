@@ -50,7 +50,7 @@ export default function AreaTreePage() {
     ...node,
     data: {
       ...node.data,
-      onSelect: node.type === 'member' ? (uuid: string) => setSelectedMemberId(uuid) : undefined,
+      onSelect: (node.type === 'member' || node.type === 'team') ? (uuid: string) => setSelectedMemberId(uuid) : undefined,
     },
   }))
 

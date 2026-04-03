@@ -228,6 +228,7 @@ async def test_list_members_includes_nested_objects(client, db_session, area):
         "id": area.id,
         "name": "Engineering",
         "description": None,
+        "member_count": 0,
     }
     assert member["team"] == {
         "id": team.id,

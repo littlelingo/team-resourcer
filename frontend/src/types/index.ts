@@ -4,6 +4,7 @@ export interface FunctionalArea {
   id: number
   name: string
   description: string | null
+  member_count: number
 }
 
 // ─── Agencies ────────────────────────────────────────────────────────────────
@@ -12,6 +13,7 @@ export interface Agency {
   id: number
   name: string
   description: string | null
+  member_count: number
 }
 
 // ─── Teams ───────────────────────────────────────────────────────────────────
@@ -30,6 +32,7 @@ export interface Team {
   functional_area_id: number
   lead_id: string | null
   functional_area?: FunctionalArea
+  member_count: number
   created_at: string
   updated_at: string
 }

@@ -15,18 +15,32 @@ from app.schemas.team import TeamCreate, TeamUpdate
 
 async def list_teams(db: AsyncSession, area_id: int | None = None) -> list[Team]:
     """Return all teams, optionally filtered by functional area, with functional_area loaded."""
-    stmt = select(Team).options(selectinload(Team.functional_area)).order_by(Team.name)
+    stmt = (
+        select(Team)
+        .options(selectinload(Team.functional_area), selectinload(Team.members))
+        .order_by(Team.name)
+    )
     if area_id is not None:
         stmt = stmt.where(Team.functional_area_id == area_id)
     result = await db.execute(stmt)
-    return list(result.scalars().all())
+    teams = list(result.scalars().all())
+    for t in teams:
+        t.member_count = len(t.members)  # type: ignore[attr-defined]
+    return teams
 
 
 async def get_team(db: AsyncSession, team_id: int) -> Team | None:
     """Fetch a single team by ID with functional_area loaded."""
-    stmt = select(Team).where(Team.id == team_id).options(selectinload(Team.functional_area))
+    stmt = (
+        select(Team)
+        .where(Team.id == team_id)
+        .options(selectinload(Team.functional_area), selectinload(Team.members))
+    )
     result = await db.execute(stmt)
-    return result.scalar_one_or_none()
+    team = result.scalar_one_or_none()
+    if team is not None:
+        team.member_count = len(team.members)  # type: ignore[attr-defined]
+    return team
 
 
 async def create_team(db: AsyncSession, data: TeamCreate, functional_area_id: int) -> Team:

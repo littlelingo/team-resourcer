@@ -30,6 +30,7 @@ class TeamResponse(BaseModel):
     functional_area_id: int
     lead_id: UUID | None
     functional_area: FunctionalAreaListResponse | None
+    member_count: int = 0
     created_at: datetime
     updated_at: datetime
 

@@ -31,6 +31,14 @@ export function getAgencyColumns({
       ),
     },
     {
+      accessorKey: 'member_count',
+      header: 'Members',
+      enableSorting: true,
+      cell: ({ row }) => (
+        <span className="text-slate-700">{row.original.member_count ?? 0}</span>
+      ),
+    },
+    {
       id: 'actions',
       header: '',
       enableSorting: false,

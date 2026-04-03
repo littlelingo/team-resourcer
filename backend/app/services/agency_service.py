@@ -4,21 +4,44 @@ from __future__ import annotations
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.agency import Agency
+from app.models.program import Program
 from app.schemas.agency import AgencyCreate, AgencyUpdate
+
+
+def _set_member_count(agency: Agency) -> None:
+    """Compute deduplicated member count from agency's programs' assignments."""
+    agency.member_count = len(  # type: ignore[attr-defined]
+        {a.member_uuid for p in agency.programs for a in p.assignments}
+    )
 
 
 async def list_agencies(db: AsyncSession) -> list[Agency]:
     """Return all agencies ordered by name."""
-    result = await db.execute(select(Agency).order_by(Agency.name))
-    return list(result.scalars().all())
+    result = await db.execute(
+        select(Agency)
+        .options(selectinload(Agency.programs).selectinload(Program.assignments))
+        .order_by(Agency.name)
+    )
+    agencies = list(result.scalars().all())
+    for a in agencies:
+        _set_member_count(a)
+    return agencies
 
 
 async def get_agency(db: AsyncSession, agency_id: int) -> Agency | None:
     """Fetch a single agency by ID."""
-    result = await db.execute(select(Agency).where(Agency.id == agency_id))
-    return result.scalar_one_or_none()
+    result = await db.execute(
+        select(Agency)
+        .options(selectinload(Agency.programs).selectinload(Program.assignments))
+        .where(Agency.id == agency_id)
+    )
+    agency = result.scalar_one_or_none()
+    if agency is not None:
+        _set_member_count(agency)
+    return agency
 
 
 async def create_agency(db: AsyncSession, data: AgencyCreate) -> Agency:
@@ -27,6 +50,13 @@ async def create_agency(db: AsyncSession, data: AgencyCreate) -> Agency:
     db.add(agency)
     await db.commit()
     await db.refresh(agency)
+    result = await db.execute(
+        select(Agency)
+        .options(selectinload(Agency.programs).selectinload(Program.assignments))
+        .where(Agency.id == agency.id)
+    )
+    agency = result.scalar_one()
+    _set_member_count(agency)
     return agency
 
 
@@ -39,6 +69,13 @@ async def update_agency(db: AsyncSession, agency_id: int, data: AgencyUpdate) ->
         setattr(agency, field, value)
     await db.commit()
     await db.refresh(agency)
+    result = await db.execute(
+        select(Agency)
+        .options(selectinload(Agency.programs).selectinload(Program.assignments))
+        .where(Agency.id == agency.id)
+    )
+    agency = result.scalar_one()
+    _set_member_count(agency)
     return agency
 
 

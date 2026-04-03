@@ -87,12 +87,20 @@ This keeps the existing `program_assignments` table but adds an optional link to
 - **program_team_id nullable**: Existing program assignments have no team — the FK must be nullable to avoid breaking existing data
 - **Scope creep**: This is the biggest feature yet (~14 files). Consider splitting into two PRPs: (1) backend model/CRUD, (2) frontend UI + tree visualization
 
+## Decisions
+
+1. **Split into phases**: Phase 1 = backend (model, migration, CRUD, routes). Phase 2 = frontend (UI, tree visualization).
+2. **UI placement**: Two surfaces:
+   - **Programs page** — program data, members, program team associations
+   - **Program Trees page** — visual tree: Program → Program Teams → Members
+   - **Teams page** — program teams could be managed here alongside functional teams with clear visual delineation (e.g., "Functional Teams" section + "Program Teams" section)
+3. **Member assignment flow**: Members do NOT need prior program assignment. Adding a member to a program team auto-creates their program assignment.
+4. **Tree node type**: TBD — reuse AreaNode or create ProgramTeamNode (Phase 2 decision)
+
 ## Open Questions
 
-1. **Member assignment flow**: When adding a member to a program team, do they automatically get a program assignment too? Or must they first be assigned to the program, then to a team within it?
-2. **UI placement**: Should program teams be managed from the Programs page (as a sub-section when clicking a program), or as a separate page?
-3. **Tree node type**: Reuse `AreaNode` (add target handle) or create a new `ProgramTeamNode` with distinct styling?
-4. **Split into phases?**: Backend CRUD first, then frontend + tree as a follow-up?
+1. **Teams page layout**: How exactly to delineate functional vs program teams (tabs? sections? filter?)
+2. **Program team lead**: Can a program team lead be anyone, or only a program member?
 
 ## Dependencies
 

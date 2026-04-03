@@ -68,3 +68,6 @@
 
 ## Bug: Tree Lead Duplicate + Team Node Clickability
 - [`research_tree_lead_duplicate.md`](research_tree_lead_duplicate.md) — 2026-04-02: build_area_tree emits all area members unconditionally; lead gets a member node AND appears on team node; fix is skip member nodes for lead_uuids in backend + add onSelect/lead_id to TeamNode + inject team onSelect in AreaTreePage
+
+## Research: Team Lead Badge in EntityMembersSheet
+- [`research_team_lead_badge.md`](research_team_lead_badge.md) — 2026-04-03: frontend-only change; Team.lead_id is already on selectedTeam; add leadId prop to EntityMembersSheet and compare member.uuid to render badge/icon; no backend work needed

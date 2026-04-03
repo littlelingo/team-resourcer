@@ -50,4 +50,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 049 | searchable-select | COMPLETE | `.context/features/049-searchable-select/` |
 | 050 | member-field-visibility | COMPLETE | `.context/features/050-member-field-visibility/` |
 | 051 | program-member-count | COMPLETE | `.context/features/051-program-member-count/` |
-| 052 | entity-member-counts | researched | `.context/features/052-entity-member-counts/` |
+| 052 | entity-member-counts | APPROVED | `.context/features/052-entity-member-counts/` |

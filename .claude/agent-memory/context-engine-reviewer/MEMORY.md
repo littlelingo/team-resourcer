@@ -16,3 +16,6 @@
 - [project_027_amount_parsing_review.md](project_027_amount_parsing_review.md) — 027-import-amount-parsing (parse_amount utility, mapper numeric validation): key findings from review on 2026-03-28
 - [project_028_currency_display_review.md](project_028_currency_display_review.md) — 028-history-currency-display (format-utils extraction, history timeline conditional): key findings from review on 2026-03-28
 - [project_029_functional_manager_review.md](project_029_functional_manager_review.md) — 029-functional-manager (two self-ref FKs, cycle detection, rename supervisor→direct manager): key findings from review on 2026-03-29
+- [project_051_program_member_count_review.md](project_051_program_member_count_review.md) — 051-program-member-count (member_count on ProgramResponse, selectinload on 4 service fns, Members column): key findings from review on 2026-04-02
+- [project_052_entity_member_count_review.md](project_052_entity_member_count_review.md) — 052-entity-member-count (member_count for agencies/areas/teams, set comprehension dedup, embedded schema default): key findings from review on 2026-04-02
+- [project_053_team_lead_node_review.md](project_053_team_lead_node_review.md) — 053-team-lead-node (show team lead on team node, remove duplicate member node in area tree): key findings from review on 2026-04-02

@@ -60,5 +60,11 @@
 ## Research: Programs Table — Total Members Column
 - [`research_program_member_count.md`](research_program_member_count.md) — 2026-04-02: ProgramResponse has no member_count; list_programs loads assignments rel but doesn't count; fix is selectinload(Program.assignments) on all 4 ProgramResponse routes + @computed_field + frontend type + new column; MissingGreenlet risk if any of the 4 routes miss the eager-load
 
+## Research: Entity Member Count — Agencies, Functional Areas, Teams
+- [`research_entity_member_count.md`](research_entity_member_count.md) — 2026-04-02: FunctionalArea and Team have direct members relationships; Agency is indirect (via programs→assignments); service functions need selectinload additions; all three schemas and frontend types lack member_count; pattern mirrors feature 051 exactly
+
 ## Research: Searchable Select / Combobox (feature 049 candidate)
 - [`research_searchable_select.md`](research_searchable_select.md) — 2026-03-30: SelectField uses Radix Select (no search); MultiSelectField uses Radix DropdownMenu (no search); cmdk@1.1.1 already installed; @radix-ui/react-popover NOT installed; 5 SelectField usages (2 files), 1 MultiSelectField usage; highest feature ID is 048
+
+## Bug: Tree Lead Duplicate + Team Node Clickability
+- [`research_tree_lead_duplicate.md`](research_tree_lead_duplicate.md) — 2026-04-02: build_area_tree emits all area members unconditionally; lead gets a member node AND appears on team node; fix is skip member nodes for lead_uuids in backend + add onSelect/lead_id to TeamNode + inject team onSelect in AreaTreePage

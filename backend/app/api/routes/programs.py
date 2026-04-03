@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.routes.program_teams import router as program_teams_router
 from app.core.database import get_db
 from app.schemas import (
     ProgramAssignmentCreate,
@@ -28,6 +29,9 @@ from app.services import (
 from app.services.tree_service import build_program_tree
 
 router = APIRouter()
+
+# Mount program teams as a sub-router under each program
+router.include_router(program_teams_router, prefix="/{program_id}/teams", tags=["program-teams"])
 
 
 @router.get("/", response_model=list[ProgramResponse])

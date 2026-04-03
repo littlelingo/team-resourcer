@@ -13,6 +13,7 @@ from app.models.base import Base
 if TYPE_CHECKING:
     from app.models.agency import Agency
     from app.models.program_assignment import ProgramAssignment
+    from app.models.program_team import ProgramTeam
 
 
 class Program(Base):
@@ -37,4 +38,5 @@ class Program(Base):
     assignments: Mapped[list[ProgramAssignment]] = relationship(
         "ProgramAssignment", back_populates="program"
     )
+    teams: Mapped[list[ProgramTeam]] = relationship("ProgramTeam", back_populates="program")
     agency: Mapped["Agency | None"] = relationship("Agency", back_populates="programs")

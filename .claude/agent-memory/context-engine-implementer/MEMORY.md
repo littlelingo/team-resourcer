@@ -1,6 +1,7 @@
 # Agent Memory Index
 
 ## Project
+- [project_feature055_backend.md](project_feature055_backend.md) — Feature 055 Phase 1: all 10 steps complete (Program Teams backend) as of 2026-04-03
 - [project_phase1_scaffold.md](project_phase1_scaffold.md) — Phase 1: all 9 steps complete (FastAPI + PostgreSQL backend)
 - [project_phase2_progress.md](project_phase2_progress.md) — Phase 2 Steps 1-11 complete as of 2026-03-23; Step 12+ remaining
 - [project_phase3_progress.md](project_phase3_progress.md) — Phase 3 Steps 1-15 complete as of 2026-03-23 (all tree pages, routing, sidebar); Step 16 (PNG export) optional/remaining

@@ -25,6 +25,12 @@ from app.schemas.program_assignment import (
     ProgramAssignmentCreate,
     ProgramAssignmentResponse,
 )
+from app.schemas.program_team import (
+    ProgramTeamCreate,
+    ProgramTeamListResponse,
+    ProgramTeamResponse,
+    ProgramTeamUpdate,
+)
 from app.schemas.team import (
     TeamCreate,
     TeamListResponse,
@@ -70,6 +76,11 @@ __all__ = [
     # program_assignment
     "ProgramAssignmentCreate",
     "ProgramAssignmentResponse",
+    # program_team
+    "ProgramTeamCreate",
+    "ProgramTeamUpdate",
+    "ProgramTeamResponse",
+    "ProgramTeamListResponse",
     # team_member
     "TeamMemberCreate",
     "TeamMemberUpdate",

@@ -13,6 +13,7 @@ from app.models.base import Base
 
 if TYPE_CHECKING:
     from app.models.program import Program
+    from app.models.program_team import ProgramTeam
     from app.models.team_member import TeamMember
 
 
@@ -29,9 +30,16 @@ class ProgramAssignment(Base):
         nullable=False,
     )
     role: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    program_team_id: Mapped[int | None] = mapped_column(
+        ForeignKey("program_teams.id"),
+        nullable=True,
+    )
 
     __table_args__ = (PrimaryKeyConstraint("member_uuid", "program_id"),)
 
     # Relationships
     member: Mapped[TeamMember] = relationship("TeamMember", back_populates="program_assignments")
     program: Mapped[Program] = relationship("Program", back_populates="assignments")
+    program_team: Mapped[ProgramTeam | None] = relationship(
+        "ProgramTeam", back_populates="assignments", foreign_keys=[program_team_id]
+    )

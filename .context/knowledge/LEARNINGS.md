@@ -27,3 +27,11 @@ When excluding entities from one context (e.g., a team lead from member nodes), 
 ## 2026-04-03: Optional props for entity-specific features in shared components (feature 054)
 
 When a shared component (e.g., `EntityMembersSheet`) is used by multiple entity pages (Teams, Programs, Areas), add entity-specific features via optional props (`leadId?: string | null`). Only the relevant page passes the prop — other consumers are completely unaffected. This avoids creating entity-specific forks of the shared component.
+
+## 2026-04-03: Alembic auto-generated migration noise and FK naming (feature 055)
+
+Alembic's `--autogenerate` detects model drift beyond your intended changes. In feature 055, the generated migration included unrelated FK recreations (dropping `ondelete='SET NULL'` from `programs.agency_id`, recreating `fk_teams_lead_id`). These silently alter existing constraints.
+
+**Always review and trim auto-generated migrations.** Remove operations that don't relate to the feature. Also: Alembic uses `None` for auto-generated FK constraint names — the downgrade's `drop_constraint(None, ...)` will fail at runtime because Postgres auto-names the constraint and Alembic can't reverse-lookup it. Always give FKs explicit names (e.g., `fk_program_assignments_program_team_id`).
+
+**Related**: When a child FK has no `ON DELETE` clause, PostgreSQL defaults to `RESTRICT`. If you need nullable FK cleanup on parent delete, either add `ondelete="SET NULL"` on the FK or null out children in the service layer before deleting.

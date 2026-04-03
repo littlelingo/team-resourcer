@@ -21,3 +21,4 @@
 - [project_053_team_lead_node_review.md](project_053_team_lead_node_review.md) — 053-team-lead-node (show team lead on team node, remove duplicate member node in area tree): key findings from review on 2026-04-02
 - [project_054_team_lead_badge_review.md](project_054_team_lead_badge_review.md) — 054-team-lead-badge (amber Lead badge in EntityMembersSheet, optional leadId prop): key findings from review on 2026-04-03
 - [project_055_program_teams_backend_review.md](project_055_program_teams_backend_review.md) — 055-program-teams-backend (ProgramTeam model, service, routes, migration, nullable FK on program_assignments): key findings from review on 2026-04-03
+- [project_044_047_review.md](project_044_047_review.md) — Features 044-047 (EID label, form prefill, program assignment, entity member management): 4 critical cache/UX bugs on 2026-04-03

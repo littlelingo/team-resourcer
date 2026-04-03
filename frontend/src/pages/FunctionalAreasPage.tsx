@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import ImportWizard from '@/components/import/ImportWizard'
 import PageHeader from '@/components/layout/PageHeader'
@@ -9,7 +10,7 @@ import EntityMembersSheet from '@/components/shared/EntityMembersSheet'
 import PageError from '@/components/shared/PageError'
 import FunctionalAreaFormDialog from '@/components/functional-areas/FunctionalAreaFormDialog'
 import { getFunctionalAreaColumns } from '@/components/functional-areas/functionalAreaColumns'
-import { useFunctionalAreas, useDeleteFunctionalArea, useAreaMembers } from '@/hooks/useFunctionalAreas'
+import { useFunctionalAreas, useDeleteFunctionalArea, useAreaMembers, areaKeys } from '@/hooks/useFunctionalAreas'
 import { useMembers, useUpdateMember } from '@/hooks/useMembers'
 import type { FunctionalArea } from '@/types'
 
@@ -20,13 +21,14 @@ export default function FunctionalAreasPage() {
   const [deleteArea, setDeleteArea] = useState<FunctionalArea | null>(null)
   const [selectedArea, setSelectedArea] = useState<FunctionalArea | null>(null)
 
+  const qc = useQueryClient()
   const areasQuery = useFunctionalAreas()
   const deleteMutation = useDeleteFunctionalArea()
   const areaMembersQuery = useAreaMembers(selectedArea?.id ?? 0)
   const allMembersQuery = useMembers()
   const updateMember = useUpdateMember()
 
-  // Find or assume an "Unassigned" area for removing members
+  // Find an "Unassigned" area for removing members (functional_area_id is NOT NULL)
   const unassignedArea = useMemo(
     () => areasQuery.data?.find((a) => a.name === 'Unassigned'),
     [areasQuery.data],
@@ -131,7 +133,10 @@ export default function FunctionalAreasPage() {
           updateMember.mutate(
             { uuid, data: { functional_area_id: selectedArea.id } },
             {
-              onSuccess: () => void areaMembersQuery.refetch(),
+              onSuccess: () => {
+                void areaMembersQuery.refetch()
+                void qc.invalidateQueries({ queryKey: areaKeys.all })
+              },
               onError: (err) => toast.error(err.message),
             },
           )
@@ -144,7 +149,10 @@ export default function FunctionalAreasPage() {
           updateMember.mutate(
             { uuid, data: { functional_area_id: unassignedArea.id } },
             {
-              onSuccess: () => void areaMembersQuery.refetch(),
+              onSuccess: () => {
+                void areaMembersQuery.refetch()
+                void qc.invalidateQueries({ queryKey: areaKeys.all })
+              },
               onError: (err) => toast.error(err.message),
             },
           )

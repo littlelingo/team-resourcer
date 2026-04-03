@@ -4,10 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { apiFetch } from '@/lib/api-client'
+import { useQueryClient } from '@tanstack/react-query'
 import { useMembers, useCreateMember, useUpdateMember } from '@/hooks/useMembers'
 import { useFunctionalAreas } from '@/hooks/useFunctionalAreas'
 import { useTeams } from '@/hooks/useTeams'
-import { usePrograms } from '@/hooks/usePrograms'
+import { usePrograms, programKeys } from '@/hooks/usePrograms'
+import { memberKeys } from '@/hooks/useMembers'
 import type { TeamMember } from '@/types'
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -35,6 +37,30 @@ const memberFormSchema = z.object({
 
 export type MemberFormValues = z.infer<typeof memberFormSchema>
 
+function buildDefaultValues(member?: TeamMember): MemberFormValues {
+  return {
+    employee_id: member?.employee_id ?? '',
+    first_name: member?.first_name ?? '',
+    last_name: member?.last_name ?? '',
+    hire_date: member?.hire_date ?? '',
+    title: member?.title ?? '',
+    email: member?.email ?? '',
+    phone: member?.phone ?? '',
+    slack_handle: member?.slack_handle ?? '',
+    city: member?.city ?? '',
+    state: member?.state ?? '',
+    functional_area_id:
+      member?.functional_area_id != null ? String(member.functional_area_id) : null,
+    team_id: member?.team_id != null ? String(member.team_id) : null,
+    supervisor_id: member?.supervisor_id ?? '',
+    functional_manager_id: member?.functional_manager_id ?? '',
+    salary: member?.salary ?? '',
+    bonus: member?.bonus ?? '',
+    pto_used: member?.pto_used ?? '',
+    program_ids: member?.program_assignments?.map((pa) => String(pa.program_id)) ?? [],
+  }
+}
+
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 interface UseMemberFormOptions {
@@ -47,6 +73,7 @@ interface UseMemberFormOptions {
 export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemberFormOptions) {
   const isEdit = Boolean(member)
   const imageFileRef = useRef<File | null>(null)
+  const qc = useQueryClient()
 
   const createMember = useCreateMember()
   const updateMember = useUpdateMember()
@@ -56,27 +83,7 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
 
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
-    defaultValues: {
-      employee_id: member?.employee_id ?? '',
-      first_name: member?.first_name ?? '',
-      last_name: member?.last_name ?? '',
-      hire_date: member?.hire_date ?? '',
-      title: member?.title ?? '',
-      email: member?.email ?? '',
-      phone: member?.phone ?? '',
-      slack_handle: member?.slack_handle ?? '',
-      city: member?.city ?? '',
-      state: member?.state ?? '',
-      functional_area_id:
-        member?.functional_area_id != null ? String(member.functional_area_id) : null,
-      team_id: member?.team_id != null ? String(member.team_id) : null,
-      supervisor_id: member?.supervisor_id ?? '',
-      functional_manager_id: member?.functional_manager_id ?? '',
-      salary: member?.salary ?? '',
-      bonus: member?.bonus ?? '',
-      pto_used: member?.pto_used ?? '',
-      program_ids: member?.program_assignments?.map((pa) => String(pa.program_id)) ?? [],
-    },
+    defaultValues: buildDefaultValues(member),
   })
 
   const selectedAreaId = form.watch('functional_area_id')
@@ -101,27 +108,7 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
   // Reset form values when dialog opens with member data (edit) or without (add)
   useEffect(() => {
     if (!open) return
-    form.reset({
-      employee_id: member?.employee_id ?? '',
-      first_name: member?.first_name ?? '',
-      last_name: member?.last_name ?? '',
-      hire_date: member?.hire_date ?? '',
-      title: member?.title ?? '',
-      email: member?.email ?? '',
-      phone: member?.phone ?? '',
-      slack_handle: member?.slack_handle ?? '',
-      city: member?.city ?? '',
-      state: member?.state ?? '',
-      functional_area_id:
-        member?.functional_area_id != null ? String(member.functional_area_id) : null,
-      team_id: member?.team_id != null ? String(member.team_id) : null,
-      supervisor_id: member?.supervisor_id ?? '',
-      functional_manager_id: member?.functional_manager_id ?? '',
-      salary: member?.salary ?? '',
-      bonus: member?.bonus ?? '',
-      pto_used: member?.pto_used ?? '',
-      program_ids: member?.program_assignments?.map((pa) => String(pa.program_id)) ?? [],
-    })
+    form.reset(buildDefaultValues(member))
   }, [open, member])
 
   // ─── Submit ───────────────────────────────────────────────────────────────
@@ -215,6 +202,16 @@ export function useMemberForm({ member, onSuccess, onOpenChange, open }: UseMemb
             method: 'DELETE',
           })
         }
+      }
+
+      // Invalidate program member caches for all affected programs
+      const affectedProgramIds = new Set([...currentProgramIds, ...selectedProgramIds])
+      for (const id of affectedProgramIds) {
+        void qc.invalidateQueries({ queryKey: programKeys.members(id) })
+      }
+      if (affectedProgramIds.size > 0) {
+        void qc.invalidateQueries({ queryKey: programKeys.all })
+        void qc.invalidateQueries({ queryKey: memberKeys.all })
       }
 
       onSuccess?.()

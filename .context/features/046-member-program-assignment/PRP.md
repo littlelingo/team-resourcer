@@ -1,6 +1,6 @@
 # PRP: Display & Edit Program Assignments on Member Detail
 
-## Status: APPROVED
+## Status: COMPLETE
 
 ## Context
 

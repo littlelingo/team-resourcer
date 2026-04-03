@@ -81,7 +81,8 @@ export function useAssignProgram() {
         method: "POST",
         body: JSON.stringify({ member_uuid: memberUuid, program_id: programId }),
       }),
-    onSuccess: () => {
+    onSuccess: (_data, { programId }) => {
+      void qc.invalidateQueries({ queryKey: programKeys.members(programId) })
       void qc.invalidateQueries({ queryKey: programKeys.all })
       void qc.invalidateQueries({ queryKey: memberKeys.all })
     },
@@ -95,7 +96,8 @@ export function useUnassignProgram() {
       apiFetch<void>(`/api/programs/${programId}/assignments/${memberUuid}`, {
         method: "DELETE",
       }),
-    onSuccess: () => {
+    onSuccess: (_data, { programId }) => {
+      void qc.invalidateQueries({ queryKey: programKeys.members(programId) })
       void qc.invalidateQueries({ queryKey: programKeys.all })
       void qc.invalidateQueries({ queryKey: memberKeys.all })
     },

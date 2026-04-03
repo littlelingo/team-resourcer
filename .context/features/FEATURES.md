@@ -42,10 +42,10 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 036 | member-card-employee-id-label | implemented | `.context/features/036-member-card-employee-id-label/` |
 | 037 | defensive-formatting-pattern | implemented | `.context/features/037-defensive-formatting-pattern/` |
 | 038 | backend-frontend-sync-comments | implemented | `.context/features/038-backend-frontend-sync-comments/` |
-| 044 | member-card-eid-text-label | APPROVED | `.context/features/044-member-card-eid-text-label/` |
-| 045 | edit-member-form-prefill | APPROVED | `.context/features/045-edit-member-form-prefill/` |
-| 046 | member-program-assignment | APPROVED | `.context/features/046-member-program-assignment/` |
-| 047 | entity-member-management | APPROVED | `.context/features/047-entity-member-management/` |
+| 044 | member-card-eid-text-label | COMPLETE | `.context/features/044-member-card-eid-text-label/` |
+| 045 | edit-member-form-prefill | COMPLETE | `.context/features/045-edit-member-form-prefill/` |
+| 046 | member-program-assignment | COMPLETE | `.context/features/046-member-program-assignment/` |
+| 047 | entity-member-management | COMPLETE | `.context/features/047-entity-member-management/` |
 | 048 | team-assignment-display | COMPLETE | `.context/features/048-team-assignment-display/` |
 | 049 | searchable-select | COMPLETE | `.context/features/049-searchable-select/` |
 | 050 | member-field-visibility | COMPLETE | `.context/features/050-member-field-visibility/` |

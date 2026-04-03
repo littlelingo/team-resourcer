@@ -1,6 +1,6 @@
 # PRP: Add "Employee Id" Label to Detail View Badge
 
-## Status: APPROVED
+## Status: COMPLETE
 
 ## Context
 

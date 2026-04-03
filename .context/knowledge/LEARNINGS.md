@@ -18,6 +18,16 @@ Adding a field to a Pydantic `ListResponse` schema that is used **both** as a li
 
 **Mitigation**: Use `= 0` defaults for additive fields. Accept that embedded usages will show the default value. Tests need updating for the new shape.
 
+## 2026-04-03: TanStack Query granular key invalidation (features 046/047)
+
+When using hierarchical query keys like `["programs", "members", id]`, invalidating the parent prefix `["programs"]` does NOT automatically invalidate child keys unless you use `{ queryKey: ["programs"], exact: false }` (which is the default). However, keys like `["programs", "list"]` and `["programs", "members", 1]` are siblings, not parent-child — invalidating `programKeys.all` (`["programs"]`) covers `list` but NOT `members(id)` because TanStack Query's prefix matching considers array position.
+
+**Rule**: Always invalidate the specific query key (`programKeys.members(id)`) in addition to broader keys. Raw `apiFetch` calls in form submit handlers bypass mutation hook `onSuccess` invalidation — either use the mutation hooks' `mutateAsync` or manually invalidate affected keys after the loop.
+
+## 2026-04-03: Extract duplicated React Hook Form defaultValues (feature 045)
+
+When a form uses both `useForm({ defaultValues })` and a `useEffect` with `form.reset(...)`, the values object is often duplicated verbatim. Extract into a `buildDefaultValues(entity?)` helper to ensure both paths stay in sync. Missing a field in one location causes silent bugs: the form either doesn't prefill on first open or doesn't reset correctly on subsequent opens.
+
 ## 2026-04-03: Scoped exclusion for multi-role entities in tree graphs (feature 053)
 
 When excluding entities from one context (e.g., a team lead from member nodes), scope the exclusion to only the specific relationship. A naive `if uuid in lead_set: skip` would hide the person from ALL teams, breaking the case where they lead Team A but are a regular member of Team B.

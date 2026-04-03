@@ -1,6 +1,6 @@
 # PRP: Add/Remove Members from Entity Tabs
 
-## Status: APPROVED
+## Status: COMPLETE
 
 ## Context
 

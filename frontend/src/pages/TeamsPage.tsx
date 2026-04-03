@@ -182,6 +182,7 @@ export default function TeamsPage() {
             { onError: (err) => toast.error(err.message) },
           )
         }}
+        leadId={selectedTeam?.lead_id}
       />
 
       {/* Import dialog */}

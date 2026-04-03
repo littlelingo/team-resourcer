@@ -16,6 +16,7 @@ interface EntityMembersSheetProps {
   allMembers: TeamMemberList[]
   onAdd: (memberUuid: string) => void
   onRemove: (memberUuid: string) => void
+  leadId?: string | null
 }
 
 export default function EntityMembersSheet({
@@ -27,6 +28,7 @@ export default function EntityMembersSheet({
   allMembers,
   onAdd,
   onRemove,
+  leadId,
 }: EntityMembersSheetProps) {
   const [adding, setAdding] = useState(false)
 
@@ -127,7 +129,14 @@ export default function EntityMembersSheet({
                       </Avatar.Fallback>
                     </Avatar.Root>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-900 truncate">{`${member.first_name} ${member.last_name}`}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium text-slate-900 truncate">{`${member.first_name} ${member.last_name}`}</p>
+                        {leadId && member.uuid === leadId && (
+                          <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 flex-shrink-0">
+                            Lead
+                          </span>
+                        )}
+                      </div>
                       {member.title && (
                         <p className="text-xs text-slate-500 truncate">{member.title}</p>
                       )}

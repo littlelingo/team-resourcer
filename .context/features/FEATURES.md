@@ -51,3 +51,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 050 | member-field-visibility | COMPLETE | `.context/features/050-member-field-visibility/` |
 | 051 | program-member-count | COMPLETE | `.context/features/051-program-member-count/` |
 | 052 | entity-member-counts | COMPLETE | `.context/features/052-entity-member-counts/` |
+| 053 | tree-lead-on-team-node | researched | `.context/features/053-tree-lead-on-team-node/` |

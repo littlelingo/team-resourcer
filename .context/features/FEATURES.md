@@ -54,4 +54,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 053 | tree-lead-on-team-node | COMPLETE | `.context/features/053-tree-lead-on-team-node/` |
 | 054 | team-lead-badge | COMPLETE | `.context/features/054-team-lead-badge/` |
 | 055 | program-tree-area-grouping | COMPLETE | `.context/features/055-program-tree-area-grouping/` |
-| 056 | multi-program-member-import | researched | `.context/features/056-multi-program-member-import/` |
+| 056 | multi-program-member-import | APPROVED | `.context/features/056-multi-program-member-import/` (PRP.md) |

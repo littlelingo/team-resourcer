@@ -50,12 +50,12 @@ Allow a member to belong to more than one program, supported end-to-end: CSV imp
 - **Role semantics drift**: single role applied to all programs means editing one program's role post-import diverges from the CSV. This is by user decision — document it.
 - **Tree duplication**: if a member appears under multiple programs in the tree, member counts (feature 051) may need to clarify "unique vs. appearance" counts to avoid double-counting.
 
-## Open Questions
+## Resolved Questions (round 2)
 
-1. **program_team column in CSV**: with `program_team_id` in scope, how does the CSV express team per program? Likely a parallel semicolon list (`"Alpha; Beta"` + `"Team1; Team2"` positionally aligned). Or just skip team assignment at import and let users set via the edit form?
-2. **Visual direction for multi-program in the tree**: (a) duplicate member node under each program (clearest, but inflates counts), (b) single node with multi-badge and a primary program, or (c) group members by "primary program" with secondary badges?
-3. **Preview/dry-run UX**: should the import preview call out unassignments explicitly as a "will remove" warning list, or is a silent diff acceptable?
-4. **Backwards compatibility**: existing import files that use a single `program_name` column (no delimiter) — do they continue to work unchanged? (Should: a cell with no `;` is a single-element list.)
+1. **program_team CSV**: parallel `;`-list — `program_names` = `"Alpha; Beta"` paired positionally with `program_team_names` = `"TeamA; TeamB"`. Team column is **optional**; import must succeed when it is absent or partially blank (blank token → no team on that program).
+2. **Tree visual**: single node with a multi-program badge (e.g., "×3" or stacked pills). Member appears once; counts stay accurate. No duplication under each program.
+3. **Preview UX**: dry-run must explicitly surface unassignments as a "will remove" warning list per member. Cannot be silent.
+4. **Backwards compat**: a cell without `;` must continue to import as a single-program assignment, unchanged. No user-visible regression for existing CSVs.
 
 ## Next
 `/planner .context/features/056-multi-program-member-import/NOTES.md`

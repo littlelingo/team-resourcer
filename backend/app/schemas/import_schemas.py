@@ -33,6 +33,7 @@ class MappingConfig(BaseModel):
     session_id: str
     column_map: dict[str, str | None]
     entity_type: EntityType = "member"
+    compute_unassignments: bool = False
 
 
 class MappedRow(BaseModel):
@@ -40,6 +41,7 @@ class MappedRow(BaseModel):
     data: dict[str, Any]
     errors: list[str]
     warnings: list[str]
+    unassignments: list[str] = []
 
 
 class MappedPreviewResult(BaseModel):

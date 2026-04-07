@@ -1,4 +1,4 @@
-employee_id,first_name,last_name,title,city,state,email,phone,slack_handle,salary,bonus,pto_used,functional_area_name,team_name,program_name,supervisor_employee_id,program_role
+employee_id,first_name,last_name,title,city,state,email,phone,slack_handle,salary,bonus,pto_used,functional_area_name,team_name,program_names,supervisor_employee_id,program_role
 EMP001,Alice,Smith,Engineer,New York,NY,alice@example.com,555-0001,@alice,120000,10000,5.0,Engineering,Backend,Alpha,,
 EMP002,Bob,Jones,Designer,London,,bob@example.com,555-0002,@bob,95000,8000,3.5,Design,UX,Beta,EMP001,
 EMP003,Carol,White,Manager,Chicago,IL,carol@example.com,555-0003,@carol,140000,15000,2.0,Engineering,Backend,Alpha,,Lead

@@ -9,6 +9,7 @@ export type MemberNodeData = {
   title?: string | null
   image_path?: string | null
   role?: string | null
+  program_count?: number | null
   onSelect?: (uuid: string) => void
 }
 
@@ -49,6 +50,14 @@ export default function MemberNode({ data }: NodeProps<MemberNodeType>) {
           {data.role && (
             <span className="mt-1 inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
               {data.role}
+            </span>
+          )}
+          {data.program_count != null && data.program_count > 1 && (
+            <span
+              className="mt-1 inline-block rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700"
+              title={`Member of ${data.program_count} programs`}
+            >
+              &times;{data.program_count}
             </span>
           )}
         </div>

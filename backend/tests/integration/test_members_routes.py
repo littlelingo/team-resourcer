@@ -3,7 +3,9 @@ import uuid as uuid_mod
 from app.models.functional_area import FunctionalArea
 from app.models.program import Program
 from app.models.program_assignment import ProgramAssignment
+from app.models.program_team import ProgramTeam
 from app.models.team import Team
+from app.models.team_member import TeamMember
 
 
 async def test_list_members_empty(client, area):
@@ -257,3 +259,42 @@ async def test_list_members_no_team_returns_null(client, area):
     member = next(m for m in resp.json() if m["uuid"] == member_uuid)
     assert member["team"] is None
     assert member["program_assignments"] == []
+
+
+# ─── Feature 056: program_assignments eager-load on list endpoint ─────────────
+
+
+async def test_list_members_returns_program_assignments(client, db_session, area):
+    """List endpoint returns program_assignments with nested program and program_team."""
+    # Create member and program via DB directly for precise control
+    member = TeamMember(
+        employee_id="PA_LIST_001",
+        first_name="Eager",
+        last_name="Load",
+        functional_area_id=area.id,
+    )
+    db_session.add(member)
+    await db_session.flush()
+
+    prog = Program(name="EagerProg")
+    db_session.add(prog)
+    await db_session.flush()
+
+    pt = ProgramTeam(program_id=prog.id, name="EagerTeam")
+    db_session.add(pt)
+    await db_session.flush()
+
+    pa = ProgramAssignment(member_uuid=member.uuid, program_id=prog.id, role="Dev", program_team_id=pt.id)
+    db_session.add(pa)
+    await db_session.flush()
+    await db_session.commit()
+
+    resp = await client.get("/api/members/")
+    assert resp.status_code == 200
+    found = next((m for m in resp.json() if m["employee_id"] == "PA_LIST_001"), None)
+    assert found is not None, "Member not found in list"
+    assert len(found["program_assignments"]) == 1
+    pa_resp = found["program_assignments"][0]
+    assert pa_resp["program"]["name"] == "EagerProg"
+    assert pa_resp["program_team"]["name"] == "EagerTeam"
+    assert pa_resp["role"] == "Dev"

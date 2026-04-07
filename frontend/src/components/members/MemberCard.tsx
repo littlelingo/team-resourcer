@@ -101,14 +101,25 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
             {member.team.name}
           </span>
         )}
-        {member.program_assignments?.map((pa, i) => (
+        {member.program_assignments?.slice(0, 2).map((pa, i) => (
           <span
             key={i}
             className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600"
           >
             {pa.program?.name ?? `Program ${i + 1}`}
+            {pa.program_team && (
+              <span className="ml-1 text-slate-400">· {pa.program_team.name}</span>
+            )}
           </span>
         ))}
+        {(member.program_assignments?.length ?? 0) > 2 && (
+          <span
+            className="inline-flex items-center rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-500 cursor-default"
+            title={member.program_assignments!.slice(2).map((pa) => pa.program?.name ?? '').join(', ')}
+          >
+            +{member.program_assignments!.length - 2} more
+          </span>
+        )}
       </div>
 
       {/* Location */}

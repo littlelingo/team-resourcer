@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Index, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Index, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -54,4 +54,7 @@ class ProgramTeam(Base):
         foreign_keys="ProgramAssignment.program_team_id",
     )
 
-    __table_args__ = (Index("ix_program_teams_program_id", "program_id"),)
+    __table_args__ = (
+        Index("ix_program_teams_program_id", "program_id"),
+        UniqueConstraint("program_id", "name", name="uq_program_teams_program_id_name"),
+    )

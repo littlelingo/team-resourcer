@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.member_history import MemberHistory
 from app.models.program import Program
+from app.models.program_assignment import ProgramAssignment
 from app.models.team_member import TeamMember
 from app.schemas.import_schemas import MappedRow
 from app.services.import_commit import (
@@ -18,6 +19,7 @@ from app.services.import_commit import (
     _append_history_if_changed,
     _get_or_create_functional_area,
     _get_or_create_program,
+    _get_or_create_program_team,
     _get_or_create_team,
     _upsert_program_assignment,
 )
@@ -52,11 +54,28 @@ async def _commit_members(
             team = await _get_or_create_team(db, str(team_name), functional_area_id)
             team_id = team.id
 
-        # Resolve Program
-        program_name = data.get("program_name")
-        program: Program | None = None
-        if program_name:
-            program = await _get_or_create_program(db, str(program_name))
+        # Resolve Programs (multi-program support)
+        # program_names is a list[str] after mapper normalization, or absent if not mapped
+        program_names_raw = data.get("program_names")
+        program_team_names_raw = data.get("program_team_names")
+        # Treat an empty/blank program_names cell as "no change" rather than mass-delete.
+        # Only mapped-AND-non-empty triggers replace semantics.
+        programs_mapped = bool(program_names_raw)
+
+        resolved_programs: list[tuple[Program, str | None]] = []
+        if program_names_raw:
+            program_names_list: list[str] = program_names_raw  # type: ignore[assignment]
+            # Build aligned team-name list; pad with None if program_team_names not mapped
+            if program_team_names_raw:
+                team_names_list: list[str | None] = list(program_team_names_raw)  # type: ignore[assignment]
+            else:
+                team_names_list = [None] * len(program_names_list)
+
+            for prog_name, team_name in zip(program_names_list, team_names_list):
+                if not prog_name:
+                    continue
+                prog = await _get_or_create_program(db, prog_name)
+                resolved_programs.append((prog, team_name if team_name else None))
 
         # Look up existing member by employee_id
         result = await db.execute(select(TeamMember).where(TeamMember.employee_id == emp_id))
@@ -80,6 +99,10 @@ async def _commit_members(
         else:
             updated_count += 1
 
+        # `member` is non-None at this point: either freshly created in the
+        # `if is_new` branch, or fetched as a non-None row in the `else` branch
+        # (is_new = member is None). The assert narrows the type for mypy.
+        assert member is not None
         employee_id_to_uuid[emp_id] = member.uuid
 
         scalar_fields = [
@@ -117,11 +140,32 @@ async def _commit_members(
 
         await db.flush()
 
-        if program is not None:
+        if programs_mapped:
+            # program_names column was mapped — apply upserts and replace semantics
             role = data.get("program_role")
-            await _upsert_program_assignment(
-                db, member.uuid, program.id, str(role) if role else None
+            role_str = str(role) if role else None
+            incoming_program_ids: set[int] = set()
+
+            for prog, team_name in resolved_programs:
+                incoming_program_ids.add(prog.id)
+                # Resolve or create program team if team_name supplied
+                pt_id: int | None = None
+                if team_name:
+                    pt = await _get_or_create_program_team(db, prog.id, team_name)
+                    pt_id = pt.id
+                await _upsert_program_assignment(db, member.uuid, prog.id, role_str, pt_id)
+
+            # Replace semantics: delete assignments for programs NOT in incoming set
+            existing_result = await db.execute(
+                select(ProgramAssignment).where(
+                    ProgramAssignment.member_uuid == member.uuid
+                )
             )
+            existing_assignments = existing_result.scalars().all()
+            for existing_pa in existing_assignments:
+                if existing_pa.program_id not in incoming_program_ids:
+                    await db.delete(existing_pa)
+            await db.flush()
 
     # Second pass: resolve supervisor_employee_id FKs
     await resolve_supervisors(db, deduped_valid, employee_id_to_uuid, error_rows)

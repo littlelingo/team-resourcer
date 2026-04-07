@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { AlertCircle, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { commitImport } from '@/api/importApi'
+import { commitImport, previewMapping } from '@/api/importApi'
 import type { MappedPreviewResult, MappedRow, CommitResult, MappingConfig, EntityType } from '@/api/importApi'
 import { memberKeys } from '@/hooks/useMembers'
 import { programKeys } from '@/hooks/usePrograms'
@@ -33,7 +33,34 @@ export default function PreviewStep({
   const [page, setPage] = useState(0)
   const queryClient = useQueryClient()
 
-  const { rows, error_count } = mappedPreview
+  // Mirror the prop into local state so we can enrich it with unassignment
+  // diffs without round-tripping to the parent. The parent never needs
+  // unassignments — they're commit-time UX only.
+  const [enrichedPreview, setEnrichedPreview] = useState<MappedPreviewResult>(mappedPreview)
+
+  // On entry (member imports only), refetch the preview with
+  // compute_unassignments=true so the destructive replace-semantics deltas
+  // appear in the table before the user clicks Import. Cheap-path previews
+  // skip this DB hit during the mapping iteration loop.
+  useEffect(() => {
+    if (entityType !== 'member') return
+    let cancelled = false
+    void previewMapping({
+      session_id: sessionId,
+      column_map: columnMap,
+      entity_type: entityType,
+      compute_unassignments: true,
+    }).then((data) => {
+      if (!cancelled) setEnrichedPreview(data)
+    })
+    return () => {
+      cancelled = true
+    }
+    // Only run on mount/sessionId change — the column_map is locked once we're in PreviewStep.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, entityType])
+
+  const { rows, error_count } = enrichedPreview
   const importableRows = rows.filter((r) => r.errors.length === 0)
   const totalPages = Math.ceil(rows.length / PAGE_SIZE)
   const pageRows = rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
@@ -190,45 +217,59 @@ export default function PreviewStep({
 
 function PreviewRow({ row, columns }: { row: MappedRow; columns: string[] }) {
   const hasError = row.errors.length > 0
+  const hasUnassignments = (row.unassignments?.length ?? 0) > 0
 
   return (
-    <tr className={cn(hasError && 'opacity-50')}>
-      <td className="px-3 py-1.5 text-slate-400">{row.index}</td>
-      <td className="px-3 py-1.5">
-        {hasError ? (
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <AlertCircle className="h-3.5 w-3.5 text-red-500 cursor-help" />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content
-                side="right"
-                className="z-50 max-w-xs rounded-md bg-slate-900 px-2.5 py-1.5 text-xs text-white shadow-lg"
-              >
-                {row.errors.join('; ')}
-                <Tooltip.Arrow className="fill-slate-900" />
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        ) : (
-          <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-        )}
-      </td>
-      {columns.map((col) => {
-        const value = row.data[col]
-        const cellError = hasError
-        return (
-          <td
-            key={col}
-            className={cn(
-              'px-3 py-1.5 whitespace-nowrap',
-              cellError ? 'bg-red-50' : 'bg-green-50',
-            )}
-          >
-            {value !== undefined && value !== null ? String(value) : ''}
+    <>
+      <tr className={cn(hasError && 'opacity-50')}>
+        <td className="px-3 py-1.5 text-slate-400">{row.index}</td>
+        <td className="px-3 py-1.5">
+          {hasError ? (
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <AlertCircle className="h-3.5 w-3.5 text-red-500 cursor-help" />
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  side="right"
+                  className="z-50 max-w-xs rounded-md bg-slate-900 px-2.5 py-1.5 text-xs text-white shadow-lg"
+                >
+                  {row.errors.join('; ')}
+                  <Tooltip.Arrow className="fill-slate-900" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          ) : (
+            <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+          )}
+        </td>
+        {columns.map((col) => {
+          const value = row.data[col]
+          const cellError = hasError
+          return (
+            <td
+              key={col}
+              className={cn(
+                'px-3 py-1.5 whitespace-nowrap',
+                cellError ? 'bg-red-50' : 'bg-green-50',
+              )}
+            >
+              {Array.isArray(value) ? value.join('; ') : value !== undefined && value !== null ? String(value) : ''}
+            </td>
+          )
+        })}
+      </tr>
+      {hasUnassignments && (
+        <tr>
+          <td />
+          <td colSpan={columns.length + 1} className="px-3 pb-1.5">
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-xs font-medium text-amber-700">
+              <AlertCircle className="h-3 w-3 flex-shrink-0" />
+              Will unassign: {row.unassignments!.join(', ')}
+            </span>
           </td>
-        )
-      })}
-    </tr>
+        </tr>
+      )}
+    </>
   )
 }

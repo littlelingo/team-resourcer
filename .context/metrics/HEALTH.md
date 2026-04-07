@@ -15,6 +15,8 @@
 | 047 | entity-member-management | 2026-04-02 | 2026-04-03 | 1d | 8 | 1 | 0 |
 | 056 | multi-program-member-import | 2026-04-06 | 2026-04-06 | 0d | 5 | 1 | 0 |
 
+Note: Feature 056 had 3 critical and 2 warning findings from code review — all fixed before commit. Two pre-existing project patterns (E402 from __future__ docstring, TeamMember | None narrowing) propagated to new code; tracked as project-wide tech debt, not feature regressions.
+
 ## Error Tracking
 
 | Total Indexed | Hits | Novel | Repeats | Hit Rate |

@@ -110,4 +110,35 @@ describe('MemberCard', () => {
     expect(screen.getByText('Edit')).toBeInTheDocument()
     expect(screen.getByText('Delete')).toBeInTheDocument()
   })
+
+  it('shows first 2 program badges and +N more chip when member has more than 2 programs', () => {
+    const member = {
+      ...baseMember,
+      program_assignments: [
+        { member_uuid: 'uuid-1', program_id: 1, program: { id: 1, name: 'Alpha' }, role: null },
+        { member_uuid: 'uuid-1', program_id: 2, program: { id: 2, name: 'Beta' }, role: null },
+        { member_uuid: 'uuid-1', program_id: 3, program: { id: 3, name: 'Gamma' }, role: null },
+      ],
+    }
+    render(<MemberCard {...defaultProps} member={member} />)
+    expect(screen.getByText('Alpha')).toBeInTheDocument()
+    expect(screen.getByText('Beta')).toBeInTheDocument()
+    expect(screen.queryByText('Gamma')).toBeNull()
+    expect(screen.getByText('+1 more')).toBeInTheDocument()
+    expect(screen.getByTitle('Gamma')).toBeInTheDocument()
+  })
+
+  it('does not show +N more chip when member has 2 or fewer programs', () => {
+    const member = {
+      ...baseMember,
+      program_assignments: [
+        { member_uuid: 'uuid-1', program_id: 1, program: { id: 1, name: 'Alpha' }, role: null },
+        { member_uuid: 'uuid-1', program_id: 2, program: { id: 2, name: 'Beta' }, role: null },
+      ],
+    }
+    render(<MemberCard {...defaultProps} member={member} />)
+    expect(screen.getByText('Alpha')).toBeInTheDocument()
+    expect(screen.getByText('Beta')).toBeInTheDocument()
+    expect(screen.queryByText(/\+\d+ more/)).toBeNull()
+  })
 })

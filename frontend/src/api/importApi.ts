@@ -16,6 +16,7 @@ export interface MappingConfig {
   session_id: string
   column_map: Record<string, string | null>
   entity_type?: EntityType
+  compute_unassignments?: boolean
 }
 
 export interface MappedRow {
@@ -23,6 +24,7 @@ export interface MappedRow {
   data: Record<string, unknown>
   errors: string[]
   warnings: string[]
+  unassignments?: string[]
 }
 
 export interface MappedPreviewResult {

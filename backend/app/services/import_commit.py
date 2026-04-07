@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Commit mapped import rows to the database, handling upserts and history."""
+
+from __future__ import annotations
 
 from datetime import date
 from decimal import Decimal, InvalidOperation
@@ -14,6 +14,7 @@ from app.models.functional_area import FunctionalArea
 from app.models.member_history import MemberHistory
 from app.models.program import Program
 from app.models.program_assignment import ProgramAssignment
+from app.models.program_team import ProgramTeam
 from app.models.team import Team
 from app.models.team_member import TeamMember
 from app.schemas.import_schemas import CommitResult, MappedRow, MappingConfig
@@ -64,10 +65,49 @@ async def _get_or_create_program(db: AsyncSession, name: str) -> Program:
     return program
 
 
+async def _get_or_create_program_team(
+    db: AsyncSession, program_id: int, name: str
+) -> ProgramTeam:
+    """Fetch a program team by (program_id, name) or create it if it does not exist.
+
+    Concurrency: defended by the unique constraint on (program_id, name); on a
+    race we catch IntegrityError and re-fetch.
+    """
+    from sqlalchemy.exc import IntegrityError
+
+    result = await db.execute(
+        select(ProgramTeam).where(ProgramTeam.program_id == program_id, ProgramTeam.name == name)
+    )
+    program_team = result.scalar_one_or_none()
+    if program_team is not None:
+        return program_team
+    program_team = ProgramTeam(program_id=program_id, name=name)
+    db.add(program_team)
+    try:
+        await db.flush()
+    except IntegrityError:
+        await db.rollback()
+        result = await db.execute(
+            select(ProgramTeam).where(
+                ProgramTeam.program_id == program_id, ProgramTeam.name == name
+            )
+        )
+        program_team = result.scalar_one()
+    return program_team
+
+
 async def _upsert_program_assignment(
-    db: AsyncSession, member_uuid: Any, program_id: int, role: str | None
+    db: AsyncSession,
+    member_uuid: Any,
+    program_id: int,
+    role: str | None,
+    program_team_id: int | None = None,
 ) -> None:
-    """Insert or update a program assignment for a member."""
+    """Insert or update a program assignment for a member.
+
+    program_team_id is written unconditionally on update (None clears it).
+    Callers from the import path should pass the desired final value.
+    """
     result = await db.execute(
         select(ProgramAssignment).where(
             ProgramAssignment.member_uuid == member_uuid,
@@ -76,10 +116,17 @@ async def _upsert_program_assignment(
     )
     assignment = result.scalar_one_or_none()
     if assignment is None:
-        assignment = ProgramAssignment(member_uuid=member_uuid, program_id=program_id, role=role)
+        assignment = ProgramAssignment(
+            member_uuid=member_uuid,
+            program_id=program_id,
+            role=role,
+            program_team_id=program_team_id,
+        )
         db.add(assignment)
-    elif role is not None:
-        assignment.role = role
+    else:
+        if role is not None:
+            assignment.role = role
+        assignment.program_team_id = program_team_id
     await db.flush()
 
 

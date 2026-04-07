@@ -4,7 +4,7 @@ import pytest
 
 import app.services.import_session as sess_mod
 from app.schemas.import_schemas import MappingConfig
-from app.services.import_mapper import apply_mapping
+from app.services.import_mapper import _split_semicolon_list, apply_mapping
 from app.services.import_parser import parse_upload
 from app.services.import_session import SessionNotFoundError, create_session
 
@@ -148,3 +148,107 @@ def test_apply_mapping_from_duplicate_csv_fixture():
     result = apply_mapping(sid, config)
     assert result.warning_count == 1
     assert any("EMP020" in w for w in result.rows[1].warnings)
+
+
+# ─── Feature 056: Multi-program import tests ──────────────────────────────────
+
+
+def test_split_semicolon_list_basic():
+    assert _split_semicolon_list("Alpha; Beta") == ["Alpha", "Beta"]
+
+
+def test_split_semicolon_list_strips_and_drops_empties():
+    assert _split_semicolon_list("; Alpha;;Beta;") == ["Alpha", "Beta"]
+
+
+def test_split_semicolon_list_single_no_semicolon():
+    """A cell with no semicolon returns a single-element list (backward compat)."""
+    assert _split_semicolon_list("Alpha") == ["Alpha"]
+
+
+def test_split_semicolon_list_empty_string():
+    assert _split_semicolon_list("") == []
+
+
+def test_split_semicolon_list_whitespace_only():
+    assert _split_semicolon_list("   ") == []
+
+
+def test_apply_mapping_program_names_normalized_to_list():
+    rows = [{"id": "EMP001", "fn": "Alice", "ln": "Smith", "pg": "Alpha; Beta"}]
+    sid = create_session(rows, ["id", "fn", "ln", "pg"])
+    config = make_config(
+        sid,
+        {"id": "employee_id", "fn": "first_name", "ln": "last_name", "pg": "program_names"},
+    )
+    result = apply_mapping(sid, config)
+    assert result.error_count == 0
+    assert result.rows[0].data["program_names"] == ["Alpha", "Beta"]
+
+
+def test_apply_mapping_program_names_single_backward_compat():
+    """Single program name without semicolon → list with one element."""
+    rows = [{"id": "EMP001", "fn": "Alice", "ln": "Smith", "pg": "Alpha"}]
+    sid = create_session(rows, ["id", "fn", "ln", "pg"])
+    config = make_config(
+        sid,
+        {"id": "employee_id", "fn": "first_name", "ln": "last_name", "pg": "program_names"},
+    )
+    result = apply_mapping(sid, config)
+    assert result.error_count == 0
+    assert result.rows[0].data["program_names"] == ["Alpha"]
+
+
+def test_apply_mapping_program_team_names_normalized_to_list():
+    rows = [{"id": "EMP001", "fn": "Alice", "ln": "Smith", "pg": "Alpha; Beta", "pt": "T1; T2"}]
+    sid = create_session(rows, ["id", "fn", "ln", "pg", "pt"])
+    config = make_config(
+        sid,
+        {
+            "id": "employee_id",
+            "fn": "first_name",
+            "ln": "last_name",
+            "pg": "program_names",
+            "pt": "program_team_names",
+        },
+    )
+    result = apply_mapping(sid, config)
+    assert result.error_count == 0
+    assert result.rows[0].data["program_team_names"] == ["T1", "T2"]
+
+
+def test_apply_mapping_program_list_length_mismatch_is_error():
+    """Mismatched lengths between program_names and program_team_names → row error."""
+    rows = [{"id": "EMP001", "fn": "Alice", "ln": "Smith", "pg": "Alpha; Beta", "pt": "T1"}]
+    sid = create_session(rows, ["id", "fn", "ln", "pg", "pt"])
+    config = make_config(
+        sid,
+        {
+            "id": "employee_id",
+            "fn": "first_name",
+            "ln": "last_name",
+            "pg": "program_names",
+            "pt": "program_team_names",
+        },
+    )
+    result = apply_mapping(sid, config)
+    assert result.error_count == 1
+    assert any("align positionally" in e for e in result.rows[0].errors)
+
+
+def test_apply_mapping_program_list_same_length_no_error():
+    """Matching lengths between program_names and program_team_names → no error."""
+    rows = [{"id": "EMP001", "fn": "Alice", "ln": "Smith", "pg": "Alpha; Beta", "pt": "T1; T2"}]
+    sid = create_session(rows, ["id", "fn", "ln", "pg", "pt"])
+    config = make_config(
+        sid,
+        {
+            "id": "employee_id",
+            "fn": "first_name",
+            "ln": "last_name",
+            "pg": "program_names",
+            "pt": "program_team_names",
+        },
+    )
+    result = apply_mapping(sid, config)
+    assert result.error_count == 0

@@ -1,10 +1,13 @@
 from decimal import Decimal
 
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 import app.services.import_session as sess_mod
 from app.models.functional_area import FunctionalArea
 from app.models.member_history import MemberHistory
+from app.models.program import Program
+from app.models.program_assignment import ProgramAssignment
 from app.models.team import Team
 from app.models.team_member import TeamMember
 from app.schemas.import_schemas import MappingConfig
@@ -277,3 +280,146 @@ async def test_existing_member_same_salary_no_history(db_session, area):
         )
     ).scalars().all()
     assert history == []
+
+
+# ─── Feature 056: Multi-program member import ─────────────────────────────────
+
+
+async def test_commit_multi_program_creates_multiple_assignments(db_session):
+    """Importing a member with two programs creates two ProgramAssignment rows."""
+    rows = [{"id": "MP_001", "fn": "Bob", "ln": "Multi", "pg": "Alpha; Beta"}]
+    sid = create_session(rows, ["id", "fn", "ln", "pg"])
+    config = make_commit_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name", "pg": "program_names"}
+    )
+    result = await commit_import(sid, config, db_session)
+    assert result.created_count == 1
+
+    member = (
+        await db_session.execute(select(TeamMember).where(TeamMember.employee_id == "MP_001"))
+    ).scalar_one()
+    assignments = (
+        await db_session.execute(
+            select(ProgramAssignment).where(ProgramAssignment.member_uuid == member.uuid)
+        )
+    ).scalars().all()
+    assert len(assignments) == 2
+    # Verify both programs were created
+    program_names_result = set()
+    for pa in assignments:
+        prog = (
+            await db_session.execute(select(Program).where(Program.id == pa.program_id))
+        ).scalar_one()
+        program_names_result.add(prog.name)
+    assert program_names_result == {"Alpha", "Beta"}
+
+
+async def test_commit_multi_program_replace_semantics_unassigns_dropped_program(db_session, area):
+    """Re-importing a member with fewer programs unassigns the dropped ones."""
+    # Setup: member already has Alpha and Beta
+    member = TeamMember(
+        employee_id="MP_REPLACE_001", first_name="Alice", last_name="Rep",
+        functional_area_id=area.id,
+    )
+    db_session.add(member)
+    await db_session.flush()
+
+    alpha = Program(name="AlphaReplace")
+    beta = Program(name="BetaReplace")
+    db_session.add_all([alpha, beta])
+    await db_session.flush()
+
+    db_session.add(ProgramAssignment(member_uuid=member.uuid, program_id=alpha.id))
+    db_session.add(ProgramAssignment(member_uuid=member.uuid, program_id=beta.id))
+    await db_session.flush()
+
+    # Re-import with only Alpha
+    rows = [{"id": "MP_REPLACE_001", "fn": "Alice", "ln": "Rep", "pg": "AlphaReplace"}]
+    sid = create_session(rows, ["id", "fn", "ln", "pg"])
+    config = make_commit_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name", "pg": "program_names"}
+    )
+    await commit_import(sid, config, db_session)
+
+    assignments = (
+        await db_session.execute(
+            select(ProgramAssignment).where(ProgramAssignment.member_uuid == member.uuid)
+        )
+    ).scalars().all()
+    assert len(assignments) == 1
+    remaining_prog = (
+        await db_session.execute(select(Program).where(Program.id == assignments[0].program_id))
+    ).scalar_one()
+    assert remaining_prog.name == "AlphaReplace"
+
+
+async def test_commit_no_program_column_mapped_preserves_existing_assignments(db_session, area):
+    """When program_names is not in the column map, existing assignments are untouched."""
+    member = TeamMember(
+        employee_id="MP_PRESERVE_001", first_name="Carol", last_name="Pres",
+        functional_area_id=area.id,
+    )
+    db_session.add(member)
+    await db_session.flush()
+
+    prog = Program(name="PreserveProgram")
+    db_session.add(prog)
+    await db_session.flush()
+    db_session.add(ProgramAssignment(member_uuid=member.uuid, program_id=prog.id))
+    await db_session.flush()
+
+    # Import without mapping program_names column
+    rows = [{"id": "MP_PRESERVE_001", "fn": "Carol", "ln": "Pres"}]
+    sid = create_session(rows, ["id", "fn", "ln"])
+    config = make_commit_config(
+        sid, {"id": "employee_id", "fn": "first_name", "ln": "last_name"}
+    )
+    await commit_import(sid, config, db_session)
+
+    assignments = (
+        await db_session.execute(
+            select(ProgramAssignment).where(ProgramAssignment.member_uuid == member.uuid)
+        )
+    ).scalars().all()
+    assert len(assignments) == 1, "Existing assignment must be preserved when program_names not mapped"
+
+
+async def test_commit_program_team_assigned_via_import(db_session):
+    """Importing with program_team_names links the program team to the assignment."""
+    from app.models.program_team import ProgramTeam
+
+    rows = [
+        {
+            "id": "MP_PT_001",
+            "fn": "Dave",
+            "ln": "Team",
+            "pg": "TeamProg",
+            "pt": "SquadA",
+        }
+    ]
+    sid = create_session(rows, ["id", "fn", "ln", "pg", "pt"])
+    config = make_commit_config(
+        sid,
+        {
+            "id": "employee_id",
+            "fn": "first_name",
+            "ln": "last_name",
+            "pg": "program_names",
+            "pt": "program_team_names",
+        },
+    )
+    await commit_import(sid, config, db_session)
+
+    member = (
+        await db_session.execute(select(TeamMember).where(TeamMember.employee_id == "MP_PT_001"))
+    ).scalar_one()
+    assignment = (
+        await db_session.execute(
+            select(ProgramAssignment).where(ProgramAssignment.member_uuid == member.uuid)
+        )
+    ).scalar_one()
+    assert assignment.program_team_id is not None
+    pt = (
+        await db_session.execute(select(ProgramTeam).where(ProgramTeam.id == assignment.program_team_id))
+    ).scalar_one()
+    assert pt.name == "SquadA"

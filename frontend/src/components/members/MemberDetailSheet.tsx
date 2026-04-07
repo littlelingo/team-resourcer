@@ -196,6 +196,9 @@ export default function MemberDetailSheet({
                         className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700"
                       >
                         {pa.program?.name ?? `Program ${i + 1}`}
+                        {pa.program_team && (
+                          <span className="ml-1 text-blue-400">· {pa.program_team.name}</span>
+                        )}
                         {pa.role && (
                           <span className="ml-1 text-blue-500">({pa.role})</span>
                         )}

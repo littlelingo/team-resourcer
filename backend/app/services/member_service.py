@@ -66,9 +66,10 @@ async def list_members(
             selectinload(TeamMember.team),
             selectinload(TeamMember.supervisor),
             selectinload(TeamMember.functional_manager),
-            selectinload(TeamMember.program_assignments).selectinload(
-                ProgramAssignment.program
-            ),
+            selectinload(TeamMember.program_assignments)
+            .selectinload(ProgramAssignment.program),
+            selectinload(TeamMember.program_assignments)
+            .selectinload(ProgramAssignment.program_team),
         )
         .order_by(TeamMember.last_name, TeamMember.first_name)
     )
@@ -101,6 +102,9 @@ async def get_member(
             selectinload(TeamMember.functional_manager),
             selectinload(TeamMember.history),
             selectinload(TeamMember.program_assignments).selectinload(ProgramAssignment.program),
+            selectinload(TeamMember.program_assignments).selectinload(
+                ProgramAssignment.program_team
+            ),
         )
     )
     result = await db.execute(stmt)

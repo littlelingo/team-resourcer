@@ -14,6 +14,7 @@ from app.schemas.import_schemas import (
 from app.services.import_commit import commit_import
 from app.services.import_mapper import apply_mapping
 from app.services.import_parser import ImportParseError, parse_upload
+from app.services.import_preview import compute_unassignments_for_rows
 from app.services.import_session import SessionNotFoundError, create_session
 from app.services.import_sheets import ImportSheetsError, fetch_sheet
 
@@ -75,11 +76,16 @@ async def fetch_google_sheet(
 @router.post("/preview", response_model=MappedPreviewResult)
 async def preview_mapping(
     body: MappingConfig,
+    db: AsyncSession = Depends(get_db),
 ) -> MappedPreviewResult:
     """Apply a column mapping to a session's rows and return a validated preview.
 
     Returns at most 50 rows in the response payload; full error/warning counts
     are always reported.
+
+    When body.compute_unassignments is True, each row is annotated with the
+    program names that would be removed from the member on commit (replace
+    semantics). This requires a DB read per member so is gated behind the flag.
     """
     try:
         result = apply_mapping(body.session_id, body)
@@ -87,6 +93,10 @@ async def preview_mapping(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    # Optionally annotate rows with unassignment diffs (DB read, gated by flag)
+    if body.compute_unassignments and body.entity_type == "member":
+        await compute_unassignments_for_rows(db, result.rows)
 
     # Limit response payload to first 50 rows while preserving aggregate counts
     return MappedPreviewResult(

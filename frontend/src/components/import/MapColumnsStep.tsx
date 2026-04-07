@@ -27,8 +27,9 @@ export const MEMBER_TARGET_FIELDS: TargetField[] = [
   { label: 'PTO Used', value: 'pto_used' },
   { label: 'Functional Area', value: 'functional_area_name' },
   { label: 'Team', value: 'team_name' },
-  { label: 'Program', value: 'program_name' },
-  { label: 'Program Role', value: 'program_role' },
+  { label: 'Programs (semicolon-separated)', value: 'program_names' },
+  { label: 'Program Teams (semicolon-separated)', value: 'program_team_names' },
+  { label: 'Program Role (applied to all)', value: 'program_role' },
   { label: 'Supervisor Employee ID', value: 'supervisor_employee_id' },
 ]
 
@@ -133,7 +134,15 @@ export default function MapColumnsStep({
   }, [headers, initialColumnMap, targetFields])
 
   const previewMutation = useMutation({
-    mutationFn: () => previewMapping({ session_id: sessionId, column_map: columnMap, entity_type: entityType }),
+    mutationFn: () => previewMapping({
+      session_id: sessionId,
+      column_map: columnMap,
+      entity_type: entityType,
+      // Cheap path during mapping iteration. PreviewStep refetches with
+      // compute_unassignments=true on entry so the destructive diff is
+      // visible before the commit button is clicked.
+      compute_unassignments: false,
+    }),
     onSuccess: (data) => {
       onPreview(columnMap, data)
     },

@@ -63,6 +63,18 @@ async def build_program_tree(db: AsyncSession, program_id: int) -> TreeResponse 
     )
     rows = (await db.execute(stmt)).all()
 
+    # Collect all member UUIDs in this program to look up total program counts
+    member_uuids = [member.uuid for _, member in rows]
+    program_count_map: dict = {}
+    if member_uuids:
+        # Count how many programs each member belongs to
+        count_stmt = select(
+            ProgramAssignment.member_uuid, ProgramAssignment.program_id
+        ).where(ProgramAssignment.member_uuid.in_(member_uuids))
+        count_rows = (await db.execute(count_stmt)).all()
+        for row_uuid, _ in count_rows:
+            program_count_map[row_uuid] = program_count_map.get(row_uuid, 0) + 1
+
     nodes: list[TreeNode] = [
         TreeNode(
             id=f"program-{program.id}",
@@ -78,6 +90,7 @@ async def build_program_tree(db: AsyncSession, program_id: int) -> TreeResponse 
 
     for assignment, member in rows:
         member_node_id = f"member-{member.uuid}"
+        total_programs = program_count_map.get(member.uuid, 1)
         nodes.append(
             TreeNode(
                 id=member_node_id,
@@ -88,6 +101,7 @@ async def build_program_tree(db: AsyncSession, program_id: int) -> TreeResponse 
                     "title": member.title,
                     "image_path": member.image_path,
                     "role": assignment.role,
+                    "program_count": total_programs,
                 },
             )
         )

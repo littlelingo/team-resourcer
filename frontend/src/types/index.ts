@@ -56,11 +56,18 @@ export interface Program {
   updated_at: string
 }
 
+export interface ProgramTeamListItem {
+  id: number
+  name: string
+  program_id: number
+}
+
 export interface ProgramAssignment {
   member_uuid: string
   program_id: number
   role: string | null
   program?: ProgramListItem
+  program_team?: ProgramTeamListItem | null
 }
 
 // ─── Member History ───────────────────────────────────────────────────────────

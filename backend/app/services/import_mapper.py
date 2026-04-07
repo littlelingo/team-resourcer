@@ -15,6 +15,31 @@ from app.services.import_session import get_session
 _EMAIL_RE = re.compile(r"\S+@\S+\.\S+")
 
 
+def _split_semicolon_list(value: Any, *, keep_blanks: bool = False) -> list[str]:
+    """Split a cell value on ';' and strip tokens.
+
+    By default drops empty/whitespace-only tokens (used for program_names).
+    With keep_blanks=True, preserves blank positions so callers can align
+    parallel lists positionally (used for program_team_names where a blank
+    token at position N means "no team for the program at position N").
+
+    A cell with no ';' returns a single-element list (backward compat).
+    E.g. "; Alpha;;Beta;" -> ["Alpha", "Beta"]   (default)
+         ";Team2"         -> ["", "Team2"]       (keep_blanks=True)
+    """
+    raw = str(value) if value is not None else ""
+    if not raw:
+        return []
+    tokens = [token.strip() for token in raw.split(";")]
+    if keep_blanks:
+        # Trim a single trailing empty token caused by a trailing ';' so
+        # "Team1;Team2;" doesn't read as length 3.
+        if tokens and tokens[-1] == "":
+            tokens = tokens[:-1]
+        return tokens
+    return [t for t in tokens if t]
+
+
 @dataclass
 class EntityConfig:
     target_fields: set[str]
@@ -38,6 +63,22 @@ def _validate_email(data: dict[str, Any], errors: list[str]) -> None:
     email_val = data.get("email")
     if email_val and not _EMAIL_RE.fullmatch(str(email_val)):
         errors.append(f"Invalid email format: '{email_val}'.")
+
+
+def _validate_program_lists(data: dict[str, Any], errors: list[str]) -> None:
+    """Validate that program_team_names aligns positionally with program_names.
+
+    Both lists must have the same length when both are present and non-empty.
+    Blank tokens within program_team_names are allowed at any index.
+    """
+    program_names = data.get("program_names")
+    program_team_names = data.get("program_team_names")
+    if program_names and program_team_names:
+        if len(program_names) != len(program_team_names):
+            errors.append(
+                "program_team_names must align positionally with program_names "
+                f"(got {len(program_names)} program(s) but {len(program_team_names)} team(s))."
+            )
 
 
 def _validate_effective_date(data: dict[str, Any], errors: list[str]) -> None:
@@ -68,14 +109,15 @@ ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
             "pto_used",
             "functional_area_name",
             "team_name",
-            "program_name",
+            "program_names",
+            "program_team_names",
             "supervisor_employee_id",
             "program_role",
         },
         required_fields={"employee_id", "first_name", "last_name"},
         numeric_fields={"salary", "bonus", "pto_used"},  # Keep in sync with _FINANCIAL_FIELDS in import_commit.py
         dedup_field="employee_id",
-        validators=[_validate_email, _validate_hire_date],
+        validators=[_validate_email, _validate_hire_date, _validate_program_lists],
     ),
     "program": EntityConfig(
         target_fields={"name", "description", "agency_name"},
@@ -171,6 +213,14 @@ def apply_mapping(
             if isinstance(value, str):
                 value = value.strip()
             data[tgt_field] = value
+
+        # Normalize program list fields from raw strings to list[str]
+        if "program_names" in data:
+            data["program_names"] = _split_semicolon_list(data["program_names"])
+        if "program_team_names" in data:
+            data["program_team_names"] = _split_semicolon_list(
+                data["program_team_names"], keep_blanks=True
+            )
 
         # --- Validation ---
 

@@ -1,5 +1,20 @@
 # Learnings
 
+## 2026-04-06: Replace-semantics imports must distinguish "unmapped" from "mapped-but-empty" (feature 056)
+
+When an import path supports replace semantics (existing rows not in the incoming set are deleted), the gate that decides whether to run the delete loop must be `bool(value)` — not `key in dict`. An empty list and an unmapped column look identical in payload, but they mean opposite things to the user:
+
+- **Unmapped**: "I'm not touching programs in this import." → preserve all existing assignments.
+- **Mapped-but-empty cell**: "This member happens to have no programs in my source data." → almost always a data hole, not an authoritative empty set.
+
+Treating both as "preserve" is the safe default. Forcing the user to explicitly opt into mass-delete (e.g., a separate "clear all" column) is even safer but out of scope for 056. The reviewer caught this in feature 056 — the implementer used `key in data` and a blank cell would have wiped every assignment for that member.
+
+## 2026-04-06: Positional list alignment requires preserving blank tokens (feature 056)
+
+A common CSV pattern for "parallel optional lists" is `"Alpha; Beta"` paired with `";Team2"` (meaning "Alpha gets no team, Beta gets Team2"). The naive split helper drops empty tokens, which collapses `";Team2"` to `["Team2"]` (length 1) and breaks length-equality validation against `["Alpha", "Beta"]` (length 2).
+
+Fix pattern: a `keep_blanks=True` mode on the split helper that preserves empty positions but trims a single trailing empty token (so `"Team1;Team2;"` stays length 2, not 3). This is the only way to express "no team for position N" without inventing per-cell escape syntax.
+
 ## 2026-04-02: Dynamic ORM attribute injection for Pydantic computed fields (feature 051)
 
 When adding a computed field (e.g., `member_count`) to a Pydantic response schema with `from_attributes=True`, there are two approaches:

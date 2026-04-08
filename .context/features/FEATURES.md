@@ -55,4 +55,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 054 | team-lead-badge | COMPLETE | `.context/features/054-team-lead-badge/` |
 | 055 | program-tree-area-grouping | COMPLETE | `.context/features/055-program-tree-area-grouping/` |
 | 056 | multi-program-member-import | COMPLETE | `.context/features/056-multi-program-member-import/` (PRP.md) |
-| 057 | member-calibration | researched | `.context/features/057-member-calibration/` |
+| 057 | member-calibration | APPROVED | implement-then-test | `.context/features/057-member-calibration/PRP.md` | |

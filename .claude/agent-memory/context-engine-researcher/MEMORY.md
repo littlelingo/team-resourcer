@@ -72,5 +72,8 @@
 ## Research: Program Teams Table (feature candidate)
 - [`research_program_teams.md`](research_program_teams.md) — 2026-04-03: full pattern audit for program_teams; Team model/service/routes/hooks are the direct templates; nesting is via `router.include_router(prefix="/{program_id}/teams")` in programs.py; lead_id uses use_alter FK; migration autogenerate requires model in __init__.py first
 
+## Research: Multi-Program Member Import
+- [`research_import_multi_program.md`](research_import_multi_program.md) — 2026-04-06: data model is already M2M; import layer is single-program-per-row only; dedup skips repeated employee_id rows; 3 backend files + 1 frontend file need changes
+
 ## Research: Team Lead Badge in EntityMembersSheet
 - [`research_team_lead_badge.md`](research_team_lead_badge.md) — 2026-04-03: frontend-only change; Team.lead_id is already on selectedTeam; add leadId prop to EntityMembersSheet and compare member.uuid to render badge/icon; no backend work needed

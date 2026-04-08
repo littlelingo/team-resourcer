@@ -1,6 +1,7 @@
 # Agent Memory Index
 
 ## Project
+- [project_feature056_complete.md](project_feature056_complete.md) — Feature 056 complete: multi-program import, replace semantics, program tree ×N badge (2026-04-06)
 - [project_feature055_backend.md](project_feature055_backend.md) — Feature 055 Phase 1: all 10 steps complete (Program Teams backend) as of 2026-04-03
 - [project_phase1_scaffold.md](project_phase1_scaffold.md) — Phase 1: all 9 steps complete (FastAPI + PostgreSQL backend)
 - [project_phase2_progress.md](project_phase2_progress.md) — Phase 2 Steps 1-11 complete as of 2026-03-23; Step 12+ remaining

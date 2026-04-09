@@ -49,19 +49,20 @@ async def get_or_create_cycle(db: AsyncSession, label: str) -> tuple[Calibration
     )
     next_seq = (seq_result.scalar() or 0) + 1
 
-    cycle = CalibrationCycle(label=label, sequence_number=next_seq)
-    db.add(cycle)
+    # Use a SAVEPOINT so a race-loss only rolls back this insert, not the
+    # entire batch transaction the caller may have flushed work into.
     try:
-        await db.flush()
+        async with db.begin_nested():
+            cycle = CalibrationCycle(label=label, sequence_number=next_seq)
+            db.add(cycle)
+            await db.flush()
+        return cycle, True
     except IntegrityError:
-        await db.rollback()
+        # Savepoint auto-rolled back; outer transaction intact.
         result = await db.execute(
             select(CalibrationCycle).where(CalibrationCycle.label == label)
         )
-        cycle = result.scalar_one()
-        return cycle, False
-
-    return cycle, True
+        return result.scalar_one(), False
 
 
 async def create_cycle(db: AsyncSession, payload: CalibrationCycleCreate) -> CalibrationCycle:

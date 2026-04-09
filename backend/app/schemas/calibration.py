@@ -14,15 +14,19 @@ from app.schemas.calibration_cycle import CalibrationCycleResponse
 #   Mid(2)     4            5            6
 #   Low(1)     7            8            9
 BOX_LABELS: dict[int, str] = {
-    1: "Star",
-    2: "High Potential",
-    3: "Enigma",
+    # Canonical labels from the source 9-Box Matrix taxonomy.
+    # The CSV's "9-Box Matrix" column produces values like "5 - Key Performer" —
+    # these labels MUST match that vocabulary so users see the same names in the
+    # imported source data and the rendered UI.
+    1: "Consistent Star",
+    2: "Future Star",
+    3: "Emerging Performer",
     4: "High Professional Plus",
     5: "Key Performer",
-    6: "Developing Professional",
-    7: "Consistent Star",
-    8: "Reliable Performer",
-    9: "Underperformer",
+    6: "Inconsistent Performer",
+    7: "High Professional",
+    8: "Solid Performer",
+    9: "Lower Performer",
 }
 
 # (performance, potential) for each box number

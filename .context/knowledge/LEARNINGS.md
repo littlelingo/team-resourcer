@@ -1,5 +1,32 @@
 # Learnings
 
+## 2026-04-08: Savepoint pattern for race-safe get_or_create in async SQLAlchemy (post-057 refactor)
+
+When a `get_or_create` helper is called from inside a batch loop, the race-loss handler must NOT use `await db.rollback()` — that discards the entire transaction's flushed work, including unrelated rows the loop has already processed. Use a **savepoint** instead via `async with db.begin_nested()`:
+
+```python
+try:
+    async with db.begin_nested():
+        thing = Thing(...)
+        db.add(thing)
+        await db.flush()
+    return thing
+except IntegrityError:
+    # SAVEPOINT auto-rolled back; outer transaction (including earlier
+    # batch work) is preserved.
+    result = await db.execute(select(Thing).where(...))
+    return result.scalar_one()
+```
+
+The DB issues a `SAVEPOINT` before the flush and `ROLLBACK TO SAVEPOINT` on exception — so only the racing insert is reverted, not the entire transaction. The outer batch's prior work survives, and the eventual `db.commit()` is a single atomic write of all successful rows.
+
+**Project-wide locations using this pattern** (post-validation of feature 057):
+- `import_commit.py::_get_or_create_program_team` (existing, refactored)
+- `calibration_cycle_service.py::get_or_create_cycle` (feature 057)
+- `import_commit_calibrations.py::_upsert_calibration_row` (feature 057)
+
+The other `_get_or_create_*` helpers in `import_commit.py` (`_functional_area`, `_team`, `_program`) do not currently catch `IntegrityError` at all — they're vulnerable to race-loss but won't lose batch work since they have no rollback. Adding the savepoint pattern to them is a follow-up that needs the underlying tables to also have unique constraints, which several already do.
+
 ## 2026-04-08: ORM cascade must reflect DB FK intent, not contradict it (feature 057)
 
 When the database FK uses `ON DELETE RESTRICT` to make a parent table append-only (cycles, audit logs, immutable references), the ORM relationship must NOT use `cascade="all, delete-orphan"`. SQLAlchemy's cascade runs *before* the database FK constraint — it deletes child rows in Python, then issues the parent DELETE, and the FK never has a chance to fire. The "RESTRICT" safety net silently does nothing.

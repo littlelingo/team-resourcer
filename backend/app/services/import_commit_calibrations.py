@@ -175,14 +175,18 @@ async def _upsert_calibration_row(
         await db.flush()
         return 0, 1
 
-    calibration = Calibration(member_uuid=member_uuid, cycle_id=cycle_id, **fields)
-    db.add(calibration)
+    # Use a SAVEPOINT so a race-loss only rolls back this single insert,
+    # NOT the entire batch loop. Without this, an insert collision on row N
+    # would discard all flushed work from rows 1..N-1 in the same batch.
     try:
-        await db.flush()
+        async with db.begin_nested():
+            calibration = Calibration(member_uuid=member_uuid, cycle_id=cycle_id, **fields)
+            db.add(calibration)
+            await db.flush()
         return 1, 0
     except IntegrityError:
-        await db.rollback()
-        # Race: re-fetch and update
+        # Savepoint auto-rolled back; outer batch transaction intact.
+        # Re-fetch the row the racing transaction inserted and update it.
         result = await db.execute(
             select(Calibration).where(
                 Calibration.member_uuid == member_uuid,

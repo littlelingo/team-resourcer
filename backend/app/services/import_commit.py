@@ -72,6 +72,10 @@ async def _get_or_create_program_team(
 
     Concurrency: defended by the unique constraint on (program_id, name); on a
     race we catch IntegrityError and re-fetch.
+
+    Uses a SAVEPOINT (`db.begin_nested()`) so a race-loss only rolls back this
+    one row's flush — not the entire batch transaction. See LEARNINGS.md
+    "Savepoint pattern for race-safe get_or_create".
     """
     from sqlalchemy.exc import IntegrityError
 
@@ -81,19 +85,22 @@ async def _get_or_create_program_team(
     program_team = result.scalar_one_or_none()
     if program_team is not None:
         return program_team
-    program_team = ProgramTeam(program_id=program_id, name=name)
-    db.add(program_team)
+
     try:
-        await db.flush()
+        async with db.begin_nested():
+            program_team = ProgramTeam(program_id=program_id, name=name)
+            db.add(program_team)
+            await db.flush()
+        return program_team
     except IntegrityError:
-        await db.rollback()
+        # Savepoint auto-rolled back; outer transaction (and earlier batch
+        # work) is preserved. Re-fetch the row the racing transaction inserted.
         result = await db.execute(
             select(ProgramTeam).where(
                 ProgramTeam.program_id == program_id, ProgramTeam.name == name
             )
         )
-        program_team = result.scalar_one()
-    return program_team
+        return result.scalar_one()
 
 
 async def _upsert_program_assignment(

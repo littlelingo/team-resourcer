@@ -7,7 +7,9 @@ ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 COPY package*.json ./
-RUN npm ci
+# --legacy-peer-deps required while Visx 3.12.x still declares React ^18 peer.
+# See .context/knowledge/dependencies/PINS.md for full context and removal criteria.
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 RUN npm run build

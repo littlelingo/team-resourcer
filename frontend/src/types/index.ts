@@ -105,6 +105,42 @@ export interface TeamMemberList {
   program_assignments?: ProgramAssignment[]
 }
 
+// ─── Calibration ─────────────────────────────────────────────────────────────
+
+export interface CalibrationCycleEmbed {
+  id: number
+  label: string
+  sequence_number: number
+  start_date: string | null
+  end_date: string | null
+  is_active: boolean
+  notes: string | null
+  created_at: string
+}
+
+export interface CalibrationEmbed {
+  id: number
+  member_uuid: string
+  cycle_id: number
+  box: number
+  reviewers: string | null
+  high_growth_or_key_talent: string | null
+  ready_for_promotion: string | null
+  can_mentor_juniors: string | null
+  next_move_recommendation: string | null
+  rationale: string | null
+  effective_date: string
+  created_at: string
+  updated_at: string
+  cycle: CalibrationCycleEmbed
+  /** Computed on the backend */
+  label: string
+  performance: number
+  potential: number
+}
+
+// ─── Team Members ─────────────────────────────────────────────────────────────
+
 export interface TeamMember extends TeamMemberList {
   phone: string | null
   /** Salary as string decimal e.g. "120000.00" */
@@ -122,6 +158,8 @@ export interface TeamMember extends TeamMemberList {
   team?: TeamListItem
   program_assignments?: ProgramAssignment[]
   history?: MemberHistory[]
+  calibrations?: CalibrationEmbed[]
+  latest_calibration?: CalibrationEmbed | null
   created_at: string
   updated_at: string
 }

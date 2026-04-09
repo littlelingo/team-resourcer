@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import type { MappedPreviewResult, CommitResult, EntityType } from '@/api/importApi'
+import type { MappedPreviewResult, CommitResult, EntityType, ConstantMapping } from '@/api/importApi'
 import SourceStep from './SourceStep'
 import MapColumnsStep, {
   MEMBER_TARGET_FIELDS,
@@ -11,6 +11,7 @@ import MapColumnsStep, {
   SALARY_HISTORY_TARGET_FIELDS,
   BONUS_HISTORY_TARGET_FIELDS,
   PTO_HISTORY_TARGET_FIELDS,
+  CALIBRATION_TARGET_FIELDS,
   type TargetField,
 } from './MapColumnsStep'
 import PreviewStep from './PreviewStep'
@@ -42,6 +43,10 @@ const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
     targetFields: PTO_HISTORY_TARGET_FIELDS,
     requiredFields: ['employee_id', 'effective_date', 'amount'],
   },
+  calibration: {
+    targetFields: CALIBRATION_TARGET_FIELDS,
+    requiredFields: ['first_name', 'last_name', 'cycle_label', 'box'],
+  },
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -55,6 +60,7 @@ interface WizardState {
   previewRows: Record<string, unknown>[]
   totalRowCount: number
   columnMap: Record<string, string | null>
+  constantMappings: ConstantMapping[]
   mappedPreview: MappedPreviewResult | null
   commitResult: CommitResult | null
 }
@@ -66,6 +72,7 @@ const INITIAL_STATE: WizardState = {
   previewRows: [],
   totalRowCount: 0,
   columnMap: {},
+  constantMappings: [],
   mappedPreview: null,
   commitResult: null,
 }
@@ -176,11 +183,13 @@ export default function ImportWizard({ entityType = 'member', onComplete }: Impo
   function handleMapPreview(
     columnMap: Record<string, string | null>,
     mappedPreview: MappedPreviewResult,
+    constantMappings: ConstantMapping[] = [],
   ) {
     setState((prev) => ({
       ...prev,
       step: 'preview',
       columnMap,
+      constantMappings,
       mappedPreview,
     }))
   }
@@ -233,6 +242,7 @@ export default function ImportWizard({ entityType = 'member', onComplete }: Impo
           onBack={handleBackToMap}
           onCommit={handleCommitResult}
           entityType={entityType}
+          constantMappings={state.constantMappings}
         />
       )}
 

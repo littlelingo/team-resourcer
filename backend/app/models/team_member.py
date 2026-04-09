@@ -14,6 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
 if TYPE_CHECKING:
+    from app.models.calibration import Calibration
     from app.models.functional_area import FunctionalArea
     from app.models.member_history import MemberHistory
     from app.models.program_assignment import ProgramAssignment
@@ -119,4 +120,10 @@ class TeamMember(Base):
     history: Mapped[list[MemberHistory]] = relationship("MemberHistory", back_populates="member")
     program_assignments: Mapped[list[ProgramAssignment]] = relationship(
         "ProgramAssignment", back_populates="member"
+    )
+    calibrations: Mapped[list[Calibration]] = relationship(
+        "Calibration",
+        back_populates="member",
+        cascade="all, delete-orphan",
+        order_by="Calibration.effective_date.desc()",
     )

@@ -8,6 +8,8 @@ import TeamsPage from '@/pages/TeamsPage'
 import OrgTreePage from '@/pages/trees/OrgTreePage'
 import ProgramTreePage from '@/pages/trees/ProgramTreePage'
 import AreaTreePage from '@/pages/trees/AreaTreePage'
+import MemberCalibrationTimelinePage from '@/pages/MemberCalibrationTimelinePage'
+import CalibrationPage from '@/pages/CalibrationPage'
 
 export default function App() {
   return (
@@ -15,6 +17,7 @@ export default function App() {
       <Route element={<AppLayout />}>
         <Route index element={<Navigate to="/members" replace />} />
         <Route path="/members" element={<MembersPage />} />
+        <Route path="/members/:uuid/calibration" element={<MemberCalibrationTimelinePage />} />
         <Route path="/programs" element={<ProgramsPage />} />
         <Route path="/agencies" element={<AgenciesPage />} />
         <Route path="/functional-areas" element={<FunctionalAreasPage />} />
@@ -24,6 +27,7 @@ export default function App() {
         <Route path="/tree/programs/:id" element={<ProgramTreePage />} />
         <Route path="/tree/areas" element={<AreaTreePage />} />
         <Route path="/tree/areas/:id" element={<AreaTreePage />} />
+        <Route path="/calibration" element={<CalibrationPage />} />
       </Route>
     </Routes>
   )

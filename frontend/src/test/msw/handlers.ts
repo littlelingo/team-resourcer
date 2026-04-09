@@ -153,4 +153,147 @@ export const handlers = [
   http.post(`${BASE}/api/import/preview`, () =>
     HttpResponse.json({ rows: [], error_count: 0, warning_count: 0 }),
   ),
+
+  // ─── Calibration ─────────────────────────────────────────────────────────────
+  http.get(`${BASE}/api/calibration-cycles/`, () =>
+    HttpResponse.json([
+      {
+        id: 1,
+        label: '2026 Q1',
+        sequence_number: 1,
+        start_date: '2026-01-01',
+        end_date: '2026-03-31',
+        is_active: true,
+        notes: null,
+        created_at: '2026-01-01T00:00:00Z',
+      },
+    ]),
+  ),
+
+  http.post(`${BASE}/api/calibration-cycles/`, () =>
+    HttpResponse.json(
+      {
+        id: 2,
+        label: '2026 Q2',
+        sequence_number: 2,
+        start_date: null,
+        end_date: null,
+        is_active: true,
+        notes: null,
+        created_at: '2026-04-01T00:00:00Z',
+      },
+      { status: 201 },
+    ),
+  ),
+
+  http.get(`${BASE}/api/calibrations/latest`, () =>
+    HttpResponse.json([
+      {
+        id: 1,
+        member_uuid: 'uuid-1',
+        cycle_id: 1,
+        box: 4,
+        reviewers: null,
+        high_growth_or_key_talent: null,
+        ready_for_promotion: 'Yes',
+        can_mentor_juniors: null,
+        next_move_recommendation: null,
+        rationale: 'Strong quarter',
+        effective_date: '2026-03-15',
+        created_at: '2026-03-15T00:00:00Z',
+        updated_at: '2026-03-15T00:00:00Z',
+        cycle: { id: 1, label: '2026 Q1', sequence_number: 1, start_date: null, end_date: null, is_active: true, notes: null, created_at: '2026-01-01T00:00:00Z' },
+        label: 'High Prof+',
+        performance: 3,
+        potential: 2,
+      },
+    ]),
+  ),
+
+  http.get(`${BASE}/api/calibrations/movement`, () =>
+    HttpResponse.json([]),
+  ),
+
+  http.get(`${BASE}/api/calibrations/trends`, () =>
+    HttpResponse.json([]),
+  ),
+
+  http.get(`${BASE}/api/members/:uuid/calibrations/`, () =>
+    HttpResponse.json([
+      {
+        id: 1,
+        member_uuid: 'uuid-1',
+        cycle_id: 1,
+        box: 4,
+        reviewers: null,
+        high_growth_or_key_talent: null,
+        ready_for_promotion: 'Yes',
+        can_mentor_juniors: null,
+        next_move_recommendation: null,
+        rationale: 'Strong quarter',
+        effective_date: '2026-03-15',
+        created_at: '2026-03-15T00:00:00Z',
+        updated_at: '2026-03-15T00:00:00Z',
+        cycle: { id: 1, label: '2026 Q1', sequence_number: 1, start_date: null, end_date: null, is_active: true, notes: null, created_at: '2026-01-01T00:00:00Z' },
+        label: 'High Prof+',
+        performance: 3,
+        potential: 2,
+      },
+    ]),
+  ),
+
+  http.post(`${BASE}/api/members/:uuid/calibrations/`, () =>
+    HttpResponse.json(
+      {
+        id: 2,
+        member_uuid: 'uuid-1',
+        cycle_id: 1,
+        box: 5,
+        reviewers: null,
+        high_growth_or_key_talent: null,
+        ready_for_promotion: null,
+        can_mentor_juniors: null,
+        next_move_recommendation: null,
+        rationale: null,
+        effective_date: '2026-03-31',
+        created_at: '2026-03-31T00:00:00Z',
+        updated_at: '2026-03-31T00:00:00Z',
+        cycle: { id: 1, label: '2026 Q1', sequence_number: 1, start_date: null, end_date: null, is_active: true, notes: null, created_at: '2026-01-01T00:00:00Z' },
+        label: 'Key Performer',
+        performance: 2,
+        potential: 2,
+      },
+      { status: 201 },
+    ),
+  ),
+
+  http.put(`${BASE}/api/members/:uuid/calibrations/:id`, () =>
+    HttpResponse.json({
+      id: 1,
+      member_uuid: 'uuid-1',
+      cycle_id: 1,
+      box: 3,
+      reviewers: null,
+      high_growth_or_key_talent: null,
+      ready_for_promotion: null,
+      can_mentor_juniors: null,
+      next_move_recommendation: null,
+      rationale: 'Updated',
+      effective_date: '2026-03-15',
+      created_at: '2026-03-15T00:00:00Z',
+      updated_at: '2026-03-15T00:00:00Z',
+      cycle: { id: 1, label: '2026 Q1', sequence_number: 1, start_date: null, end_date: null, is_active: true, notes: null, created_at: '2026-01-01T00:00:00Z' },
+      label: 'Enigma',
+      performance: 1,
+      potential: 3,
+    }),
+  ),
+
+  http.delete(`${BASE}/api/members/:uuid/calibrations/:id`, () =>
+    new HttpResponse(null, { status: 204 }),
+  ),
+
+  http.post(`${BASE}/api/calibrations/resolve-ambiguous`, () =>
+    HttpResponse.json({ created_calibrations: 1, updated_calibrations: 0 }),
+  ),
 ]

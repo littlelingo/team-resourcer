@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { previewMapping } from '@/api/importApi'
-import type { MappedPreviewResult, EntityType } from '@/api/importApi'
+import type { MappedPreviewResult, EntityType, ConstantMapping } from '@/api/importApi'
 
 // ─── Target field definitions ─────────────────────────────────────────────────
 
 export interface TargetField {
   label: string
   value: string
+  /** How the value is supplied. 'column' = CSV column, 'constant' = inline text input. Default: 'column'. */
+  source?: 'column' | 'constant' | 'column-or-constant'
+  required?: boolean
 }
 
 // Keep in sync with ENTITY_CONFIGS in backend/app/services/import_mapper.py
@@ -76,16 +79,35 @@ export const PTO_HISTORY_TARGET_FIELDS: TargetField[] = [
   { label: 'Notes', value: 'notes' },
 ]
 
+// Calibration import fields.
+// Fields with source: 'constant' use an inline text input — no CSV column is expected.
+// Fields with source: 'column-or-constant' can be mapped from a column OR given a constant.
+export const CALIBRATION_TARGET_FIELDS: TargetField[] = [
+  { label: 'First Name',                  value: 'first_name',               required: true,  source: 'column' },
+  { label: 'Last Name',                   value: 'last_name',                required: true,  source: 'column' },
+  { label: 'Cycle Label',                 value: 'cycle_label',              required: true,  source: 'constant' },
+  { label: '9-Box Matrix Value',          value: 'box',                      required: true,  source: 'column' },
+  { label: 'Effective Date',              value: 'effective_date',           required: true,  source: 'column-or-constant' },
+  { label: 'Calibration Reviewers',       value: 'reviewers',                required: false, source: 'column' },
+  { label: 'High Growth or Key Talent',   value: 'high_growth_or_key_talent',required: false, source: 'column' },
+  { label: 'Ready for Promotion?',        value: 'ready_for_promotion',      required: false, source: 'column' },
+  { label: 'Can Mentor Juniors?',         value: 'can_mentor_juniors',       required: false, source: 'column' },
+  { label: 'Next Move Recommendation',    value: 'next_move_recommendation', required: false, source: 'column' },
+  { label: 'Rationale',                   value: 'rationale',                required: false, source: 'column' },
+]
+
 // Auto-suggest: try exact match first, then includes
 function suggestField(header: string, fields: TargetField[]): string | null {
   const normalized = header.trim().toLowerCase()
-  const exact = fields.find((f) => f.label.toLowerCase() === normalized)
+  // Only suggest column-backed fields
+  const columnFields = fields.filter((f) => !f.source || f.source === 'column' || f.source === 'column-or-constant')
+  const exact = columnFields.find((f) => f.label.toLowerCase() === normalized)
   if (exact) return exact.value
-  const exactValue = fields.find((f) => f.value.toLowerCase() === normalized)
+  const exactValue = columnFields.find((f) => f.value.toLowerCase() === normalized)
   if (exactValue) return exactValue.value
-  const includes = fields.find((f) => f.label.toLowerCase().includes(normalized) || normalized.includes(f.label.toLowerCase()))
+  const includes = columnFields.find((f) => f.label.toLowerCase().includes(normalized) || normalized.includes(f.label.toLowerCase()))
   if (includes) return includes.value
-  const includesValue = fields.find((f) => f.value.toLowerCase().includes(normalized) || normalized.includes(f.value.toLowerCase()))
+  const includesValue = columnFields.find((f) => f.value.toLowerCase().includes(normalized) || normalized.includes(f.value.toLowerCase()))
   if (includesValue) return includesValue.value
   return null
 }
@@ -96,7 +118,7 @@ interface MapColumnsStepProps {
   sessionId: string
   headers: string[]
   initialColumnMap: Record<string, string | null>
-  onPreview: (columnMap: Record<string, string | null>, result: MappedPreviewResult) => void
+  onPreview: (columnMap: Record<string, string | null>, result: MappedPreviewResult, constantMappings?: ConstantMapping[]) => void
   targetFields?: TargetField[]
   requiredFields?: string[]
   entityType?: EntityType
@@ -122,6 +144,18 @@ export default function MapColumnsStep({
     return auto
   })
 
+  // Constant-value state for fields with source: 'constant' or 'column-or-constant'
+  const constantFields = targetFields.filter(
+    (f) => f.source === 'constant' || f.source === 'column-or-constant',
+  )
+  const [constantValues, setConstantValues] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {}
+    for (const f of constantFields) {
+      init[f.value] = ''
+    }
+    return init
+  })
+
   // Re-run auto-suggest if headers change (new upload)
   useEffect(() => {
     if (Object.keys(initialColumnMap).length === 0) {
@@ -133,24 +167,46 @@ export default function MapColumnsStep({
     }
   }, [headers, initialColumnMap, targetFields])
 
+  // Build constant_mappings array from non-empty constant values
+  function buildConstantMappings(): ConstantMapping[] {
+    return constantFields
+      .filter((f) => {
+        // For column-or-constant: only emit as constant if no column is mapped to this field
+        if (f.source === 'column-or-constant') {
+          const hasMapped = Object.values(columnMap).includes(f.value)
+          return !hasMapped && constantValues[f.value]?.trim()
+        }
+        return constantValues[f.value]?.trim()
+      })
+      .map((f) => ({ field: f.value, constant: constantValues[f.value].trim() }))
+  }
+
   const previewMutation = useMutation({
-    mutationFn: () => previewMapping({
-      session_id: sessionId,
-      column_map: columnMap,
-      entity_type: entityType,
-      // Cheap path during mapping iteration. PreviewStep refetches with
-      // compute_unassignments=true on entry so the destructive diff is
-      // visible before the commit button is clicked.
-      compute_unassignments: false,
-    }),
+    mutationFn: () => {
+      const constantMappings = buildConstantMappings()
+      return previewMapping({
+        session_id: sessionId,
+        column_map: columnMap,
+        entity_type: entityType,
+        compute_unassignments: false,
+        ...(constantMappings.length > 0 ? { constant_mappings: constantMappings } : {}),
+      })
+    },
     onSuccess: (data) => {
-      onPreview(columnMap, data)
+      onPreview(columnMap, data, buildConstantMappings())
     },
   })
 
-  const hasRequiredFields = requiredFields.every((f) =>
-    Object.values(columnMap).includes(f),
-  )
+  // Required check: column-mapped required fields OR satisfied by a constant
+  const hasRequiredFields = requiredFields.every((f) => {
+    const inColumn = Object.values(columnMap).includes(f)
+    if (inColumn) return true
+    const field = targetFields.find((tf) => tf.value === f)
+    if (field?.source === 'constant' || field?.source === 'column-or-constant') {
+      return constantValues[f]?.trim().length > 0
+    }
+    return false
+  })
 
   function handleChange(header: string, value: string) {
     setColumnMap((prev) => ({
@@ -158,6 +214,11 @@ export default function MapColumnsStep({
       [header]: value === '' ? null : value,
     }))
   }
+
+  // Column-only fields (excluding pure-constant ones from the mapping table)
+  const pureConstantFieldValues = new Set(
+    targetFields.filter((f) => f.source === 'constant').map((f) => f.value),
+  )
 
   return (
     <div>
@@ -167,6 +228,57 @@ export default function MapColumnsStep({
           Match each column from your source file to a target field. Columns set to "Skip" will be ignored.
         </p>
       </div>
+
+      {/* Constant-value fields (e.g. Cycle Label) — shown above the column mapping table */}
+      {constantFields.length > 0 && (
+        <div className="mb-6 rounded-md border border-slate-200 bg-slate-50 p-4 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Constant Values
+          </p>
+          <p className="text-xs text-slate-500">
+            These values are applied to every row — they are not columns in your CSV file.
+          </p>
+          <div className="space-y-2">
+            {constantFields.map((field) => {
+              const isMappedAsColumn =
+                field.source === 'column-or-constant' &&
+                Object.values(columnMap).includes(field.value)
+              return (
+                <div key={field.value} className="flex items-center gap-3">
+                  <label className="w-44 shrink-0 text-sm font-medium text-slate-700">
+                    {field.label}
+                    {field.required && <span className="ml-1 text-red-400">*</span>}
+                  </label>
+                  {isMappedAsColumn ? (
+                    <span className="text-xs text-slate-400 italic">
+                      (mapped from column — constant ignored)
+                    </span>
+                  ) : (
+                    <input
+                      type="text"
+                      value={constantValues[field.value] ?? ''}
+                      onChange={(e) =>
+                        setConstantValues((prev) => ({
+                          ...prev,
+                          [field.value]: e.target.value,
+                        }))
+                      }
+                      placeholder={
+                        field.value === 'cycle_label'
+                          ? 'e.g. 2026 Q1'
+                          : field.value === 'effective_date'
+                            ? 'e.g. 2026-03-31'
+                            : 'Enter constant value'
+                      }
+                      className="flex-1 rounded border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                    />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-md border border-slate-200 overflow-hidden mb-6">
         <table className="w-full text-sm">
@@ -195,11 +307,14 @@ export default function MapColumnsStep({
                     className="w-full rounded border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
                   >
                     <option value="">Skip this column</option>
-                    {targetFields.map((field) => (
-                      <option key={field.value} value={field.value}>
-                        {field.label}
-                      </option>
-                    ))}
+                    {/* Exclude pure-constant fields from the dropdown — they are always constant */}
+                    {targetFields
+                      .filter((f) => !pureConstantFieldValues.has(f.value))
+                      .map((field) => (
+                        <option key={field.value} value={field.value}>
+                          {field.label}
+                        </option>
+                      ))}
                   </select>
                 </td>
               </tr>

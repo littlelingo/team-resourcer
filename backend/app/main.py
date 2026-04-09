@@ -10,8 +10,11 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.routes.agencies import router as agencies_router
 from app.api.routes.areas import router as areas_router
+from app.api.routes.calibration_cycles import router as calibration_cycles_router
+from app.api.routes.calibrations import router as calibrations_router
 from app.api.routes.history import router as history_router
 from app.api.routes.import_router import router as import_router
+from app.api.routes.member_calibrations import router as member_calibrations_router
 from app.api.routes.members import router as members_router
 from app.api.routes.org import router as org_router
 from app.api.routes.programs import router as programs_router
@@ -70,3 +73,14 @@ app.include_router(teams_top_router, prefix="/api/teams", tags=["teams"])
 app.include_router(areas_router, prefix="/api/areas", tags=["areas", "teams"])
 app.include_router(org_router, prefix="/api/org", tags=["org"])
 app.include_router(import_router, prefix="/api/import", tags=["import"])
+app.include_router(
+    calibration_cycles_router,
+    prefix="/api/calibration-cycles",
+    tags=["calibration-cycles"],
+)
+app.include_router(calibrations_router, prefix="/api/calibrations", tags=["calibrations"])
+app.include_router(
+    member_calibrations_router,
+    prefix="/api/members/{member_uuid}/calibrations",
+    tags=["member-calibrations"],
+)

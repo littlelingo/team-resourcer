@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.models.calibration import Calibration
 from app.models.program_assignment import ProgramAssignment
 from app.models.team_member import TeamMember
 from app.schemas.team_member import TeamMemberCreate, TeamMemberUpdate
@@ -105,6 +106,7 @@ async def get_member(
             selectinload(TeamMember.program_assignments).selectinload(
                 ProgramAssignment.program_team
             ),
+            selectinload(TeamMember.calibrations).selectinload(Calibration.cycle),
         )
     )
     result = await db.execute(stmt)

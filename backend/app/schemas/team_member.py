@@ -5,8 +5,9 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, computed_field, field_validator
 
+from app.schemas.calibration import CalibrationResponse
 from app.schemas.functional_area import FunctionalAreaListResponse
 from app.schemas.member_history import MemberHistoryResponse
 from app.schemas.program_assignment import ProgramAssignmentResponse
@@ -138,5 +139,13 @@ class TeamMemberDetailResponse(BaseModel):
     team: TeamListResponse | None
     program_assignments: list[ProgramAssignmentResponse]
     history: list[MemberHistoryResponse]
+    calibrations: list[CalibrationResponse] = []
     created_at: datetime
     updated_at: datetime
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def latest_calibration(self) -> CalibrationResponse | None:
+        if self.calibrations:
+            return self.calibrations[0]
+        return None

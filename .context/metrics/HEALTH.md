@@ -14,6 +14,7 @@
 | 046 | member-program-assignment | 2026-04-02 | 2026-04-03 | 1d | 5 | 1 | 0 |
 | 047 | entity-member-management | 2026-04-02 | 2026-04-03 | 1d | 8 | 1 | 0 |
 | 056 | multi-program-member-import | 2026-04-06 | 2026-04-06 | 0d | 5 | 1 | 0 |
+| 057 | member-calibration | 2026-04-08 | 2026-04-08 | 0d | 36 | 1 | 0 |
 
 Note: Feature 056 had 3 critical and 2 warning findings from code review — all fixed before commit. Two pre-existing project patterns (E402 from __future__ docstring, TeamMember | None narrowing) propagated to new code; tracked as project-wide tech debt, not feature regressions.
 
@@ -21,7 +22,7 @@ Note: Feature 056 had 3 critical and 2 warning findings from code review — all
 
 | Total Indexed | Hits | Novel | Repeats | Hit Rate |
 |---------------|------|-------|---------|----------|
-| 11 | 2 | 6 | 0 | 18.2% |
+| 14 | 6 | 9 | 0 | 42.9% |
 
 Note: MissingGreenlet error (feature 050) was referenced during 051/052 planning — informed the selectinload-everywhere pattern.
 3 novel cache invalidation errors discovered during 044-047 validation — all fixed.
@@ -37,6 +38,7 @@ Note: MissingGreenlet error (feature 050) was referenced during 051/052 planning
 | 2026-04-03 | 055 | 1 | 0 | 0 | 0 | 0 |
 | 2026-04-03 | 044-047 | 2 | 0 | 0 | 0 | 0 |
 | 2026-04-06 | 056 | 2 | 0 | 0 | 0 | 0 |
+| 2026-04-08 | 057 | 4 | 0 | 0 | 1 | 0 |
 
 ## Context Efficiency
 
@@ -49,3 +51,4 @@ Note: MissingGreenlet error (feature 050) was referenced during 051/052 planning
 | 055 | 1 | 1 | 0 | 2 |
 | 044-047 | 1 | 0 | 0 | 3 |
 | 056 | 0 | 0 | 0 | 3 |
+| 057 | 0 | 0 | 0 | 6 |

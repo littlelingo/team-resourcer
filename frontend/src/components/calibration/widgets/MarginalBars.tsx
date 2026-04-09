@@ -5,16 +5,7 @@ import { AxisBottom, AxisLeft } from '@visx/axis'
 import { cn } from '@/lib/utils'
 import { useLatestCalibrations } from '@/hooks/useCalibrations'
 import { useCalibrationFilters } from '../CalibrationFilterContext'
-
-// Box layout: performance axis (column): 1=low, 2=mid, 3=high
-//             potential axis (row):       1=low, 2=mid, 3=high
-const BOX_TO_AXES: Record<number, [number, number]> = {
-  1: [3, 3], 2: [2, 3], 3: [1, 3],
-  4: [3, 2], 5: [2, 2], 6: [1, 2],
-  7: [3, 1], 8: [2, 1], 9: [1, 1],
-}
-
-const AXIS_LABELS = ['Low', 'Mid', 'High']
+import { BOX_TO_AXES, AXIS_LABELS } from './constants'
 
 interface MarginalBarsProps {
   className?: string
@@ -33,7 +24,18 @@ export default function MarginalBars({ className }: MarginalBarsProps) {
     return <div className={cn('animate-pulse rounded-lg bg-slate-50 h-32', className)} />
   }
 
-  if (calibrations.length === 0) return null
+  if (calibrations.length === 0) {
+    return (
+      <div
+        className={cn(
+          'flex items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500',
+          className,
+        )}
+      >
+        No calibration data to summarize.
+      </div>
+    )
+  }
 
   // Aggregate performance and potential counts
   const perfCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0 }

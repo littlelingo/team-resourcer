@@ -29,8 +29,14 @@ class CalibrationCycle(Base):
     )
 
     # Relationships
+    # Cycles are append-only once they have data — the DB FK uses ON DELETE RESTRICT
+    # to enforce this. The ORM cascade must NOT be "all, delete-orphan" or it would
+    # silently delete child Calibrations before the RESTRICT ever fires, evaporating
+    # historical performance data. `passive_deletes=True` defers deletion semantics
+    # to the DB so the RESTRICT is the source of truth.
     calibrations: Mapped[list[Calibration]] = relationship(
         "Calibration",
         back_populates="cycle",
-        cascade="all, delete-orphan",
+        cascade="save-update, merge",
+        passive_deletes=True,
     )

@@ -3,13 +3,7 @@ import { Group } from '@visx/group'
 import { useCalibrationCycles } from '@/hooks/useCalibrationCycles'
 import { useCalibrationMovement } from '@/hooks/useCalibrationMovement'
 import { cn } from '@/lib/utils'
-
-// Box labels for display
-const BOX_LABELS: Record<number, string> = {
-  1: 'Star (1)', 2: 'Hi Pot (2)', 3: 'Enigma (3)',
-  4: 'Hi Prof+ (4)', 5: 'Key Perf (5)', 6: 'Dev Prof (6)',
-  7: 'Const Star (7)', 8: 'Reliable (8)', 9: 'Underperf (9)',
-}
+import { BOX_LABELS } from './constants'
 
 const BOX_COLORS: Record<number, string> = {
   1: '#059669', 2: '#10b981', 3: '#d97706',

@@ -714,6 +714,53 @@ Manual smoke test in Phase 6 Validation above (steps 1–6).
 
 **Why**: The `CommitResult` schema did not expose cycle IDs. Embedding `cycle_id` in each `ambiguous_row` is more correct since different rows in theory could belong to different cycles (if the CSV mapped multiple cycle_labels), and it avoids adding a separate `created_cycle_ids` field to `CommitResult`.
 
+## Validation Findings (post-merge code review)
+
+**Reviewer verdict**: APPROVE — 0 critical, 4 warnings, 5 suggestions.
+
+**Fixed inline before validation commit**:
+1. ✅ `CalibrationCycle.calibrations` cascade contradicted DB FK RESTRICT — changed to `cascade="save-update, merge"` + `passive_deletes=True`. Latent data-loss path closed.
+2. ✅ `MarginalBars` empty state was `return null` (collapsed grid layout) — now renders the standard dashed-border placeholder.
+3. ✅ `BOX_LABELS` / `BOX_TO_AXES` triplicated across 3 widget files with **divergent labels** (NineBoxGrid swapped "Consistent Star" between boxes 1 and 7) — extracted to `frontend/src/components/calibration/widgets/constants.ts`, mirroring the backend canonical labels.
+
+**Logged as TODOs (not blocking commit)**:
+
+| # | Severity | Location | Issue | Recommended fix |
+|---|---|---|---|---|
+| 1 | Warning | `import_commit_calibrations.py:183-195` + `import_commit.py:86-95` | `db.rollback()` in race-retry helpers loses unrelated batch work. **Project-wide pattern.** | Refactor all `_get_or_create_*` helpers to use `async with db.begin_nested()` savepoints. Separate refactor PR. |
+| 2 | Warning | `CohortSmallMultiples.tsx:37-40` | Permanently stubbed: always renders one "All Members" group. | Implement per-area/team/program grouping using existing `area_id`/`team_id` on `CalibrationLatestRow`, OR rebrand as "coming soon". |
+| 3 | Suggestion | `FilterTransitions.tsx:35-37` + `registry.ts:50-58` | Default export renders `null` and is `defaultVisible: true`. Confusing menu entry. | Wire `FilterTransition` wrappers into chip components OR remove from registry (it's an always-on layer). |
+| 4 | Suggestion | `CalibrationPage.tsx:39-45` | `trajectory-path` in registry+menu but never mounted by the page. | Add `pageOnly: false` flag to `WidgetDef`; hide page-incompatible widgets from page-level toggle menu. |
+| 5 | Suggestion | `import_commit_calibrations.py:76-97` | N+1 query loading `functional_area`/`team` for each ambiguous candidate. | Single `select(...).where(uuid.in_([...])).options(selectinload(...))`. |
+| 6 | Suggestion | `calibration_service.py:98-125` | `list_movement` and `list_trends` return raw `dict` with no Pydantic `response_model`. | Add `CalibrationMovementRow` and `CalibrationTrendPoint` Pydantic models. |
+| 7 | Open | All widgets + backend | Backend `BOX_LABELS` (and now mirrored frontend constant) use labels invented by the implementer ("Star", "Enigma", "Reliable Performer") that **do not match the source 9-Box Matrix image** ("Consistent Star", "Emerging Performer", "Solid Performer", etc.). | Decide whether to align labels to source image. 1 backend dict + 1 frontend dict + assertion review. **Content decision.** |
+
+**Findings #1 and #7 are the highest-priority follow-ups.** #1 is a latent data-loss path affecting the entire import pipeline. #7 is user-facing content correctness.
+
+## Metrics
+
+| Field | Value |
+|---|---|
+| Plan date | 2026-04-08 |
+| Validate date | 2026-04-08 |
+| Elapsed | 0d (single session) |
+| Total steps | 36 |
+| Sessions | 1 |
+| `/clear` count | 0 |
+| `/resume` count | 0 |
+| Errors added to INDEX.md | 3 (cascade-vs-restrict, full-rollback-loses-batch, frontend-constant-drift) |
+| Known-error hits | 4 (errors #4, #6, #7, #15, #17 mitigations all verified working) |
+| Learnings added | 4 |
+| Library files added | 0 |
+| Stack recipes added | 0 |
+| Dependency pins added | 1 (Visx 3.12 + React 19 in PINS.md) |
+| Patterns added | 0 (PATTERNS.md is empty stub — opportunity for follow-up) |
+| Execution mode | single implementer subagent in worktree, single reviewer for validation |
+| Rollbacks | 0 |
+| Empty implementer runs | 0 |
+| Reviewer findings | 0 critical, 4 warnings, 5 suggestions |
+| Inline fixes | 4 (3 from review, 1 was a missing test value handling) |
+
 ## Next
 After approval: `/implement .context/features/057-member-calibration/PRP.md`
 (run `/clear` first if context > 50%)

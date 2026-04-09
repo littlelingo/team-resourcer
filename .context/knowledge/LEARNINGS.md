@@ -1,5 +1,27 @@
 # Learnings
 
+## 2026-04-08: ORM cascade must reflect DB FK intent, not contradict it (feature 057)
+
+When the database FK uses `ON DELETE RESTRICT` to make a parent table append-only (cycles, audit logs, immutable references), the ORM relationship must NOT use `cascade="all, delete-orphan"`. SQLAlchemy's cascade runs *before* the database FK constraint — it deletes child rows in Python, then issues the parent DELETE, and the FK never has a chance to fire. The "RESTRICT" safety net silently does nothing.
+
+The fix is `cascade="save-update, merge"` + `passive_deletes=True`, which tells SQLAlchemy "don't touch the children — let the database decide." Now the FK fires and the parent DELETE raises `IntegrityError`, which is what RESTRICT was supposed to do all along.
+
+This is a latent bug in feature 057's `CalibrationCycle` model — there's no cycle-delete route today, so the wrong cascade hasn't bitten anything yet. Caught by code review and fixed pre-commit. Worth grepping the codebase for `cascade="all, delete-orphan"` next to a FK with `ondelete="RESTRICT"` — the combination is always wrong.
+
+## 2026-04-08: Frontend data constants must mirror the backend single-source-of-truth (feature 057)
+
+Three calibration widgets each defined their own `BOX_LABELS: Record<number, string>` inline. Within the same PR, two of the three diverged from each other and from the backend's canonical labels — and one widget swapped "Consistent Star" from box 1 to box 7, completely changing the taxonomy users would see. Reviewer caught the duplication; the actual divergence was worse than the duplication suggested.
+
+The rule: **any user-visible constants that mirror backend data go in exactly one frontend file** (`<feature>/constants.ts`) with a docstring pointing at the canonical backend source. Three identical inline constants across files is the smell that should trigger the extraction. Drift between the duplicates is a near-certainty given enough time.
+
+## 2026-04-08: Visx 3.12 + React 19 requires `--legacy-peer-deps` (feature 057)
+
+Visx 3.12 still declares `peer react@^18`, but the runtime is fully forward-compatible with React 19 — Visx only uses stable hooks, refs, and SVG primitives. The peer-deps cap is a stale package.json declaration, not a real incompatibility. `npm install --legacy-peer-deps` is the standard workaround until Visx ships a 4.x. Pin documented in `.context/knowledge/dependencies/PINS.md`. Removal criteria: when `npm install` (no flag) succeeds with Visx 4.x.
+
+## 2026-04-08: Worktree-isolated agents leak Docker containers (feature 057)
+
+When an agent runs in a `git worktree` and uses Docker Compose, Compose names the project after the worktree directory (`agent-<hash>`). The containers persist after the agent exits, holding ports (5432, 5173, 8000) and bind-mount file ownership. Removing the git worktree without first stopping the containers leaves: (a) Docker-uid-owned files in the orphaned dir that block normal `rm`, (b) port conflicts the next time the main project tries `make up`. **Fix**: before removing a worktree, run `docker compose -p <agent-project> down -v` from the worktree dir or by name.
+
 ## 2026-04-06: Replace-semantics imports must distinguish "unmapped" from "mapped-but-empty" (feature 056)
 
 When an import path supports replace semantics (existing rows not in the incoming set are deleted), the gate that decides whether to run the delete loop must be `bool(value)` — not `key in dict`. An empty list and an unmapped column look identical in payload, but they mean opposite things to the user:

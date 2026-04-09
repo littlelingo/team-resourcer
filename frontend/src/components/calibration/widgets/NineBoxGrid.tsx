@@ -4,13 +4,7 @@ import { cn } from '@/lib/utils'
 import { useLatestCalibrations } from '@/hooks/useCalibrations'
 import { useCalibrationFilters } from '../CalibrationFilterContext'
 import type { CalibrationLatestRow } from '@/api/calibrationApi'
-
-// Box label lookup
-const BOX_LABELS: Record<number, string> = {
-  1: 'Star', 2: 'High Potential', 3: 'Enigma',
-  4: 'High Prof+', 5: 'Key Performer', 6: 'Dev Professional',
-  7: 'Consistent Star', 8: 'Reliable', 9: 'Underperformer',
-}
+import { BOX_LABELS } from './constants'
 
 // Color theme per box — intensity reflects "desirability"
 const BOX_BG: Record<number, string> = {

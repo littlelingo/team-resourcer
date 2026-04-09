@@ -60,3 +60,23 @@ Alembic's `--autogenerate` detects model drift beyond your intended changes. In 
 **Always review and trim auto-generated migrations.** Remove operations that don't relate to the feature. Also: Alembic uses `None` for auto-generated FK constraint names — the downgrade's `drop_constraint(None, ...)` will fail at runtime because Postgres auto-names the constraint and Alembic can't reverse-lookup it. Always give FKs explicit names (e.g., `fk_program_assignments_program_team_id`).
 
 **Related**: When a child FK has no `ON DELETE` clause, PostgreSQL defaults to `RESTRICT`. If you need nullable FK cleanup on parent delete, either add `ondelete="SET NULL"` on the FK or null out children in the service layer before deleting.
+
+## 2026-04-08: Calibration architecture decisions captured in ADR-001 (feature 057)
+
+The 9-box calibration feature introduced several non-obvious architectural choices. Full rationale in `.context/decisions/ADR-001-calibration-architecture.md`. Key learnings:
+
+1. **Store `box`, compute axes in Pydantic**: CSV provides box (1-9) directly. Storing it eliminates a parsing round-trip and keeps the CHECK constraint trivial. `performance` and `potential` are `@computed_field` properties derived from `BOX_TO_AXES` — the single source of truth lives in `backend/app/schemas/calibration.py`.
+
+2. **MissingGreenlet guard**: `calibrations` must ONLY be on `TeamMemberDetailResponse`, never `TeamMemberListResponse`. The list route doesn't eagerly load calibrations, so accessing the relationship there would trigger a `MissingGreenlet` error. Guard: `selectinload(TeamMember.calibrations).selectinload(Calibration.cycle)` only in `get_member()`.
+
+3. **Name-only member matching (no employee_id in calibration CSV)**: Use `scalars().all()` — never `scalar_one_or_none()` — for member lookup. 0 matches → `unmatched_rows`, 2+ matches → `ambiguous_rows` with candidate context. `cycle_id` must be embedded in each `ambiguous_row` dict so the resolve UI can call `POST /api/calibrations/resolve-ambiguous` correctly (the commit result doesn't expose cycle_ids separately).
+
+4. **Wizard constant-value affordance**: `MapColumnsStep` gained a `source: 'constant'` field type. The constant value is sent as `ConstantMapping` objects in the `MappingConfig` and applied to every row before validation. This is intentionally generic — any future import where metadata applies to an entire file can use the same mechanism.
+
+5. **Widget registry pattern**: 9 widgets registered in `WIDGET_REGISTRY` as `React.lazy()` components. Widget visibility persisted to `localStorage` under `team-resourcer:calibration:visibleWidgets:v1` (versioned key). Data-source gating (`dataSource` field on `WidgetDef`) prevents unnecessary API calls for hidden widgets.
+
+6. **Race-safe get-or-create for cycles**: `get_or_create_cycle` uses try-insert + `IntegrityError` catch + re-fetch, same pattern as `import_commit.py`. Required because concurrent imports could race to create the same cycle label.
+
+7. **`invalidateAllCalibrationViews` helper**: Every calibration mutation `onSuccess` must call this helper. It invalidates `calibrationKeys.all` (covers all calibration queries by prefix) plus the member detail cache. Not calling it leads to stale 9-box grids after import.
+
+8. **`@visx/sankey` is not needed for Sankey-style diagrams**: The standard approach (hand-rolled SVG cubic bezier paths with `M x y C ...`) produces equivalent visual output. Use `@visx/group` + plain `<path>` elements. Stroke width proportional to flow count gives depth cues. This avoids an extra dependency with uncertain API stability. See `MovementSankey.tsx` for the pattern.

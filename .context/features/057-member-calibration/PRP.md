@@ -1,6 +1,6 @@
 # PRP-057: Member Calibration (9-Box Matrix)
 
-**Status**: APPROVED
+**Status**: COMPLETE
 **Research**: `.context/features/057-member-calibration/NOTES.md`
 **Testing Strategy**: implement-then-test (project default)
 **Complexity**: HIGH (single PRP, sequenced into 6 phases for incremental delivery)
@@ -693,6 +693,26 @@ Manual smoke test in Phase 6 Validation above (steps 1–6).
 3. Should "Calibration Reviewers" eventually become a join to `team_members`? *Default for v1*: free text. Revisit when reviewer-centric reporting is requested.
 
 ---
+
+## Deviations
+
+### Phase 5.2 — MovementSankey: fallback to hand-rolled ribbons (not @visx/sankey)
+
+**PRP**: Step 5.1 called for `npm install @visx/sankey @visx/hierarchy` and using `@visx/sankey` for the 9-node sankey diagram.
+
+**What was implemented**: `@visx/sankey` was not installed. The Sankey widget (`MovementSankey.tsx`) uses `@visx/group` + hand-rolled SVG cubic bezier paths (`M x y C ...`). Flow ribbons are drawn as `<path>` elements with stroke width proportional to move count.
+
+**Why**: The PRP risk table explicitly preapproved this fallback — "if `@visx/sankey` resists, fall back to hand-rolled ribbons with `@visx/shape` Curve paths. ~1 day cost." The hand-rolled approach is simpler, produces equivalent visual output, and avoids a dependency that had uncertain API compatibility.
+
+**Impact**: Functionally equivalent. No user-visible difference. If 9-node layouts become more complex, consider migrating to `@visx/sankey` at that time.
+
+### Phase 6.2 — AmbiguousResolveTable: cycle_id derived from row data (not CommitResult)
+
+**PRP**: The `AmbiguousResolveTable` was designed with a `cycleId?: number` prop sourced from the commit result.
+
+**What was implemented**: `cycle_id` is embedded in each `ambiguous_row` dict by the backend `_commit_calibrations` function. The table groups resolutions by `cycle_id` and makes one `POST /resolve-ambiguous` call per unique cycle. The `cycleId` prop was removed.
+
+**Why**: The `CommitResult` schema did not expose cycle IDs. Embedding `cycle_id` in each `ambiguous_row` is more correct since different rows in theory could belong to different cycles (if the CSV mapped multiple cycle_labels), and it avoids adding a separate `created_cycle_ids` field to `CommitResult`.
 
 ## Next
 After approval: `/implement .context/features/057-member-calibration/PRP.md`

@@ -2,11 +2,108 @@ import * as Dialog from '@radix-ui/react-dialog'
 import * as Avatar from '@radix-ui/react-avatar'
 import * as Separator from '@radix-ui/react-separator'
 import { X, Mail, Phone, Hash, MapPin } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { getImageUrl } from '@/lib/api-client'
 import { getInitials } from '@/lib/member-utils'
 import { formatCurrency, formatNumber } from '@/lib/format-utils'
-import type { TeamMember } from '@/types'
+import type { TeamMember, CalibrationEmbed } from '@/types'
+
+// Box position → background color intensity
+const BOX_COLORS: Record<number, string> = {
+  1: 'bg-emerald-600 text-white',
+  2: 'bg-emerald-500 text-white',
+  3: 'bg-yellow-500 text-white',
+  4: 'bg-emerald-400 text-white',
+  5: 'bg-blue-500 text-white',
+  6: 'bg-yellow-400 text-white',
+  7: 'bg-blue-400 text-white',
+  8: 'bg-slate-400 text-white',
+  9: 'bg-red-400 text-white',
+}
+
+function CalibrationChip({ text, label }: { text: string | null; label: string }) {
+  if (!text) return null
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs text-slate-700">
+      <span className="font-medium text-slate-500">{label}:</span>
+      {text}
+    </span>
+  )
+}
+
+function CalibrationSection({ calibration, memberUuid }: {
+  calibration: CalibrationEmbed
+  memberUuid: string
+}) {
+  const boxColor = BOX_COLORS[calibration.box] ?? 'bg-slate-500 text-white'
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          Calibration
+        </h3>
+        <Link
+          to={`/members/${memberUuid}/calibration`}
+          className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+        >
+          View full timeline →
+        </Link>
+      </div>
+
+      {/* Box badge */}
+      <div className="flex items-center gap-3 mb-3">
+        <span
+          className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-lg text-lg font-bold',
+            boxColor,
+          )}
+        >
+          {calibration.box}
+        </span>
+        <div>
+          <p className="text-sm font-medium text-slate-900">{calibration.label}</p>
+          <p className="text-xs text-slate-500">
+            Perf {calibration.performance} · Pot {calibration.potential}
+          </p>
+        </div>
+      </div>
+
+      {/* Cycle + date */}
+      <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+        <span className="font-medium">{calibration.cycle.label}</span>
+        <span>·</span>
+        <span>{new Date(calibration.effective_date).toLocaleDateString()}</span>
+      </div>
+
+      {/* Flag chips */}
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        <CalibrationChip text={calibration.ready_for_promotion} label="Promotion" />
+        <CalibrationChip text={calibration.can_mentor_juniors} label="Mentor" />
+        <CalibrationChip text={calibration.high_growth_or_key_talent} label="Growth" />
+      </div>
+
+      {/* Rationale excerpt */}
+      {calibration.rationale && (
+        <p className="text-xs text-slate-600 line-clamp-2 italic">
+          &ldquo;{calibration.rationale}&rdquo;
+        </p>
+      )}
+
+      {/* Reviewers */}
+      {calibration.reviewers && (
+        <p className="mt-1.5 text-xs text-slate-400">
+          Reviewers: {calibration.reviewers}
+        </p>
+      )}
+
+      {/* Trajectory placeholder — replaced in Phase 5 */}
+      <div className="mt-3 h-16 rounded-md border border-dashed border-slate-200 flex items-center justify-center">
+        <span className="text-xs text-slate-400">Trajectory coming in Phase 5</span>
+      </div>
+    </div>
+  )
+}
 
 /* Keep field list in sync with _FINANCIAL_FIELDS in backend/app/services/import_commit.py */
 const HISTORY_FIELD_STYLES: Record<string, { label: string; dot: string; badge: string }> = {
@@ -276,6 +373,17 @@ export default function MemberDetailSheet({
                     })}
                   </ol>
                 </div>
+                <Separator.Root className="h-px bg-slate-100" />
+              </>
+            )}
+
+            {/* 7. Calibration */}
+            {member.latest_calibration && (
+              <>
+                <CalibrationSection
+                  calibration={member.latest_calibration}
+                  memberUuid={member.uuid}
+                />
               </>
             )}
           </div>

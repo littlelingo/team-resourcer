@@ -76,6 +76,23 @@ export const PTO_HISTORY_TARGET_FIELDS: TargetField[] = [
   { label: 'Notes', value: 'notes' },
 ]
 
+// Calibration import fields.
+// Fields with source: 'constant' use an inline text input instead of a column dropdown —
+// see Phase 6 for full constant-value UI. For now, treated as optional column mappings.
+export const CALIBRATION_TARGET_FIELDS: TargetField[] = [
+  { label: 'First Name', value: 'first_name' },
+  { label: 'Last Name', value: 'last_name' },
+  { label: 'Cycle Label (constant)', value: 'cycle_label' },
+  { label: '9-Box Matrix Value', value: 'box' },
+  { label: 'Effective Date', value: 'effective_date' },
+  { label: 'Calibration Reviewers', value: 'reviewers' },
+  { label: 'High Growth or Key Talent', value: 'high_growth_or_key_talent' },
+  { label: 'Ready for Promotion?', value: 'ready_for_promotion' },
+  { label: 'Can Mentor Juniors?', value: 'can_mentor_juniors' },
+  { label: 'Next Move Recommendation', value: 'next_move_recommendation' },
+  { label: 'Rationale', value: 'rationale' },
+]
+
 // Auto-suggest: try exact match first, then includes
 function suggestField(header: string, fields: TargetField[]): string | null {
   const normalized = header.trim().toLowerCase()

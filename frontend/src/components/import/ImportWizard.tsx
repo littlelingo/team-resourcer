@@ -11,6 +11,7 @@ import MapColumnsStep, {
   SALARY_HISTORY_TARGET_FIELDS,
   BONUS_HISTORY_TARGET_FIELDS,
   PTO_HISTORY_TARGET_FIELDS,
+  CALIBRATION_TARGET_FIELDS,
   type TargetField,
 } from './MapColumnsStep'
 import PreviewStep from './PreviewStep'
@@ -41,6 +42,10 @@ const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
   pto_history: {
     targetFields: PTO_HISTORY_TARGET_FIELDS,
     requiredFields: ['employee_id', 'effective_date', 'amount'],
+  },
+  calibration: {
+    targetFields: CALIBRATION_TARGET_FIELDS,
+    requiredFields: ['first_name', 'last_name', 'cycle_label', 'box'],
   },
 }
 

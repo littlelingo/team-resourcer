@@ -69,4 +69,6 @@ class Calibration(Base):
 
     # Relationships
     member: Mapped[TeamMember] = relationship("TeamMember", back_populates="calibrations")
-    cycle: Mapped[CalibrationCycle] = relationship("CalibrationCycle", back_populates="calibrations")
+    cycle: Mapped[CalibrationCycle] = relationship(
+        "CalibrationCycle", back_populates="calibrations"
+    )

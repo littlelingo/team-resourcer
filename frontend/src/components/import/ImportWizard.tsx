@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import type { MappedPreviewResult, CommitResult, EntityType } from '@/api/importApi'
+import type { MappedPreviewResult, CommitResult, EntityType, ConstantMapping } from '@/api/importApi'
 import SourceStep from './SourceStep'
 import MapColumnsStep, {
   MEMBER_TARGET_FIELDS,
@@ -60,6 +60,7 @@ interface WizardState {
   previewRows: Record<string, unknown>[]
   totalRowCount: number
   columnMap: Record<string, string | null>
+  constantMappings: ConstantMapping[]
   mappedPreview: MappedPreviewResult | null
   commitResult: CommitResult | null
 }
@@ -71,6 +72,7 @@ const INITIAL_STATE: WizardState = {
   previewRows: [],
   totalRowCount: 0,
   columnMap: {},
+  constantMappings: [],
   mappedPreview: null,
   commitResult: null,
 }
@@ -181,11 +183,13 @@ export default function ImportWizard({ entityType = 'member', onComplete }: Impo
   function handleMapPreview(
     columnMap: Record<string, string | null>,
     mappedPreview: MappedPreviewResult,
+    constantMappings: ConstantMapping[] = [],
   ) {
     setState((prev) => ({
       ...prev,
       step: 'preview',
       columnMap,
+      constantMappings,
       mappedPreview,
     }))
   }
@@ -238,6 +242,7 @@ export default function ImportWizard({ entityType = 'member', onComplete }: Impo
           onBack={handleBackToMap}
           onCommit={handleCommitResult}
           entityType={entityType}
+          constantMappings={state.constantMappings}
         />
       )}
 

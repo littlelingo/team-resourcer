@@ -1,11 +1,11 @@
 """Route handlers for calibration cycles."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.schemas.calibration_cycle import CalibrationCycleCreate, CalibrationCycleResponse
-from app.services.calibration_cycle_service import create_cycle, get_cycle, list_cycles
+from app.services.calibration_cycle_service import create_cycle, list_cycles
 
 router = APIRouter()
 

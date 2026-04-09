@@ -64,6 +64,7 @@ export interface CommitResult {
     last_name: string
     candidates: Array<{ uuid: string; label: string; area: string; team: string; hire_date: string }>
     row_data: Record<string, unknown>
+    cycle_id: number
   }>
 }
 

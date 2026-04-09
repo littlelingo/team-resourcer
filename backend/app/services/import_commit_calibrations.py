@@ -101,6 +101,7 @@ async def _commit_calibrations(
                 "last_name": last_name,
                 "candidates": candidate_list,
                 "row_data": dict(data),
+                "cycle_id": cycle_id,
             })
             continue
 

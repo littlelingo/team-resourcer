@@ -4,12 +4,13 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { AlertCircle, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { commitImport, previewMapping } from '@/api/importApi'
-import type { MappedPreviewResult, MappedRow, CommitResult, MappingConfig, EntityType } from '@/api/importApi'
+import type { MappedPreviewResult, MappedRow, CommitResult, MappingConfig, EntityType, ConstantMapping } from '@/api/importApi'
 import { memberKeys } from '@/hooks/useMembers'
 import { programKeys } from '@/hooks/usePrograms'
 import { areaKeys } from '@/hooks/useFunctionalAreas'
 import { teamKeys } from '@/hooks/useTeams'
 import { agencyKeys } from '@/hooks/useAgencies'
+import { invalidateAllCalibrationViews } from '@/hooks/useCalibrationCycles'
 
 const PAGE_SIZE = 20
 
@@ -20,6 +21,7 @@ interface PreviewStepProps {
   onBack: () => void
   onCommit: (result: CommitResult) => void
   entityType?: EntityType
+  constantMappings?: ConstantMapping[]
 }
 
 export default function PreviewStep({
@@ -29,6 +31,7 @@ export default function PreviewStep({
   onBack,
   onCommit,
   entityType = 'member',
+  constantMappings,
 }: PreviewStepProps) {
   const [page, setPage] = useState(0)
   const queryClient = useQueryClient()
@@ -72,7 +75,12 @@ export default function PreviewStep({
 
   const commitMutation = useMutation({
     mutationFn: () => {
-      const config: MappingConfig = { session_id: sessionId, column_map: columnMap, entity_type: entityType }
+      const config: MappingConfig = {
+        session_id: sessionId,
+        column_map: columnMap,
+        entity_type: entityType,
+        ...(constantMappings && constantMappings.length > 0 ? { constant_mappings: constantMappings } : {}),
+      }
       return commitImport(config)
     },
     onSuccess: (data) => {
@@ -92,6 +100,8 @@ export default function PreviewStep({
         queryClient.invalidateQueries({ queryKey: agencyKeys.all })
       } else if (entityType === 'salary_history' || entityType === 'bonus_history' || entityType === 'pto_history') {
         queryClient.invalidateQueries({ queryKey: memberKeys.all })
+      } else if (entityType === 'calibration') {
+        invalidateAllCalibrationViews(queryClient)
       }
       onCommit(data)
     },

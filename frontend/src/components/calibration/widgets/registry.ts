@@ -1,0 +1,88 @@
+import { lazy } from 'react'
+import type { WidgetDef, WidgetId } from './types'
+
+export const WIDGET_REGISTRY: Record<WidgetId, WidgetDef> = {
+  'kpi-strip': {
+    id: 'kpi-strip',
+    label: 'KPI Strip',
+    description: 'Key calibration metrics at a glance',
+    category: 'overview',
+    dataSource: 'latest',
+    defaultVisible: true,
+    component: lazy(() => import('./KpiStrip')),
+  },
+  'nine-box-grid': {
+    id: 'nine-box-grid',
+    label: '9-Box Grid',
+    description: 'Members plotted on the 9-box matrix',
+    category: 'distribution',
+    dataSource: 'latest',
+    defaultVisible: true,
+    component: lazy(() => import('./NineBoxGrid')),
+  },
+  'marginal-bars': {
+    id: 'marginal-bars',
+    label: 'Marginal Bars',
+    description: 'Performance and potential distribution bars',
+    category: 'distribution',
+    dataSource: 'latest',
+    defaultVisible: true,
+    component: lazy(() => import('./MarginalBars')),
+  },
+  'movement-sankey': {
+    id: 'movement-sankey',
+    label: 'Movement Sankey',
+    description: 'Flows between boxes across two cycles',
+    category: 'movement',
+    dataSource: 'movement',
+    defaultVisible: false,
+    component: lazy(() => import('./MovementSankey')),
+  },
+  'cohort-small-multiples': {
+    id: 'cohort-small-multiples',
+    label: 'Cohort Comparison',
+    description: 'Mini 9-boxes per area/team/program cohort',
+    category: 'comparison',
+    dataSource: 'latest',
+    defaultVisible: false,
+    component: lazy(() => import('./CohortSmallMultiples')),
+  },
+  'filter-transitions': {
+    id: 'filter-transitions',
+    label: 'Filter Transitions',
+    description: 'Animated chip transitions (always-on layer)',
+    category: 'overview',
+    dataSource: 'none',
+    defaultVisible: true,
+    component: lazy(() => import('./FilterTransitions')),
+  },
+  'trajectory-path': {
+    id: 'trajectory-path',
+    label: 'Trajectory Path',
+    description: "Member's movement path through the 9-box over time",
+    category: 'trends',
+    dataSource: 'member-history',
+    defaultVisible: false,
+    component: lazy(() => import('./TrajectoryPath')),
+  },
+  'comparison-radar': {
+    id: 'comparison-radar',
+    label: 'Comparison Radar',
+    description: 'Radar chart comparing up to 4 members',
+    category: 'comparison',
+    dataSource: 'member-history',
+    defaultVisible: false,
+    component: lazy(() => import('./ComparisonRadar')),
+  },
+  'cycle-trend-lines': {
+    id: 'cycle-trend-lines',
+    label: 'Cycle Trend Lines',
+    description: 'Box counts over time across cycles',
+    category: 'trends',
+    dataSource: 'trends',
+    defaultVisible: false,
+    component: lazy(() => import('./CycleTrendLines')),
+  },
+}
+
+export const WIDGET_IDS = Object.keys(WIDGET_REGISTRY) as WidgetId[]

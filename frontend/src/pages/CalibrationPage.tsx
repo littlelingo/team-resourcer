@@ -1,20 +1,121 @@
-/**
- * CalibrationPage — org-level 9-box matrix visualization.
- * Widget registry and full implementation arrives in Phase 4/5.
- * This is the placeholder that satisfies Phase 3 route registration.
- */
+import { Suspense } from 'react'
+import { CalibrationFilterProvider, useCalibrationFilters } from '@/components/calibration/CalibrationFilterContext'
+import { useWidgetVisibility } from '@/components/calibration/useWidgetVisibility'
+import WidgetToggleMenu from '@/components/calibration/WidgetToggleMenu'
+import WidgetSkeleton from '@/components/calibration/WidgetSkeleton'
+import { WIDGET_REGISTRY } from '@/components/calibration/widgets/registry'
+import { useCalibrationCycles } from '@/hooks/useCalibrationCycles'
+
+// ─── Filter bar ───────────────────────────────────────────────────────────────
+
+function CyclePicker() {
+  const { data: cycles = [] } = useCalibrationCycles()
+  const { cycleId, setFilter } = useCalibrationFilters()
+
+  return (
+    <select
+      value={cycleId ?? ''}
+      onChange={(e) => setFilter('cycleId', e.target.value ? Number(e.target.value) : undefined)}
+      className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 shadow-sm"
+    >
+      <option value="">All cycles</option>
+      {cycles.map((c) => (
+        <option key={c.id} value={c.id}>
+          {c.label}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+function CalibrationPageInner() {
+  const { visible, toggle } = useWidgetVisibility()
+
+  const KpiStrip = WIDGET_REGISTRY['kpi-strip'].component
+  const NineBoxGrid = WIDGET_REGISTRY['nine-box-grid'].component
+  const MarginalBars = WIDGET_REGISTRY['marginal-bars'].component
+  const MovementSankey = WIDGET_REGISTRY['movement-sankey'].component
+  const CohortSmallMultiples = WIDGET_REGISTRY['cohort-small-multiples'].component
+  const CycleTrendLines = WIDGET_REGISTRY['cycle-trend-lines'].component
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-5">
+      {/* Page header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Calibration</h1>
+          <p className="mt-0.5 text-sm text-slate-500">9-Box Matrix visualization</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <CyclePicker />
+          <WidgetToggleMenu visible={visible} onToggle={toggle} />
+        </div>
+      </div>
+
+      {/* KPI Strip — full width */}
+      {visible.has('kpi-strip') && (
+        <Suspense fallback={<WidgetSkeleton height="h-16" />}>
+          <KpiStrip />
+        </Suspense>
+      )}
+
+      {/* Main layout: 9-box + marginal bars */}
+      {(visible.has('nine-box-grid') || visible.has('marginal-bars')) && (
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-8 rounded-lg border border-slate-200 bg-white p-4">
+            {visible.has('nine-box-grid') && (
+              <Suspense fallback={<WidgetSkeleton height="h-64" />}>
+                <NineBoxGrid />
+              </Suspense>
+            )}
+          </div>
+          <div className="col-span-4 rounded-lg border border-slate-200 bg-white p-4">
+            {visible.has('marginal-bars') && (
+              <Suspense fallback={<WidgetSkeleton height="h-48" />}>
+                <MarginalBars />
+              </Suspense>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Phase 5 widgets */}
+      {visible.has('movement-sankey') && (
+        <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <h2 className="mb-3 text-sm font-medium text-slate-700">Movement Between Cycles</h2>
+          <Suspense fallback={<WidgetSkeleton height="h-64" />}>
+            <MovementSankey />
+          </Suspense>
+        </div>
+      )}
+
+      {visible.has('cohort-small-multiples') && (
+        <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <h2 className="mb-3 text-sm font-medium text-slate-700">Cohort Comparison</h2>
+          <Suspense fallback={<WidgetSkeleton height="h-64" />}>
+            <CohortSmallMultiples />
+          </Suspense>
+        </div>
+      )}
+
+      {visible.has('cycle-trend-lines') && (
+        <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <h2 className="mb-3 text-sm font-medium text-slate-700">Cycle Trends</h2>
+          <Suspense fallback={<WidgetSkeleton height="h-48" />}>
+            <CycleTrendLines />
+          </Suspense>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function CalibrationPage() {
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Calibration</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          9-Box Matrix visualization — widgets arriving in Phase 4.
-        </p>
-      </div>
-      <div className="rounded-lg border border-dashed border-slate-200 p-16 text-center">
-        <p className="text-slate-400">Widget registry loading in Phase 4</p>
-      </div>
-    </div>
+    <CalibrationFilterProvider>
+      <CalibrationPageInner />
+    </CalibrationFilterProvider>
   )
 }

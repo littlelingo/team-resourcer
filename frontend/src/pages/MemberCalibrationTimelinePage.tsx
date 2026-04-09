@@ -1,9 +1,14 @@
+import { lazy, Suspense } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { useCalibrationHistory } from '@/hooks/useCalibrationHistory'
 import { useMember } from '@/hooks/useMembers'
 import { cn } from '@/lib/utils'
 import type { Calibration } from '@/api/calibrationApi'
+
+const TrajectoryPath = lazy(
+  () => import('@/components/calibration/widgets/TrajectoryPath'),
+)
 
 const BOX_COLORS: Record<number, string> = {
   1: 'bg-emerald-600 text-white',
@@ -86,6 +91,16 @@ export default function MemberCalibrationTimelinePage() {
           <span className="text-sm text-slate-500">
             Box {trend.oldest.box} → Box {trend.newest.box}
           </span>
+        </div>
+      )}
+
+      {/* Trajectory widget */}
+      {!isLoading && history.length > 0 && (
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-4">
+          <h2 className="mb-3 text-sm font-medium text-slate-700">Movement Path</h2>
+          <Suspense fallback={<div className="h-32 animate-pulse rounded-lg bg-slate-50" />}>
+            <TrajectoryPath history={history} mode="page" />
+          </Suspense>
         </div>
       )}
 

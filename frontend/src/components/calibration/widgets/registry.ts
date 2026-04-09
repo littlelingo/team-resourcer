@@ -65,15 +65,6 @@ export const WIDGET_REGISTRY: Record<WidgetId, WidgetDef> = {
     defaultVisible: false,
     component: lazy(() => import('./TrajectoryPath')),
   },
-  'comparison-radar': {
-    id: 'comparison-radar',
-    label: 'Comparison Radar',
-    description: 'Radar chart comparing up to 4 members',
-    category: 'comparison',
-    dataSource: 'member-history',
-    defaultVisible: false,
-    component: lazy(() => import('./ComparisonRadar')),
-  },
   'cycle-trend-lines': {
     id: 'cycle-trend-lines',
     label: 'Cycle Trend Lines',

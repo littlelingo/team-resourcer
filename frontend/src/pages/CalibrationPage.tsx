@@ -1,10 +1,12 @@
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
+import { Users } from 'lucide-react'
 import { CalibrationFilterProvider, useCalibrationFilters } from '@/components/calibration/CalibrationFilterContext'
 import { useWidgetVisibility } from '@/components/calibration/useWidgetVisibility'
 import WidgetToggleMenu from '@/components/calibration/WidgetToggleMenu'
 import WidgetSkeleton from '@/components/calibration/WidgetSkeleton'
 import { WIDGET_REGISTRY } from '@/components/calibration/widgets/registry'
 import { useCalibrationCycles } from '@/hooks/useCalibrationCycles'
+import CompareDrawer from '@/components/calibration/CompareDrawer'
 
 // ─── Filter bar ───────────────────────────────────────────────────────────────
 
@@ -32,6 +34,7 @@ function CyclePicker() {
 
 function CalibrationPageInner() {
   const { visible, toggle } = useWidgetVisibility()
+  const [compareOpen, setCompareOpen] = useState(false)
 
   const KpiStrip = WIDGET_REGISTRY['kpi-strip'].component
   const NineBoxGrid = WIDGET_REGISTRY['nine-box-grid'].component
@@ -51,8 +54,17 @@ function CalibrationPageInner() {
         <div className="flex items-center gap-2">
           <CyclePicker />
           <WidgetToggleMenu visible={visible} onToggle={toggle} />
+          <button
+            onClick={() => setCompareOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            <Users className="h-3.5 w-3.5" />
+            Compare
+          </button>
         </div>
       </div>
+
+      <CompareDrawer open={compareOpen} onOpenChange={setCompareOpen} />
 
       {/* KPI Strip — full width */}
       {visible.has('kpi-strip') && (

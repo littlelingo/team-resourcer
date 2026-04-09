@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Avatar from '@radix-ui/react-avatar'
 import * as Separator from '@radix-ui/react-separator'
@@ -8,6 +9,10 @@ import { getImageUrl } from '@/lib/api-client'
 import { getInitials } from '@/lib/member-utils'
 import { formatCurrency, formatNumber } from '@/lib/format-utils'
 import type { TeamMember, CalibrationEmbed } from '@/types'
+
+const TrajectoryPath = lazy(
+  () => import('@/components/calibration/widgets/TrajectoryPath'),
+)
 
 // Box position → background color intensity
 const BOX_COLORS: Record<number, string> = {
@@ -97,9 +102,11 @@ function CalibrationSection({ calibration, memberUuid }: {
         </p>
       )}
 
-      {/* Trajectory placeholder — replaced in Phase 5 */}
-      <div className="mt-3 h-16 rounded-md border border-dashed border-slate-200 flex items-center justify-center">
-        <span className="text-xs text-slate-400">Trajectory coming in Phase 5</span>
+      {/* Trajectory widget */}
+      <div className="mt-3">
+        <Suspense fallback={<div className="h-16 animate-pulse rounded-md bg-slate-50" />}>
+          <TrajectoryPath memberUuid={memberUuid} mode="detail-sheet" />
+        </Suspense>
       </div>
     </div>
   )

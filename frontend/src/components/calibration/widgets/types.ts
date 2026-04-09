@@ -7,7 +7,6 @@ export type WidgetId =
   | 'cohort-small-multiples'
   | 'filter-transitions'
   | 'trajectory-path'
-  | 'comparison-radar'
   | 'kpi-strip'
   | 'cycle-trend-lines'
 

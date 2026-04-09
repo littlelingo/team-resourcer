@@ -1,15 +1,17 @@
-"""Route handlers for org-level calibration analytics."""
+"""Route handlers for org-level calibration analytics and import resolution."""
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.schemas.calibration import CalibrationResponse
+from app.schemas.import_schemas import ResolveAmbiguousRequest, ResolveAmbiguousResult
 from app.services.calibration_service import (
     list_latest_calibrations,
     list_movement,
     list_trends,
 )
+from app.services.import_commit_calibrations import apply_calibration_resolutions
 
 router = APIRouter()
 
@@ -49,3 +51,20 @@ async def get_trends(
 ) -> list[dict]:
     """Return aggregated box counts per cycle for trend lines."""
     return await list_trends(db, last_n_cycles=cycles)
+
+
+@router.post("/resolve-ambiguous", response_model=ResolveAmbiguousResult)
+async def resolve_ambiguous(
+    payload: ResolveAmbiguousRequest,
+    db: AsyncSession = Depends(get_db),
+) -> ResolveAmbiguousResult:
+    """Apply manual resolutions for ambiguous calibration import rows."""
+    summary = await apply_calibration_resolutions(
+        db, payload.cycle_id, payload.resolutions
+    )
+    try:
+        await db.commit()
+    except Exception:
+        await db.rollback()
+        raise
+    return ResolveAmbiguousResult(**summary)

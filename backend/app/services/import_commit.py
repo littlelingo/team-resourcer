@@ -322,6 +322,30 @@ async def commit_import(
         created, updated = await _commit_financial_history(
             db, deduped_valid, error_rows, "pto_used"
         )
+    elif entity_type == "calibration":
+        from app.services.import_commit_calibrations import _commit_calibrations
+
+        cal_summary = await _commit_calibrations(db, deduped_valid)
+
+        try:
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise
+
+        delete_session(session_id)
+
+        return CommitResult(
+            created_count=cal_summary["created_calibrations"],
+            updated_count=cal_summary["updated_calibrations"],
+            skipped_count=len(error_rows) + dedup_skipped,
+            error_rows=error_rows,
+            created_calibrations=cal_summary["created_calibrations"],
+            updated_calibrations=cal_summary["updated_calibrations"],
+            created_cycles=cal_summary["created_cycles"],
+            unmatched_rows=cal_summary["unmatched_rows"],
+            ambiguous_rows=cal_summary["ambiguous_rows"],
+        )
     else:
         created, updated = await _commit_members(db, deduped_valid, error_rows)
 

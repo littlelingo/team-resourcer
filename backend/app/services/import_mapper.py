@@ -91,6 +91,53 @@ def _validate_effective_date(data: dict[str, Any], errors: list[str]) -> None:
             data["effective_date"] = str(parsed)
 
 
+def validate_box_value(raw: Any) -> int | None:
+    """Parse a box value from a CSV cell.
+
+    Accepts "5", "5 - Key Performer", "5-Key Performer", etc.
+    Returns the integer 1-9 or None if invalid.
+    """
+    if raw is None:
+        return None
+    s = str(raw).strip()
+    if not s:
+        return None
+    # Extract leading integer (handles "5 - Key Performer" or "5-Performer")
+    import re as _re
+
+    m = _re.match(r"^(\d+)", s)
+    if not m:
+        return None
+    value = int(m.group(1))
+    if 1 <= value <= 9:
+        return value
+    return None
+
+
+def _validate_box(data: dict[str, Any], errors: list[str]) -> None:
+    """Validate and normalize the 'box' field for calibration rows."""
+    val = data.get("box")
+    if val is None or val == "":
+        # Required-field check already covers this
+        return
+    parsed = validate_box_value(val)
+    if parsed is None:
+        errors.append(f"'box' must be an integer 1-9, got '{val}'.")
+    else:
+        data["box"] = str(parsed)
+
+
+def _validate_calibration_effective_date(data: dict[str, Any], errors: list[str]) -> None:
+    """Validate effective_date for calibration; allow missing (will default later)."""
+    val = data.get("effective_date")
+    if val and val != "":
+        parsed = parse_date(str(val))
+        if parsed is None:
+            errors.append(f"'effective_date' could not be parsed as a date, got '{val}'.")
+        else:
+            data["effective_date"] = str(parsed)
+
+
 ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
     "member": EntityConfig(
         target_fields={
@@ -160,6 +207,25 @@ ENTITY_CONFIGS: dict[EntityType, EntityConfig] = {
         dedup_field=None,
         validators=[_validate_effective_date],
     ),
+    "calibration": EntityConfig(
+        target_fields={
+            "first_name",
+            "last_name",
+            "cycle_label",
+            "box",
+            "reviewers",
+            "high_growth_or_key_talent",
+            "ready_for_promotion",
+            "can_mentor_juniors",
+            "next_move_recommendation",
+            "rationale",
+            "effective_date",
+        },
+        required_fields={"first_name", "last_name", "cycle_label", "box"},
+        numeric_fields=set(),
+        dedup_field=None,
+        validators=[_validate_box, _validate_calibration_effective_date],
+    ),
 }
 
 
@@ -197,6 +263,11 @@ def apply_mapping(
     session = get_session(session_id)
     raw_rows = session.raw_rows
 
+    # Build constant value lookup from constant_mappings
+    constant_values: dict[str, str] = {
+        cm.field: cm.constant for cm in (mapping_config.constant_mappings or [])
+    }
+
     seen_dedup: dict[str, int] = {}  # dedup_field value → first 1-based row index
     mapped_rows: list[MappedRow] = []
 
@@ -213,6 +284,10 @@ def apply_mapping(
             if isinstance(value, str):
                 value = value.strip()
             data[tgt_field] = value
+
+        # Apply constant mappings: set field to constant value for every row
+        for tgt_field, constant_value in constant_values.items():
+            data[tgt_field] = constant_value
 
         # Normalize program list fields from raw strings to list[str]
         if "program_names" in data:

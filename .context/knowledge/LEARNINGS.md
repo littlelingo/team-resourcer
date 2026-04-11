@@ -43,11 +43,11 @@ The rule: **any user-visible constants that mirror backend data go in exactly on
 
 ## 2026-04-08: Visx 3.12 + React 19 requires `--legacy-peer-deps` (feature 057)
 
-Visx 3.12 still declares `peer react@^18`, but the runtime is fully forward-compatible with React 19 — Visx only uses stable hooks, refs, and SVG primitives. The peer-deps cap is a stale package.json declaration, not a real incompatibility. `npm install --legacy-peer-deps` is the standard workaround until Visx ships a 4.x. Pin documented in `.context/knowledge/dependencies/PINS.md`. Removal criteria: when `npm install` (no flag) succeeds with Visx 4.x.
+> Promoted to: `.context/knowledge/dependencies/PINS.md` (Visx 3.12.x section)
 
 ## 2026-04-08: Worktree-isolated agents leak Docker containers (feature 057)
 
-When an agent runs in a `git worktree` and uses Docker Compose, Compose names the project after the worktree directory (`agent-<hash>`). The containers persist after the agent exits, holding ports (5432, 5173, 8000) and bind-mount file ownership. Removing the git worktree without first stopping the containers leaves: (a) Docker-uid-owned files in the orphaned dir that block normal `rm`, (b) port conflicts the next time the main project tries `make up`. **Fix**: before removing a worktree, run `docker compose -p <agent-project> down -v` from the worktree dir or by name.
+> Promoted to: `.context/knowledge/stack/worktree-docker-cleanup.md`
 
 ## 2026-04-06: Replace-semantics imports must distinguish "unmapped" from "mapped-but-empty" (feature 056)
 
@@ -104,11 +104,7 @@ When a shared component (e.g., `EntityMembersSheet`) is used by multiple entity 
 
 ## 2026-04-03: Alembic auto-generated migration noise and FK naming (feature 055)
 
-Alembic's `--autogenerate` detects model drift beyond your intended changes. In feature 055, the generated migration included unrelated FK recreations (dropping `ondelete='SET NULL'` from `programs.agency_id`, recreating `fk_teams_lead_id`). These silently alter existing constraints.
-
-**Always review and trim auto-generated migrations.** Remove operations that don't relate to the feature. Also: Alembic uses `None` for auto-generated FK constraint names — the downgrade's `drop_constraint(None, ...)` will fail at runtime because Postgres auto-names the constraint and Alembic can't reverse-lookup it. Always give FKs explicit names (e.g., `fk_program_assignments_program_team_id`).
-
-**Related**: When a child FK has no `ON DELETE` clause, PostgreSQL defaults to `RESTRICT`. If you need nullable FK cleanup on parent delete, either add `ondelete="SET NULL"` on the FK or null out children in the service layer before deleting.
+> Promoted to: `.context/knowledge/libraries/alembic.md`
 
 ## 2026-04-08: Calibration architecture decisions captured in ADR-001 (feature 057)
 

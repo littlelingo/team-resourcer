@@ -56,3 +56,4 @@ Tracks feature research and implementation. Each feature gets a directory under 
 | 055 | program-tree-area-grouping | COMPLETE | `.context/features/055-program-tree-area-grouping/` |
 | 056 | multi-program-member-import | COMPLETE | `.context/features/056-multi-program-member-import/` (PRP.md) |
 | 057 | member-calibration | COMPLETE | implement-then-test | `.context/features/057-member-calibration/PRP.md` | AUTO |
+| 058 | calibration-import | researched | `.context/features/058-calibration-import/` |

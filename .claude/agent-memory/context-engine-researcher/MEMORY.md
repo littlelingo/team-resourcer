@@ -78,5 +78,8 @@
 ## Research: Calibration Entity (9-box matrix, feature candidate)
 - [`research_calibration_feature.md`](research_calibration_feature.md) — 2026-04-08 pre-planning: MemberHistory is the closest child-entity analog; name-based lookup (first+last) needed since calibration CSVs won't have employee_id; no charting libs installed (no recharts/d3/visx); @xyflow/react already present for tree views
 
+## Research: Calibration Import — Feature 058
+- Backend fully implemented (import_commit_calibrations.py, ENTITY_CONFIGS, CommitResult extensions, resolve-ambiguous endpoint); only gap is a CalibrationPage import button/dialog; pattern is MembersPage.tsx Upload dropdown; see `.context/features/058-calibration-import/NOTES.md`
+
 ## Research: Team Lead Badge in EntityMembersSheet
 - [`research_team_lead_badge.md`](research_team_lead_badge.md) — 2026-04-03: frontend-only change; Team.lead_id is already on selectedTeam; add leadId prop to EntityMembersSheet and compare member.uuid to render badge/icon; no backend work needed

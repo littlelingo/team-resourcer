@@ -45,6 +45,30 @@ BOX_TO_AXES: dict[int, tuple[int, int]] = {
 }
 
 
+class CalibrationBriefResponse(BaseModel):
+    """Lightweight calibration summary for member list cards."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    box: int
+    cycle_id: int
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def label(self) -> str:
+        return BOX_LABELS[self.box]
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def performance(self) -> int:
+        return BOX_TO_AXES[self.box][0]
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def potential(self) -> int:
+        return BOX_TO_AXES[self.box][1]
+
+
 class CalibrationCreate(BaseModel):
     cycle_id: int
     box: int
@@ -100,3 +124,12 @@ class CalibrationResponse(BaseModel):
     @property
     def potential(self) -> int:
         return BOX_TO_AXES[self.box][1]
+
+
+class CalibrationLatestResponse(CalibrationResponse):
+    """CalibrationResponse enriched with member identity for the /latest endpoint."""
+
+    member_first_name: str
+    member_last_name: str
+    member_area: str | None = None
+    member_team: str | None = None

@@ -7,7 +7,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, computed_field, field_validator
 
-from app.schemas.calibration import CalibrationResponse
+from app.schemas.calibration import CalibrationBriefResponse, CalibrationResponse
 from app.schemas.functional_area import FunctionalAreaListResponse
 from app.schemas.member_history import MemberHistoryResponse
 from app.schemas.program_assignment import ProgramAssignmentResponse
@@ -101,6 +101,14 @@ class TeamMemberListResponse(BaseModel):
     functional_area: FunctionalAreaListResponse | None = None
     team: TeamListResponse | None = None
     program_assignments: list[ProgramAssignmentResponse] = []
+    calibrations: list[CalibrationBriefResponse] = []
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def latest_calibration(self) -> CalibrationBriefResponse | None:
+        if self.calibrations:
+            return self.calibrations[0]
+        return None
 
 
 class MemberRefResponse(BaseModel):

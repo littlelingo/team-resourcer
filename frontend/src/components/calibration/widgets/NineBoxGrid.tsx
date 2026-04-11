@@ -44,15 +44,28 @@ function MemberChip({ cal, onOpen }: {
         </Tooltip.Trigger>
         <Tooltip.Portal>
           <Tooltip.Content
-            className="z-50 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-md"
+            className="z-50 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs shadow-md max-w-[220px]"
             sideOffset={4}
           >
-            <p className="font-medium">{cal.label}</p>
+            <p className="font-semibold text-slate-900">
+              {cal.member_first_name} {cal.member_last_name}
+            </p>
+            <p className="text-slate-500">
+              Box {cal.box} — {cal.label}
+            </p>
+            {(cal.member_area || cal.member_team) && (
+              <p className="text-slate-400">
+                {[cal.member_area, cal.member_team].filter(Boolean).join(' / ')}
+              </p>
+            )}
             {cal.ready_for_promotion && (
-              <p className="text-slate-500">Promo: {cal.ready_for_promotion}</p>
+              <p className="text-slate-500 mt-1">Promo: {cal.ready_for_promotion}</p>
             )}
             {cal.can_mentor_juniors && (
               <p className="text-slate-500">Mentor: {cal.can_mentor_juniors}</p>
+            )}
+            {cal.high_growth_or_key_talent && (
+              <p className="text-slate-500">Growth: {cal.high_growth_or_key_talent}</p>
             )}
             <Tooltip.Arrow className="fill-white" />
           </Tooltip.Content>

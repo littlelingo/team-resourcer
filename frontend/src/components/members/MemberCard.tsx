@@ -147,6 +147,29 @@ export default function MemberCard({ member, onEdit, onDelete, onClick }: Member
           <span className="truncate">{member.functional_manager_name}</span>
         </div>
       )}
+
+      {/* Calibration indicator */}
+      {member.latest_calibration && (
+        <div className="mt-3 flex items-center justify-center gap-1.5 rounded-md border border-slate-100 bg-slate-50 px-2 py-1.5">
+          <span
+            className={cn(
+              'flex h-5 w-5 items-center justify-center rounded text-xs font-bold',
+              member.latest_calibration.box === 0
+                ? 'bg-slate-300 text-slate-600'
+                : member.latest_calibration.box <= 3
+                  ? 'bg-emerald-500 text-white'
+                  : member.latest_calibration.box <= 6
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-slate-400 text-white',
+            )}
+          >
+            {member.latest_calibration.box}
+          </span>
+          <span className="text-xs text-slate-500 truncate">
+            {member.latest_calibration.label}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

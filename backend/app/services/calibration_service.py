@@ -64,7 +64,11 @@ async def list_latest_calibrations(
                 Calibration.cycle_id == cycle_id,
                 Calibration.member_uuid.in_(member_stmt),
             )
-            .options(selectinload(Calibration.cycle))
+            .options(
+                selectinload(Calibration.cycle),
+                selectinload(Calibration.member).selectinload(TeamMember.functional_area),
+                selectinload(Calibration.member).selectinload(TeamMember.team),
+            )
             .order_by(Calibration.member_uuid)
         )
     else:
@@ -87,7 +91,11 @@ async def list_latest_calibrations(
                     Calibration.effective_date == sub.c.max_date,
                 ),
             )
-            .options(selectinload(Calibration.cycle))
+            .options(
+                selectinload(Calibration.cycle),
+                selectinload(Calibration.member).selectinload(TeamMember.functional_area),
+                selectinload(Calibration.member).selectinload(TeamMember.team),
+            )
             .order_by(Calibration.member_uuid)
         )
 

@@ -71,6 +71,7 @@ async def list_members(
             .selectinload(ProgramAssignment.program),
             selectinload(TeamMember.program_assignments)
             .selectinload(ProgramAssignment.program_team),
+            selectinload(TeamMember.calibrations),
         )
         .order_by(TeamMember.last_name, TeamMember.first_name)
     )

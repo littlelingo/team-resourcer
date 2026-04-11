@@ -101,6 +101,7 @@ async def get_program_members(db: AsyncSession, program_id: int) -> list[TeamMem
             selectinload(TeamMember.program_assignments).selectinload(
                 ProgramAssignment.program
             ),
+            selectinload(TeamMember.calibrations),
         )
         .order_by(TeamMember.first_name, TeamMember.last_name)
     )

@@ -35,7 +35,10 @@ export interface Calibration {
 }
 
 export interface CalibrationLatestRow extends Calibration {
-  // same shape — included for semantic clarity in the visualization layer
+  member_first_name: string
+  member_last_name: string
+  member_area: string | null
+  member_team: string | null
 }
 
 export interface CalibrationMovementRow {

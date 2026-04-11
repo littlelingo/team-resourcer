@@ -103,9 +103,18 @@ export interface TeamMemberList {
   functional_area?: FunctionalArea | null
   team?: TeamListItem | null
   program_assignments?: ProgramAssignment[]
+  latest_calibration?: CalibrationBrief | null
 }
 
 // ─── Calibration ─────────────────────────────────────────────────────────────
+
+export interface CalibrationBrief {
+  box: number
+  cycle_id: number
+  label: string
+  performance: number
+  potential: number
+}
 
 export interface CalibrationCycleEmbed {
   id: number

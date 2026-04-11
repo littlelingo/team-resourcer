@@ -11,3 +11,14 @@ Created automatically at phase boundaries and before Agent Team execution.
 <!-- **Branch**: [branch name] -->
 <!-- **PRP**: [path or "none"] -->
 <!-- **PRP progress**: [N/M steps] -->
+
+### CP-001: post-implement calibration-import
+**Created**: 2026-04-11T01:10:48Z
+**Git tag**: checkpoint-001
+**Trigger**: phase-boundary
+**Branch**: main
+**PRP**: .context/features/016-member-select-value-bug/PRP.md
+**PRP progress**: 0
+0/0
+0
+**Files snapshotted**: 15 (working tree was dirty)

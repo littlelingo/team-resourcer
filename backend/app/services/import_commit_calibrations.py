@@ -187,13 +187,17 @@ async def _upsert_calibration_row(
     except IntegrityError:
         # Savepoint auto-rolled back; outer batch transaction intact.
         # Re-fetch the row the racing transaction inserted and update it.
+        # If no row exists, the IntegrityError was from a CHECK or other
+        # constraint (not a race) — skip this row gracefully.
         result = await db.execute(
             select(Calibration).where(
                 Calibration.member_uuid == member_uuid,
                 Calibration.cycle_id == cycle_id,
             )
         )
-        existing = result.scalar_one()
+        existing = result.scalar_one_or_none()
+        if existing is None:
+            return 0, 0
         for k, v in fields.items():
             setattr(existing, k, v)
         await db.flush()

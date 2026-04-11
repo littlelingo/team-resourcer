@@ -1,0 +1,13 @@
+{
+  "checkpoint": "CP-001",
+  "label": "post-implement calibration-import",
+  "trigger": "phase-boundary",
+  "timestamp": "2026-04-11T01:10:48Z",
+  "branch": "main",
+  "git_sha": "682842e47a252e1bc5d1bdf0751d59258eb86b33",
+  "active_prp": ".context/features/016-member-select-value-bug/PRP.md",
+  "prp_progress": "0
+0/0
+0",
+  "files_snapshotted": 15
+}

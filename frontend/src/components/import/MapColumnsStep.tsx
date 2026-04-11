@@ -151,7 +151,9 @@ export default function MapColumnsStep({
   const [constantValues, setConstantValues] = useState<Record<string, string>>(() => {
     const init: Record<string, string> = {}
     for (const f of constantFields) {
-      init[f.value] = ''
+      init[f.value] = f.value === 'effective_date'
+        ? new Date().toISOString().slice(0, 10)
+        : ''
     }
     return init
   })
@@ -245,14 +247,33 @@ export default function MapColumnsStep({
                 Object.values(columnMap).includes(field.value)
               return (
                 <div key={field.value} className="flex items-center gap-3">
-                  <label className="w-44 shrink-0 text-sm font-medium text-slate-700">
-                    {field.label}
-                    {field.required && <span className="ml-1 text-red-400">*</span>}
-                  </label>
+                  <div className="w-44 shrink-0">
+                    <label className="text-sm font-medium text-slate-700">
+                      {field.label}
+                      {field.required && <span className="ml-1 text-red-400">*</span>}
+                    </label>
+                    {field.value === 'cycle_label' && (
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        A name for this calibration round, e.g. "2026 Q1" or "Spring Review". All rows in this import will be grouped under this cycle.
+                      </p>
+                    )}
+                  </div>
                   {isMappedAsColumn ? (
                     <span className="text-xs text-slate-400 italic">
                       (mapped from column — constant ignored)
                     </span>
+                  ) : field.value === 'effective_date' ? (
+                    <input
+                      type="date"
+                      value={constantValues[field.value]}
+                      onChange={(e) =>
+                        setConstantValues((prev) => ({
+                          ...prev,
+                          [field.value]: e.target.value,
+                        }))
+                      }
+                      className="flex-1 rounded border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                    />
                   ) : (
                     <input
                       type="text"
@@ -266,9 +287,7 @@ export default function MapColumnsStep({
                       placeholder={
                         field.value === 'cycle_label'
                           ? 'e.g. 2026 Q1'
-                          : field.value === 'effective_date'
-                            ? 'e.g. 2026-03-31'
-                            : 'Enter constant value'
+                          : 'Enter constant value'
                       }
                       className="flex-1 rounded border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
                     />

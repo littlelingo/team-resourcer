@@ -18,6 +18,7 @@
  * vocabulary users see in the source data and expect in the rendered UI.
  */
 export const BOX_LABELS: Record<number, string> = {
+  0: 'Too New to Evaluate',
   1: 'Consistent Star',
   2: 'Future Star',
   3: 'Emerging Performer',
@@ -31,6 +32,7 @@ export const BOX_LABELS: Record<number, string> = {
 
 /** Box number → (performance, potential) where each axis is 1=Low, 2=Mid, 3=High. */
 export const BOX_TO_AXES: Record<number, [number, number]> = {
+  0: [0, 0],
   1: [3, 3], 2: [2, 3], 3: [1, 3],
   4: [3, 2], 5: [2, 2], 6: [1, 2],
   7: [3, 1], 8: [2, 1], 9: [1, 1],

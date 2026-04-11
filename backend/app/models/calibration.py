@@ -32,7 +32,7 @@ class Calibration(Base):
     __tablename__ = "calibrations"
     __table_args__ = (
         UniqueConstraint("member_uuid", "cycle_id", name="uq_calibrations_member_cycle"),
-        CheckConstraint("box BETWEEN 1 AND 9", name="ck_calibrations_box_range"),
+        CheckConstraint("box BETWEEN 0 AND 9", name="ck_calibrations_box_range"),
         Index("ix_calibrations_member_effective", "member_uuid", "effective_date"),
         Index("ix_calibrations_cycle_id", "cycle_id"),
         Index("ix_calibrations_box", "box"),

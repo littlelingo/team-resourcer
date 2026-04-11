@@ -94,8 +94,8 @@ def _validate_effective_date(data: dict[str, Any], errors: list[str]) -> None:
 def validate_box_value(raw: Any) -> int | None:
     """Parse a box value from a CSV cell.
 
-    Accepts "5", "5 - Key Performer", "5-Key Performer", etc.
-    Returns the integer 1-9 or None if invalid.
+    Accepts "5", "5 - Key Performer", "5-Key Performer", "0 - Too New to Evaluate", etc.
+    Returns the integer 0-9 or None if invalid.
     """
     if raw is None:
         return None
@@ -109,7 +109,7 @@ def validate_box_value(raw: Any) -> int | None:
     if not m:
         return None
     value = int(m.group(1))
-    if 1 <= value <= 9:
+    if 0 <= value <= 9:
         return value
     return None
 
@@ -122,7 +122,7 @@ def _validate_box(data: dict[str, Any], errors: list[str]) -> None:
         return
     parsed = validate_box_value(val)
     if parsed is None:
-        errors.append(f"'box' must be an integer 1-9, got '{val}'.")
+        errors.append(f"'box' must be an integer 0-9, got '{val}'.")
     else:
         data["box"] = str(parsed)
 

@@ -18,6 +18,7 @@ BOX_LABELS: dict[int, str] = {
     # The CSV's "9-Box Matrix" column produces values like "5 - Key Performer" —
     # these labels MUST match that vocabulary so users see the same names in the
     # imported source data and the rendered UI.
+    0: "Too New to Evaluate",
     1: "Consistent Star",
     2: "Future Star",
     3: "Emerging Performer",
@@ -31,6 +32,7 @@ BOX_LABELS: dict[int, str] = {
 
 # (performance, potential) for each box number
 BOX_TO_AXES: dict[int, tuple[int, int]] = {
+    0: (0, 0),
     1: (3, 3),
     2: (2, 3),
     3: (1, 3),

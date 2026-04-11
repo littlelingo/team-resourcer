@@ -8,12 +8,14 @@ import { BOX_LABELS } from './constants'
 
 // Color theme per box — intensity reflects "desirability"
 const BOX_BG: Record<number, string> = {
+  0: 'bg-slate-100/50',
   1: 'bg-emerald-500/15', 2: 'bg-emerald-400/10', 3: 'bg-yellow-400/10',
   4: 'bg-emerald-400/10', 5: 'bg-blue-400/10',   6: 'bg-yellow-300/10',
   7: 'bg-blue-300/10',   8: 'bg-slate-200/30',   9: 'bg-red-200/20',
 }
 
 const BOX_DOT: Record<number, string> = {
+  0: 'bg-slate-300 text-slate-600',
   1: 'bg-emerald-600 text-white', 2: 'bg-emerald-500 text-white', 3: 'bg-yellow-500 text-white',
   4: 'bg-emerald-400 text-white', 5: 'bg-blue-500 text-white',   6: 'bg-yellow-400 text-white',
   7: 'bg-blue-400 text-white',   8: 'bg-slate-400 text-white',   9: 'bg-red-400 text-white',
@@ -92,7 +94,7 @@ export default function NineBoxGrid({ onMemberClick, className }: NineBoxGridPro
 
   // Group by box
   const byBox: Record<number, CalibrationLatestRow[]> = {}
-  for (let b = 1; b <= 9; b++) byBox[b] = []
+  for (let b = 0; b <= 9; b++) byBox[b] = []
   for (const cal of calibrations) {
     if (byBox[cal.box]) byBox[cal.box].push(cal)
   }
@@ -184,6 +186,27 @@ export default function NineBoxGrid({ onMemberClick, className }: NineBoxGridPro
           ))}
         </div>
       </div>
+
+      {/* Box 0 — Too New to Evaluate — rendered outside the 3×3 grid */}
+      {byBox[0].length > 0 && (
+        <div className={cn('rounded-md border border-slate-200 p-2', BOX_BG[0])}>
+          <div className="flex items-center gap-2 mb-1">
+            <span className={cn('flex h-5 w-5 items-center justify-center rounded text-xs font-bold', BOX_DOT[0])}>
+              0
+            </span>
+            <p className="text-xs text-slate-500">{BOX_LABELS[0]} ({byBox[0].length})</p>
+          </div>
+          <div className="flex flex-wrap gap-0.5">
+            {byBox[0].map((cal) => (
+              <MemberChip
+                key={cal.member_uuid}
+                cal={cal}
+                onOpen={onMemberClick ?? (() => {})}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
